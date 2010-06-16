@@ -1,0 +1,18 @@
+<package>
+  <description brief="hbba_tests">
+
+     hbba_tests - A set of scripts to test various packages of the hbba stack.
+
+  </description>
+  <author>Francois Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+
+  <depend package="iw_translator_v8"/>
+  <depend package="iw_msgs"/>
+  <depend package="iw"/>
+
+</package>
+
+

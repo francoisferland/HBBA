@@ -1,0 +1,18 @@
+<package>
+  <description brief="iw">
+    iw - Intention Workspace for the HBBA ROS instance.
+  </description>
+  <author>Francois Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="iw_msgs"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/msg/cpp"/>
+  </export>
+</package>
+
+

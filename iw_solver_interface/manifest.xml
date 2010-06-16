@@ -1,0 +1,20 @@
+<package>
+  <description brief="iw_solver_interface">
+
+     iw_solver_interface - A C++ interface for intention/desires attention
+	 resources constraints solving.
+
+  </description>
+  <author>Francois Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="roscpp"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include/"/>
+  </export>
+
+</package>
+
+

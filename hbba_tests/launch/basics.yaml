@@ -1,0 +1,32 @@
+# We're evaluating two ways of describing strategies in YAML. No parsing code
+# has been developed yet. We're leaning on the first one.
+#
+# The loader would look for the "strategies" namespace. Then, each sub-namespace
+# is a strategy. The namespace name is the id, and we look for 2 specific
+# sub-namespaces: utility and cost, and 2 string parameters: bringup and
+# bringdown. Utility and cost namespaces contain a list of parameters where the
+# key is the id of the resource and the value its cost or utility effect.
+strategies:
+  goto1:
+    utility:
+      goto: 1
+    cost:
+      cpu: 10
+      planner: 1 
+    bringup: '
+      msg = "goto1_up";
+      print(msg);'
+    bringdown: '
+      print("goto1_dn");'
+
+  strat2: 
+    id: 'goto1'
+    utility: [
+      {id: 'goto', value: 1}
+    ]
+    cost: [
+      {id: 'cpu', value: 10},
+      {id: 'planner', value: 1}
+    ]
+    bringup: 'print("goto1_up")'
+    bringdown: 'print("goto1_dn")'

@@ -1,0 +1,5 @@
+<launch>
+  <node name="iw" pkg="iw" type="iw.py"/>
+  <node name="translator" pkg="iw_translator_v8" type="iw_translator_v8"
+    launch-prefix="xterm -e gdb --args"/>
+</launch>

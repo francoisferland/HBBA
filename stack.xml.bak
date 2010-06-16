@@ -1,0 +1,11 @@
+<stack>
+  <description brief="az3">HBBA - IntRoLab's Hybrid Behavior-Based Architecture.</description>
+  <author>Maintained by fferland</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend stack="common_msgs" /> <!-- geometry_msgs -->
+  <depend stack="ros" /> <!-- rospy, std_msgs, roscpp -->
+  <depend stack="bhvr"/>
+
+</stack>

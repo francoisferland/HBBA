@@ -1,0 +1,15 @@
+<package>
+  <description brief="iw_msgs">
+    iw_msgs - Messages and services for the Intention Workspace.
+  </description>
+  <author>Francois Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+
+  <export>
+    <cpp cflags="-I${prefix}/msg/cpp"/>
+  </export>
+</package>
+
+

@@ -1,0 +1,10 @@
+<library path="lib/libiw_se_plugins">
+	<class name="iw_translator_v8/TranslatorPlugins"
+		type="iw_translator_v8::engine_plugins"
+		base_class_type="script_engine::engine_module">
+		<description>
+			A set of script engine plugins for the intention translator. 
+		</description>
+	</class>
+</library>
+

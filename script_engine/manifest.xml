@@ -1,0 +1,19 @@
+<package>
+  <description brief="script_engine">
+    script_engine - A modular, javascript execution engine based on Google V8.
+  </description>
+  <author>Francois Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="roscpp"/>
+  <depend package="pluginlib"/>
+  <depend package="std_msgs"/>
+  <rosdep name="libv8"/>
+
+  <export>
+  	<cpp cflags='-I${prefix}/include' lflags='-L${prefix}/lib'/>
+	<script_engine plugin="${prefix}/test_plugins.xml"/>
+  </export>
+</package>
+

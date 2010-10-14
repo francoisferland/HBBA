@@ -12,7 +12,12 @@
   <depend package="topic_filters_manager"/>
   <depend package="roscpp"/>
   <depend package="iw_solver_gecode"/>
-  <rosdep name="v8"/>
+  <depend package="script_engine"/>
+  <depend package="pluginlib"/>
+
+  <export>
+    <script_engine plugin="${prefix}/se_plugins.xml"/>
+  </export>
 
 </package>
 

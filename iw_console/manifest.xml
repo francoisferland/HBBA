@@ -1,0 +1,19 @@
+<package>
+  <description brief="iw_console">
+
+     iw_console - A GUI console for the intention workspace.
+
+  </description>
+  <author>Francois Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="roscpp"/>
+  <depend package="iw_msgs"/>
+  <depend package="topic_filters_manager"/>
+  <depend package="script_engine"/>
+  <rosdep name="wxwidgets"/>
+
+</package>
+
+

@@ -1,3 +1,5 @@
+libv8:
+    ubuntu: libv8-dev
 gecode:
   ubuntu: libgecode-dev
 

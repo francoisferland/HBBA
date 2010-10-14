@@ -15,9 +15,9 @@ strategies:
       planner: 1 
     bringup: '
       msg = "goto1_up";
-      print(msg);'
+      se_log(msg);'
     bringdown: '
-      print("goto1_dn");'
+      se_log("goto1_dn");'
 
   strat2: 
     id: 'goto1'
@@ -28,5 +28,5 @@ strategies:
       {id: 'cpu', value: 10},
       {id: 'planner', value: 1}
     ]
-    bringup: 'print("goto1_up")'
-    bringdown: 'print("goto1_dn")'
+    bringup: 'se_log("goto1_up")'
+    bringdown: 'se_log("goto1_dn")'

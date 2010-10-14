@@ -4,7 +4,7 @@ import roslib; roslib.load_manifest("iw")
 import rospy
 
 from iw.srv import *
-from iw.msg import *
+from iw_msgs.msg import *
 
 class iw_server:
 	def __init__(self):

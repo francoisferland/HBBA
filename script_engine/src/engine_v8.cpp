@@ -62,7 +62,7 @@ engine_v8::~engine_v8()
 		delete *i;
 }
 
-bool engine_v8::eval(const std::string& src)
+bool engine_v8::eval(const std::string& src, std::string& result)
 {
 	ROS_INFO("eval(\"%s\") ...", src.c_str());
 	using namespace v8;
@@ -70,12 +70,12 @@ bool engine_v8::eval(const std::string& src)
 	Handle<String> str = String::New(src.c_str());
 	Handle<Script> script = Script::Compile(str);
 
-	return run_script(script);
+	return run_script(script, result);
 }
 
 bool engine_v8::eval_srv(EvalScript::Request& req, EvalScript::Response& res)
 {
-	eval(req.source);
+	eval(req.source, res.result);
 
 	return true;
 }
@@ -95,10 +95,10 @@ bool engine_v8::compile_srv(CompileScript::Request& req,
 	return compile(req.name, req.source);
 }
 
-bool engine_v8::run(const std::string& name)
+bool engine_v8::run(const std::string& name, std::string& result)
 {
 	v8::Context::Scope context_scope(context_);
-	return run_script(scripts_map_[name]);
+	return run_script(scripts_map_[name], result);
 	//scripts_map_[name]->Run();
 
 	return true;
@@ -106,10 +106,10 @@ bool engine_v8::run(const std::string& name)
 
 bool engine_v8::run_srv(RunScript::Request& req, RunScript::Response& res)
 {
-	return run(req.name);
+	return run(req.name, res.result);
 }
 
-bool engine_v8::run_script(const v8::Handle<v8::Script>& s)
+bool engine_v8::run_script(const v8::Handle<v8::Script>& s, std::string& result)
 {
 	using namespace v8;
 
@@ -122,6 +122,9 @@ bool engine_v8::run_script(const v8::Handle<v8::Script>& s)
 		ROS_ERROR("Exception: %s", *e_str);
 		return false;
 	}
+	
+	v8::String::Utf8Value rs(v);
+	result = std::string(*rs, rs.length());
 
 	return true;
 

@@ -1,0 +1,10 @@
+<library path="lib/libnav_script_engine_plugins">
+	<class name="nav_script_engine_plugins/Navigation"
+		type="nav_script_engine_plugins::navigation_plugins"
+		base_class_type="script_engine::engine_module">
+		<description>
+			A set of script engine plugins for the navigation stack. 
+		</description>
+	</class>
+</library>
+

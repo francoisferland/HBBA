@@ -26,20 +26,21 @@ namespace script_engine
 		/// \brief Compile and run the given script.
 		///
 		/// \param src The script's source.
+		/// \param result A reference to the result.
 		/// \returns False if an error occurs.
-		bool eval(const std::string& src);
+		bool eval(const std::string& src, std::string& result);
 
 		/// \brief Compile and register a script
 		bool compile(const std::string& name, const std::string& src);
 
 		/// \brief Run a precompiled and registered script.
-		bool run(const std::string& name);
+		bool run(const std::string& name, std::string& result);
 
 	private:
 		bool eval_srv(EvalScript::Request&, EvalScript::Response&);
 		bool compile_srv(CompileScript::Request&, CompileScript::Response&);
 		bool run_srv(RunScript::Request&, RunScript::Response&);
-		bool run_script(const v8::Handle<v8::Script>& s);
+		bool run_script(const v8::Handle<v8::Script>& s, std::string& result);
 
 		v8::HandleScope scope_;
 		v8::Handle<v8::ObjectTemplate> global_;

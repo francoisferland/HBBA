@@ -12,6 +12,7 @@
   <depend package="iw_translator_v8"/>
   <depend package="iw_msgs"/>
   <depend package="iw"/>
+  <depend package="rospy"/>
 
 </package>
 

@@ -32,8 +32,6 @@ namespace iw_translator_v8
 		translator(); 
 
 	private:
-		typedef std::string script_t;
-
 		bool add_strategy_srv(AddStrategy::Request& req,
 			AddStrategy::Response& res);
 
@@ -52,9 +50,8 @@ namespace iw_translator_v8
 
 		script_engine::engine_v8 engine_;
 
-		// The first script in the pair is the bringup, the second the
-		// bringdown.
-		typedef std::map< std::string, std::pair<script_t, script_t> > 
+		typedef iw_translator_v8::Strategy strat_t;
+		typedef std::map<std::string, strat_t> 
 			strat_map_t;
 		strat_map_t strats_;
 
@@ -82,24 +79,39 @@ namespace iw_translator_v8
 		AddStrategy::Response& res)
 	{
 		// Compile scripts and save the handles.
-		std::string bup_name = req.strategy.id + "_bringup";
-		std::string bdn_name = req.strategy.id + "_bringdown";
-		engine_.compile(bup_name, req.strategy.bringup);
-		engine_.compile(bdn_name, req.strategy.bringdown);
+		// TODO: Replace following code with an evaluation of the source of the
+		// strategy, which will register bringup and bringdown functions right
+		// into the context. Save the name specified in the strategy pair,
+		//std::string bup_name = req.strategy.id + "_bringup";
+		//std::string bdn_name = req.strategy.id + "_bringdown";
+		//engine_.compile(bup_name, req.strategy.bringup);
+		//engine_.compile(bdn_name, req.strategy.bringdown);
 
-		strats_[req.strategy.id] = std::make_pair(
-			bup_name,
-			bdn_name);
+		std::string r;
+		if (!engine_.eval(req.strategy.source, r))
+		{
+			ROS_ERROR("An error occured while evaluating %s's source: %s",
+				req.strategy.id.c_str(), r.c_str());
+			return false;
+		}
+
+		// Save a full copy.
+		strats_[req.strategy.id] = req.strategy;
 
 		// Convert for the solver.
 		typename solver_base_t::strat_vec_t c(req.strategy.cost.size());
 		for (size_t i = 0; i < c.size(); ++i)
 			c[i] = std::make_pair(req.strategy.cost[i].id,
 					req.strategy.cost[i].value);
-		typename solver_base_t::strat_vec_t u(req.strategy.utility.size());
-		for (size_t i = 0; i < c.size(); ++i)
-			u[i] = std::make_pair(req.strategy.utility[i].id,
-					req.strategy.utility[i].value);
+		// TODO: Replace the utility vector with a single declaration in the
+		// solver.
+		//typename solver_base_t::strat_vec_t u(req.strategy.utility.size());
+		//for (size_t i = 0; i < u.size(); ++i)
+		//	u[i] = std::make_pair(req.strategy.utility[i].id,
+		//			req.strategy.utility[i].value);
+		typename solver_base_t::strat_vec_t u(1);
+		u[0] = std::make_pair(req.strategy.utility.id,
+			req.strategy.utility.value);
 		solver_->add_strategy(req.strategy.id, c, u);
 
 		return true;
@@ -117,27 +129,40 @@ namespace iw_translator_v8
 	template <class T>
 	void translator<T>::desires_cb(const iw_msgs::DesiresSet::ConstPtr& msg)
 	{
-		// Build the utility vector
+		// Desire type -> params map. Note that the incoming desires' set 
+		// shouldn't contain more than one instance of a single utility type, 
+		// e.g., there shouldn't be two "goto" desires.
+		typedef std::map<std::string, std::string> type_params_map_t;
+		type_params_map_t type_params;
+
+		// Build the utility vector and type map
 		typedef std::vector<iw_msgs::Desire> u_vec_t;
 		const u_vec_t& desires = msg->desires;
 		typename u_vec_t::const_iterator d;
 		for (d = desires.begin(); d != desires.end(); ++d)
+		{
 			solver_->set_info_min(d->type, d->utility);
+			type_params[d->type] = d->params;
+		}
 
 		// Solve and execute the solution.
 		typedef typename solver_base_t::sol_vec_t s_vec_t;
 		s_vec_t res(strats_.size());
 		solver_->solve(res);
 		typename s_vec_t::const_iterator s;
+		std::string result; // Ignored for now.
 		for (s = res.begin(); s != res.end(); ++s)
-			// Reminder: s->first: strat_id, s->second: activation
-			// strats_[strat_id].first: bringup, 
-			// strats_[strat_id].second: bringdown
+		{
+			std::string script;
+			const strat_t& strat = strats_[s->first];
 			if (s->second) 
-				engine_.run(strats_[s->first].first);
+				script = strat.bringup_function;
 			else
-				engine_.run(strats_[s->first].second);
+				script = strat.bringdown_function;
 
+			script += "(" + type_params[strat.utility.id] + ");";
+			engine_.eval(script, result);
+		}
 	}
 
 }

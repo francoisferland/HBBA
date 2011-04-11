@@ -3,6 +3,7 @@
   <!-- node name="iwc" pkg="iw_console" type="iw_console"/ -->
   <node name="translator" pkg="iw_translator_v8" type="iw_translator_v8"
     output="screen"
+	launch-prefix="xterm -e gdb --args"
   />
 
 </launch>

@@ -1,0 +1,26 @@
+<package>
+  <description brief="hbba_test">
+
+     hbba_test - A set of scripts and launch files to test the whole HBBA setup.
+
+  </description>
+  <author>François Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/hbba_test</url>
+  <depend package="iw"/>
+  <depend package="iw_solver_ortools"/>
+  <depend package="script_engine"/>
+  <depend package="topic_filters"/>
+  <depend package="topic_filters_manager"/>
+  <depend package="rospy"/>
+  <depend package="smach"/>
+  <depend package="smach_ros"/>
+  <depend package="geometry_msgs"/>
+  <depend package="hri_behaviors"/>
+  <depend package="face_emotion"/>
+  <depend package="gesture"/>
+
+</package>
+
+

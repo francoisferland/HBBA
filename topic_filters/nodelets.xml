@@ -1,0 +1,7 @@
+<library path="lib/libgeneric_divisor">
+  <class name="topic_filters/GenericDivisor"
+    type="topic_filters::GenericDivisor"
+    base_class_type="nodelet::Nodelet">
+    <description>A generic, dynamic topic filter nodelet.</description>
+  </class>
+</library>

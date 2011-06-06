@@ -1,0 +1,14 @@
+<package>
+  <description brief="hbba_msgs">
+
+     hbba_msgs - Message and service types for the HBBA implementation.
+
+  </description>
+  <author>François Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/hbba_msgs</url>
+
+</package>
+
+

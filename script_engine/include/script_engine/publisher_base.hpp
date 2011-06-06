@@ -1,5 +1,5 @@
-#ifndef SERVICE_CALLER_BASE_HPP
-#define SERVICE_CALLER_BASE_HPP
+#ifndef PUBLISHER_BASE_HPP
+#define PUBLISHER_BASE_HPP
 
 #include "engine_module.hpp"
 #include <boost/function.hpp>

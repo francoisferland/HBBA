@@ -1,5 +1,5 @@
-#ifndef SERVICE_CALLER_BASE_HPP
-#define SERVICE_CALLER_BASE_HPP
+#ifndef PUBLISHER_TOPIC_ARG_BASE_HPP
+#define PUBLISHER_TOPIC_ARG_BASE_HPP
 
 #include "engine_module.hpp"
 #include <boost/function.hpp>
@@ -14,11 +14,11 @@ namespace script_engine
 	pub_map_t pub_map_;
 	/// \brief A template class for publishing to a specific topic.
 	///
+    /// The first argument of your function is assumed to be the topic name.
 	/// You can only have one topic type/name/func tuple per node.
 	/// For a usage sample, see pub_test.cpp.
 	template<
 		class T, 		// Topic type
-		const char TName[],	// Topic name
 		const char FName[],	// Script function name
 		// Argument conversion function
 		void AFun(const v8::Arguments&, T&)>
@@ -62,7 +62,7 @@ namespace script_engine
 			return v8::True();
 		}
 
-		typedef publisher_topic_arg_base<T, TName, FName, AFun> this_t;
+		typedef publisher_topic_arg_base<T, FName, AFun> this_t;
 
 	};
 

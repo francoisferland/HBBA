@@ -1,0 +1,4 @@
+string ns # Namespace of the filter
+string type # Type of the filter, ex. 'switch_filter'
+---
+

@@ -1,0 +1,10 @@
+<library path="lib/libtfm_se_plugins">
+	<class name="topic_filters_manager/ScriptEnginePlugins"
+		type="topic_filters_manager::ScriptEnginePlugins"
+		base_class_type="script_engine::engine_module">
+		<description>
+			A set of script engine plugins for the topic filters manager. 
+		</description>
+	</class>
+</library>
+

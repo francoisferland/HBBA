@@ -1,0 +1,7 @@
+<launch>
+  <include file="$(find jn0_bringup)/launch/junior.launch"/>
+  <include file="$(find hbba_test)/launch/hbba_base.launch"/>
+  <include file="$(find hbba_test)/launch/percepts.launch"/>
+  <include file="$(find hbba_test)/launch/hri_behaviors.launch"/>
+
+</launch>

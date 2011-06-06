@@ -1,0 +1,12 @@
+<launch>
+  <group ns="test_filter">
+  	<node name="filter" pkg="topic_filters" type="switch_filter.py"
+		args="input output std_msgs/String">
+	</node>
+  </group>
+
+  <!-- node name="topic_filters_manager" pkg="topic_filters_manager"
+  	type="standalone_manager"/ -->
+
+
+</launch>

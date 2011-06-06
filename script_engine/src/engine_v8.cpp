@@ -64,13 +64,28 @@ engine_v8::~engine_v8()
 
 bool engine_v8::eval(const std::string& src, std::string& result)
 {
-	ROS_INFO("eval(\"%s\") ...", src.c_str());
+	//ROS_INFO("eval(\"%s\") ...", src.c_str());
 	using namespace v8;
 	Context::Scope context_scope(context_);
 	Handle<String> str = String::New(src.c_str());
-	Handle<Script> script = Script::Compile(str);
 
-	return run_script(script, result);
+    Handle<Script> script;
+    {
+        TryCatch tc;
+        script = Script::Compile(str);
+        if (tc.HasCaught())
+        {
+            result = *String::AsciiValue(tc.Message()->Get());
+            ROS_ERROR("V8 compile error: %s:\n\t %s", result.c_str(),
+                *String::AsciiValue(tc.Message()->GetSourceLine()));
+            return false;
+        }
+    }
+
+    if (!script.IsEmpty())
+	    return run_script(script, result);
+    else
+        return false;
 }
 
 bool engine_v8::eval_srv(EvalScript::Request& req, EvalScript::Response& res)

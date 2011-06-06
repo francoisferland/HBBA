@@ -1,0 +1,17 @@
+<launch>
+  <include file="$(find jn0_bringup)/launch/junior.launch"/>
+
+  <group ns="leg_detection">
+    <node name="leg_detection" pkg="leg_detection" type="leg_detector" 
+      args="$(find leg_detection)/trained_leg_detector.yaml">
+    </node>
+    <node name="laser_filter" pkg="nodelet" type="nodelet"
+      args="standalone topic_filters/GenericDivisor /sensors/base_scan scan"/>
+  </group>
+
+  <include file="$(find hbba_test)/launch/hbba_base.launch"/>
+  <group ns="hbba">
+    <node name="strat_config" pkg="hbba_test" type="config.py"/>
+  </group>
+</launch>
+

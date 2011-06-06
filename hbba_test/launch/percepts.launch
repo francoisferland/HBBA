@@ -1,0 +1,14 @@
+<launch>
+  <group ns="leg_detection">
+    <node name="leg_detection" pkg="leg_detection" type="leg_detector"
+      respawn="true"
+      args="$(find leg_detection)/trained_leg_detector.yaml">
+      <param name="fixed_frame" value="/odom"/>
+      <param name="reliability_threshold" value="0.7"/>
+      <param name="nb_good_detection" type="int" value="6"/>
+    </node>
+    <node name="laser_filter" pkg="nodelet" type="nodelet"
+      args="standalone topic_filters/GenericDivisor /sensors/base_scan scan"/>
+  </group>
+
+</launch>

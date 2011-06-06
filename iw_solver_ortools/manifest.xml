@@ -1,0 +1,18 @@
+<package>
+  <description brief="iw_solver_ortools">
+
+     iw_solver_ortools - Google OR-tools-based solver for IW constraints.
+
+  </description>
+  <author>François Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/iw_solver_ortools</url>
+  <depend package="hbba_msgs"/>
+  <depend package="iw_solver_interface"/>
+  <depend package="or_tools"/>
+  <depend package="rospy"/>
+
+</package>
+
+

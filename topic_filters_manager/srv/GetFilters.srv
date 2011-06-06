@@ -1,0 +1,6 @@
+---
+# For each filter, we provide its namespace, its type and a state string.
+# The state string format is type-specific.
+string[] filters
+string[] types
+string[] states

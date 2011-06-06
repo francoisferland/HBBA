@@ -1,22 +1,20 @@
 #include "iw_solver_interface/iw_solver_base.hpp"
+#include "iw_solver_interface/solver_node.hpp"
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
 namespace {
 	/// \brief A dummy solver to test compilations issues with the interface.
-	class dummy_solver: 
-		public iw_solver_interface::iw_solver_base<dummy_solver>
+	class dummy_solver 
 	{
 	public:
-		typedef iw_solver_interface::iw_solver_base<dummy_solver> base_t;
-
 		void set_resource_max(unsigned int i, int max)
 		{
 			res_[i] = max;
 		}
 
-		void set_info_min(unsigned int i, int min)
+		void set_util_min(unsigned int i, int min)
 		{
 			info_[i] = min;
 		}
@@ -56,22 +54,29 @@ namespace {
 
 int main(int argc, char** argv)
 {
-	dummy_solver::base_t b = dummy_solver();
+    using namespace iw_solver_interface;
 
-	b.add_resource("CPU");
-	b.add_info("INFO");
-	dummy_solver::base_t::strat_vec_t cs, us;
-	b.clear_model();
+    typedef SolverNode<dummy_solver> node_t;
+
+    ros::init(argc, argv, "dummy_solver");
+    node_t n;
+
+	n.add_resource("CPU");
+	n.add_util("INFO");
+	node_t::strat_vec_t cs, us;
+	n.clear_model();
 	cs.push_back(std::make_pair("CPU", 5));
 	us.push_back(std::make_pair("INFO", 2));
-	b.add_strategy("S1", cs, us);
+	n.add_strategy("S1", cs, us);
 	us[0].second = 3;
-	b.add_strategy("S2", cs, us);
-	b.set_resource_max("CPU", 10);
-	b.set_info_min("INFO", 1);
-	b.clear_reqs();
-	dummy_solver::base_t::sol_vec_t res(b.strat_count());
-	b.solve(res);
+	n.add_strategy("S2", cs, us);
+	n.set_resource_max("CPU", 10);
+	n.set_util_min("INFO", 1);
+	n.clear_reqs();
+	node_t::sol_vec_t res(n.strat_count());
+	n.solve(res);
+
+    ros::spin();
 }
 
 

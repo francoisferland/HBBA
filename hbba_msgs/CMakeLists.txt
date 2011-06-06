@@ -17,18 +17,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #uncomment if you have defined messages
-#rosbuild_genmsg()
+rosbuild_genmsg()
 #uncomment if you have defined services
 rosbuild_gensrv()
-
-rosbuild_add_library(engine_v8 src/engine_v8.cpp)
-target_link_libraries(engine_v8 v8)
-rosbuild_add_executable(script_engine src/script_engine.cpp)
-target_link_libraries(script_engine engine_v8)
-
-# A test plugin suite
-rosbuild_add_library(common_plugins 
-	src/common_plugins.cpp )
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)

@@ -9,7 +9,7 @@ if (len(argv) < 3):
 	exit -1
 
 sname = argv[1] + "/Register"
-rospy.wait_for_service(sname)
+rospy.wait_for_service(sname, timeout = 30.0)
 srv = rospy.ServiceProxy(sname, RegisterBehavior)
 srv(argv[2:])
 

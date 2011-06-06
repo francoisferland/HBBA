@@ -9,8 +9,11 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/abtr_priority</url>
  <depend package="roscpp"/>
+ <depend package="rospy"/>
  <depend package="nodelet"/>
  <depend package="topic_tools"/>
+ <depend package="std_msgs"/>
+ <depend package="actionlib_msgs"/>
 
  <export>
    <cpp cflags="-I${prefix}/include"/>

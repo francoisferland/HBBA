@@ -4,6 +4,7 @@
 #include "abtr_priority/RegisterBehavior.h"
 #include <std_msgs/Int32.h>
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/thread.hpp>
 
 namespace abtr_priority
 {
@@ -42,7 +43,7 @@ namespace abtr_priority
 			void (T::*fp)(int, ros::Time, const boost::shared_ptr<const M>&),
 			T* fp_obj): 
 			n_(n),
-			srv_(n_.advertiseService(topic_name + "/Register", 
+			srv_(n_.advertiseService(topic_name + "/register", 
 				&ThisType::registerCB, this)),
 			//sub_(n_.subscribe(topic_name, 10, &ThisType::cmdCB, this)),
 			fp_(fp), fp_obj_(fp_obj)
@@ -59,8 +60,11 @@ namespace abtr_priority
 				ROS_INFO("Registering behavior %s", i->c_str());
 				int p = getPriority(*i);
 				if (p >= 0)
+                {
 					subscribers_.push_back(BehaviorSubPtr(
 						new BehaviorSub(*this, n_, *i, p)));
+                    ROS_INFO("Registration for %s done.", i->c_str());
+                }
 				else
 					ROS_WARN("Invalid priority for topic %s", i->c_str());
 			}
@@ -150,6 +154,9 @@ namespace abtr_priority
 		/// \brief Default constructor. Results in an unusable back end.
 		BackEnd()
 		{
+            // Stop the output thread.
+            running_ = false;
+            thread_.join();
 		}
 
 		/// \brief Complete constructor.
@@ -161,12 +168,16 @@ namespace abtr_priority
 		{
 			double p;
 			n_.param("abtr_period", p, 0.1);
+            period_ = ros::Duration(p);
 			n_.param("abtr_cycle_flush", cycle_flush_, false);
 			timeout_ = ros::Duration(2.0 * p);
-			timer_ = n_.createTimer(ros::Duration(p), 
-				&ThisType::timerCB, this);
+
+			//timer_ = n_.createTimer(ros::Duration(p), 
+			//	&ThisType::timerCB, this);
 			
 			advertised_ = false;
+            running_ = true;
+            thread_ = boost::thread(boost::bind(&ThisType::threadLoop, this)); 
 
 		}
 
@@ -219,34 +230,42 @@ namespace abtr_priority
         }
 
 	private:
-		void timerCB(const ros::TimerEvent& evt)
+		void threadLoop()
 		{
-            mutex_t::scoped_lock lock(mutex_);
+            while (running_)
+            {
+                period_.sleep();
 
-			if (!cycle_flush_)
-				clearOldCommands(evt.current_expected);
+                {
+                    mutex_t::scoped_lock lock(mutex_);
 
-			if (cmd_map_.empty())
-				return;
+                    if (!cycle_flush_)
+                        clearOldCommands(ros::Time::now());
 
-			// Return whatever is left at the top of the list.
-			std_msgs::Int32 p;
-			const typename M::ConstPtr cmd = top(p.data);
+                    if (cmd_map_.empty())
+                        continue;
 
-			if (!advertised_)
-			{
-				pub_ = impl_::advertise<M>(n_, topic_name_, *cmd);
-				pub_priority_ = n_.advertise<std_msgs::Int32>("priority", 10);
-				advertised_ = true;
-			}
-			pub_.publish(cmd);
-			pub_priority_.publish(p);
+                    // Return whatever is left at the top of the list.
+                    std_msgs::Int32 p;
+                    const typename M::ConstPtr cmd = top(p.data);
 
-            last_cmd_ = cmd;
-            last_cmd_p_ = p.data;
+                    if (!advertised_)
+                    {
+                        pub_ = impl_::advertise<M>(n_, topic_name_, *cmd);
+                        pub_priority_ = 
+                            n_.advertise<std_msgs::Int32>("priority", 10);
+                        advertised_ = true;
+                    }
+                    pub_.publish(cmd);
+                    pub_priority_.publish(p);
 
-			if (cycle_flush_)
-				cmd_map_.clear();
+                    last_cmd_ = cmd;
+                    last_cmd_p_ = p.data;
+
+                    if (cycle_flush_)
+                        cmd_map_.clear();
+                }
+            }
 		}
 
 		/// \brief Look for expired commands in the map.
@@ -266,7 +285,6 @@ namespace abtr_priority
 		}
 
 		ros::NodeHandle n_;
-		ros::Timer timer_;
 		ros::Duration timeout_;
 		ros::Publisher pub_;
 		ros::Publisher pub_priority_;
@@ -281,6 +299,9 @@ namespace abtr_priority
         typename M::ConstPtr last_cmd_;
         int last_cmd_p_;
 
+        boost::thread thread_;
+        bool running_;
+        ros::Duration period_;
         typedef boost::recursive_mutex mutex_t;
         mutex_t mutex_;
 

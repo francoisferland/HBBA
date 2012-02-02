@@ -4,6 +4,7 @@ string bringup_function		# Bringup function name. Can be empty.
 string bringdown_function	# Bringdown function name. Can be empty.
 ResourceUsage utility		# Effect on information classes.
 ResourceUsage[] cost		# Usage cost description.
+ResourceUsage[] utility_min #Utility needed on another class.
 
 # The bringup and bringdown functions need to be declared in your script's
 # source and follow this signature :

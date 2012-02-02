@@ -62,14 +62,18 @@ namespace iw_solver_interface
             // TODO: Give access to the strategies database for client classes.
             strategies_[strat.id] = strat;
 
-            // Convert the cost and utility vectors
+            // Convert the cost, utility and utility needed vectors
             typename base_t::strat_vec_t c(req.strategy.cost.size());
             for (size_t i = 0; i < c.size(); ++i)
                 c[i] = std::make_pair(strat.cost[i].id, strat.cost[i].value);
             typename base_t::strat_vec_t u(1);
             u[0] = std::make_pair(strat.utility.id, strat.utility.value);
+            typename base_t::strat_vec_t u_min(req.strategy.utility_min.size());
+            for (size_t i = 0; i < u_min.size(); ++i)
+                u_min[i] = std::make_pair(strat.utility_min[i].id, 
+                    strat.utility_min[i].value);
 
-            base_t::add_strategy(strat.id, c, u);
+            base_t::add_strategy(strat.id, c, u, u_min);
             return true;
         }
 
@@ -100,18 +104,22 @@ namespace iw_solver_interface
             typename base_t::sol_vec_t result(base_t::strat_count());
             base_t::solve(result);
 
-			//Publish the intention set for diagnostic purposes
-			hbba_msgs::Intention intent;
-			std::vector<std::string> strat_id ; 
-            strat_id.reserve(result.size());
-			std::vector<uint8_t > strat_enabled ; 
-            strat_id.reserve(result.size());
+            // Publish the intention set for diagnostic purposes
+            // Note that desire fields can be empty, since not every single 
+            // strategy can directly be mapped to a desire.
+            // We only keep direct associations.
+            hbba_msgs::Intention intent;
+            intent.strategies.reserve(result.size());
+            intent.desires.reserve(result.size());
+            intent.enabled.resize(result.size()); 
 
             typedef typename base_t::sol_vec_t::const_iterator CI;
-            for (CI i = result.begin(); i != result.end(); ++i)
+            size_t j = 0; // Used to map desires to strategies.
+            for (CI i = result.begin(); i != result.end(); ++i, ++j)
             {
-                strat_id.push_back(i->first);
-                strat_enabled.push_back(i->second);
+                // Add strategy to the intention message.
+                intent.strategies.push_back(i->first);
+                intent.enabled.push_back(i->second);
 
                 // Get the name of the script function.
                 const hbba_msgs::Strategy& s = strategies_[i->first];
@@ -123,25 +131,26 @@ namespace iw_solver_interface
 
                 // Map desires params to strategies.
                 script += "(";
-            	typedef typename u_vec_t::const_iterator u_vec_it;
-	            for (u_vec_it d = desires.begin(); d != desires.end(); ++d) 
-	            {	
-			        if(s.utility.id == d->type)
-						script += d->params;
-				}	
+                typedef typename u_vec_t::const_iterator u_vec_it;
+                for (u_vec_it d = desires.begin(); d != desires.end(); ++d) 
+                {   
+                    if(s.utility.id == d->type)
+                    {
+                        script += d->params;
+                        intent.desires[j] = d->id;
+                    }
+                }   
                 script += ");";
 
                 // Run the corresponding script.
-				script_engine::EvalScript eval;
-				eval.request.source = script;
+                script_engine::EvalScript eval;
+                eval.request.source = script;
                 ROS_INFO("Function call: %s", script.c_str());
-				scl_eval_script_.call(eval);
+                scl_eval_script_.call(eval);
             }
 
-			intent.strategies = strat_id;	
-			intent.enabled = strat_enabled; 
-	 		pub_intention_.publish(intent);
-	 		
+            pub_intention_.publish(intent);
+            
         }
 
     private:

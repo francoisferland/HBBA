@@ -105,7 +105,7 @@ namespace iw_solver_ortools
 			}
 			
 			//Create the Solver
-			Solver::Solver solver("strategyselection"); 
+			Solver solver("strategyselection"); 
 
 			//Create the variables
 			vector<IntVar*> a;
@@ -145,8 +145,8 @@ namespace iw_solver_ortools
 				solver.AddConstraint(solver.MakeScalProdGreaterOrEqual(a,u_k, uMin_k));
 				objectiveUti_var_array.push_back(solver.MakeScalProd(a,u_k)->Var());
 			}
-			
-/*			//Utility of each strategy display
+			/*
+			//Utility of each strategy display
 			typedef map<unsigned int, Strategy>::const_iterator CI ;
 			for(CI i = strat_.begin(); i != strat_.end(); ++i)			
 			{ 
@@ -158,7 +158,7 @@ namespace iw_solver_ortools
 				}
 				printf("\n"); 
 			}
-*/
+			*/
 			vector<SearchMonitor*> monitors;
 
 			//Optimization 

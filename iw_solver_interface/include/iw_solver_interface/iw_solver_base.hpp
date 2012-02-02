@@ -11,6 +11,9 @@
 #include <vector>
 #include <iostream>
 
+#include <stdio.h>
+#include <stdlib.h>
+
 namespace iw_solver_interface
 {
     /// \brief A base interface class for IW constraint solvers.
@@ -59,113 +62,114 @@ namespace iw_solver_interface
     ///    Clear information utility requirements.
     ///
     template <class T>
-	class iw_solver_base
-	{
-	public:
+    class iw_solver_base
+    {
+    public:
         /// \brief Vector type for cost/utility tag/value pairs.
-		typedef std::vector< std::pair< std::string, int > > strat_vec_t;
+        typedef std::vector< std::pair< std::string, int > > strat_vec_t;
         /// \brief Vector type for strategy activation tag/value pairs.
-		typedef std::vector< std::pair< std::string, bool > > sol_vec_t;
+        typedef std::vector< std::pair< std::string, bool > > sol_vec_t;
         /// \brief Vector type for ordered cost and utility values.
         typedef std::vector<int> costs_t;
 
-		iw_solver_base(): impl_(new T()) 
-		{
-		}
+        iw_solver_base(): impl_(new T()) 
+        {
+        }
 
-		~iw_solver_base()
-		{
-		}
+        ~iw_solver_base()
+        {
+        }
 
-		/// \brief Add a resource to the solver's set.
-		///
-		/// We index resources by name in their order of addition.
-		/// Adding a second resource with the same name isn't a good idea,
-		/// since the original will no longer be accessible and might break
-		/// constraints in the actual solver implementation.
-		void add_resource(const std::string& name) 
-		{
-			update_index(res_map_.left, name);
-		}
+        /// \brief Add a resource to the solver's set.
+        ///
+        /// We index resources by name in their order of addition.
+        /// Adding a second resource with the same name isn't a good idea,
+        /// since the original will no longer be accessible and might break
+        /// constraints in the actual solver implementation.
+        void add_resource(const std::string& name) 
+        {
+            update_index(res_map_.left, name);
+        }
 
-		/// \brief Sets a resource utilization limit.
-		void set_resource_max(const std::string& name, const int max)
-		{
-			unsigned int i = index(res_map_.left, name);
+        /// \brief Sets a resource utilization limit.
+        void set_resource_max(const std::string& name, const int max)
+        {
+            unsigned int i = index(res_map_.left, name);
             if (i >= cmax_.size())
                 cmax_.resize(i+1);
             cmax_[i] = max;
             res_updated_ = true;
-		}
+        }
 
-		/// \brief Add an information to provide to the solver's set.
-		///
-		/// We index informations by name in their order of addition.
-		/// Adding a second information with the same name isn't a good idea,
-		/// since the original will no longer be accessible and might break
-		/// constraints in the actual solver implementation.
-		void add_util(const std::string& name) 
-		{
-			update_index(util_map_.left, name);
-		}
+        /// \brief Add an information to provide to the solver's set.
+        ///
+        /// We index informations by name in their order of addition.
+        /// Adding a second information with the same name isn't a good idea,
+        /// since the original will no longer be accessible and might break
+        /// constraints in the actual solver implementation.
+        void add_util(const std::string& name) 
+        {
+            update_index(util_map_.left, name);
+        }
 
-		/// \brief Sets a desired information minimum utility.
-		void set_util_min(const std::string& name, const int min)
-		{
-			unsigned int i = index(util_map_.left, name);
+        /// \brief Sets a desired information minimum utility.
+        void set_util_min(const std::string& name, const int min)
+        {
+            unsigned int i = index(util_map_.left, name);
             if (i >= umin_.size())
                 umin_.resize(i + 1);
             umin_[i] = min;
             util_updated_ = true;
 
-		}
+        }
+        
+        /// \brief Refresh the model according to the added resources and info
+        /// identifiers.
+        ///
+        /// This absolutely needs to be called before changing any model
+        /// parameters with set_resource_max and set_util_min or adding
+        /// strategies.
+        void clear_model()
+        {
+            impl_->clear_model(res_map_.size(), util_map_.size());
+        }
 
-		/// \brief Refresh the model according to the added resources and info
-		/// identifiers.
-		///
-		/// This absolutely needs to be called before changing any model
-		/// parameters with set_resource_max and set_util_min or adding
-		/// strategies.
-		void clear_model()
-		{
-			impl_->clear_model(res_map_.size(), util_map_.size());
-		}
-
-		/// \brief Clears the requirements (util_min) for the solution.
-		void clear_reqs()
-		{
-			impl_->clear_reqs();
+        /// \brief Clears the requirements (util_min) for the solution.
+        void clear_reqs()
+        {
+            impl_->clear_reqs();
             umin_.resize(0);
             util_updated_ = true;
-		}
+        }
 
-		/// \brief Add a strategy to the set.
-		///
-		/// If a resource or util doesn't exist in the index, it will be added
-		/// automatically.
-		///
-		/// \param c Cost vector.
-		/// \param u utility effect vector.
-		void add_strategy(const std::string& id, const strat_vec_t& c,
-			const strat_vec_t& u)
-		{
+        /// \brief Add a strategy to the set.
+        ///
+        /// If a resource or util doesn't exist in the index, it will be added
+        /// automatically.
+        ///
+        /// \param c Cost vector.
+        /// \param u utility effect vector.
+        void add_strategy(const std::string& id, const strat_vec_t& c,
+            const strat_vec_t& u, const strat_vec_t& u_min)
+        {
             //  - Add costs and utilities in both matrices:
             //    - Look for a cost/utility name in the map.
             //    - Resize the matrix if it's a new value. 
             //  - Flag model_updated_.
             update_matrix(cost_mtx_, res_map_, id, c);
             update_matrix(util_mtx_, util_map_, id, u);
+            update_matrix(u_min_mtx_, util_map_, id, u_min);
             model_updated_ = true;
 
-		}
+        }
 
-		/// \brief Solves the constraint problem.
-		///
-		/// \param ref The result will be added to this vector. Each strategy
-		/// will be listed as to be activated (true) or not (false). It assumes
-		/// the vector has been fully allocated.
-		void solve(sol_vec_t& res)
-		{
+        /// \brief Solves the constraint problem.
+        ///
+        /// \param ref The result will be added to this vector. Each strategy
+        /// will be listed as to be activated (true) or not (false). It assumes
+        /// the vector has been fully allocated.
+        void solve(sol_vec_t& res)
+        {
             if (model_updated_)
             {
                 // Clear model and send the strategy set to the low-level 
@@ -178,11 +182,27 @@ namespace iw_solver_interface
                     // anything that will respond to std::copy.
                     costs_t cs(cost_mtx_.shape()[1]);
                     costs_t us(util_mtx_.shape()[1]);
+                    costs_t u_min(u_min_mtx_.shape()[1]);
                     std::copy(cost_mtx_[i].begin(), cost_mtx_[i].end(), 
                         cs.begin());
                     std::copy(util_mtx_[i].begin(), util_mtx_[i].end(),
                         us.begin());
-                    impl_->add_strategy(i, cs, us);
+                    std::copy(u_min_mtx_[i].begin(), u_min_mtx_[i].end(), 
+                        u_min.begin());
+
+                    costs_t uf(util_mtx_.shape()[1]);   
+                    printf("Utilité finale strat %d  ",i);
+                    for(size_t j =0; j<us.size(); ++j)
+                    {
+                        if (j < u_min.size())
+                            uf[j] = us[j] - u_min[j];
+                        else
+                            uf[j] = us[j];
+                        printf(" %d ", uf[j]);
+                    }
+                   printf("\n");
+                    
+                    impl_->add_strategy(i, cs, uf);
                 }
                 model_updated_ = false;
             }
@@ -199,27 +219,28 @@ namespace iw_solver_interface
                     impl_->set_resource_max(i, cmax_[i]);
                 res_updated_ = false;
             }
+            if (u_min_updated_)
 
-			typedef std::vector<bool> iv_t;
-			std::vector<bool> strats(strat_map_.size());
-			impl_->solve(strats);
-			// TODO: We only keep the first solution for now, optimizations are
+            typedef std::vector<bool> iv_t;
+            std::vector<bool> strats(strat_map_.size());
+            impl_->solve(strats);
+            // TODO: We only keep the first solution for now, optimizations are
             // currently fixed in the lower level solver.
-			index_map_t::right_map::const_iterator i = strat_map_.right.begin();
-			for (; i != strat_map_.right.end(); ++i)
-				res[i->first] = std::make_pair(i->second, strats[i->first]);
-					
-		}
+            index_map_t::right_map::const_iterator i = strat_map_.right.begin();
+            for (; i != strat_map_.right.end(); ++i)
+                res[i->first] = std::make_pair(i->second, strats[i->first]);
+                    
+        }
 
-		/// \brief Returns the amount of strategies in the set.
-		unsigned int strat_count() const { return strat_map_.size(); }
+        /// \brief Returns the amount of strategies in the set.
+        unsigned int strat_count() const { return strat_map_.size(); }
 
-	private:
+    private:
         /// \brief Bidirectional map type for tag/index retrieval. 
-		typedef boost::bimap< 
-			boost::bimaps::unordered_set_of<std::string>, 
-			boost::bimaps::vector_of<unsigned int> >
-			index_map_t;
+        typedef boost::bimap< 
+            boost::bimaps::unordered_set_of<std::string>, 
+            boost::bimaps::vector_of<unsigned int> >
+            index_map_t;
         /// \brief Matrix type for costs and utilities. One strategy per row.
         typedef boost::multi_array<int, 2> matrix_t;
 
@@ -258,68 +279,68 @@ namespace iw_solver_interface
         /// Warning: Does not check for existing values.
         /// Use index() to check for existing values, which will call this
         /// function if it doesn't exist in the map.
-		template <class M>
-		unsigned int update_index(M& map, const std::string& name)
-		{
-			unsigned int i = map.size();
-			map[name] = i;
-			//std::cerr << "Added " << i << ": " << name << std::endl;
-			return i;
-		}
+        template <class M>
+        unsigned int update_index(M& map, const std::string& name)
+        {
+            unsigned int i = map.size();
+            map[name] = i;
+            //std::cerr << "Added " << i << ": " << name << std::endl;
+            return i;
+        }
 
-		/// \brief Retreive the index in a map, create the pair if it isn't
-		/// available.
-		template <class M>
-		int index(M& map, const std::string& name)
-		{
-			typename M::const_iterator i = map.find(name);
-			if (i == map.end())
-				return update_index(map, name);
-			else
-				return i->second;
-		}
+        /// \brief Retreive the index in a map, create the pair if it isn't
+        /// available.
+        template <class M>
+        int index(M& map, const std::string& name)
+        {
+            typename M::const_iterator i = map.find(name);
+            if (i == map.end())
+                return update_index(map, name);
+            else
+                return i->second;
+        }
 
-		/// \brief Builds an indexed vector from a name/value pairs vector.
-		///
-		/// Updates index when encountering new names.
+        /// \brief Builds an indexed vector from a name/value pairs vector.
+        ///
+        /// Updates index when encountering new names.
         /// TODO: Remove this when the update_matrix(...) model works.
-		void build_indexed_vector(const strat_vec_t& in, costs_t& out,
-			index_map_t& index)
-		{
-			for (strat_vec_t::const_iterator i = in.begin(); i != in.end(); ++i)
-			{
-				const std::string& name = i->first;
-				unsigned int idx;
-				index_map_t::left_map::const_iterator j;
-				if ((j = index.left.find(name)) == index.left.end())
-					idx = update_index(index.left, name);
-			}
-			out = costs_t(index.right.size(),0);
-			for (strat_vec_t::const_iterator i = in.begin(); i != in.end(); ++i)
-			{
-				const std::string& name = i->first;
-				const unsigned int& value = i->second;
-				unsigned int idx;
-				index_map_t::left_map::const_iterator j;
-				j = index.left.find(name);
-				idx = j->second;
-				out[idx] = value;
-			}
-		}
+        void build_indexed_vector(const strat_vec_t& in, costs_t& out,
+            index_map_t& index)
+        {
+            for (strat_vec_t::const_iterator i = in.begin(); i != in.end(); ++i)
+            {
+                const std::string& name = i->first;
+                unsigned int idx;
+                index_map_t::left_map::const_iterator j;
+                if ((j = index.left.find(name)) == index.left.end())
+                    idx = update_index(index.left, name);
+            }
+            out = costs_t(index.right.size(),0);
+            for (strat_vec_t::const_iterator i = in.begin(); i != in.end(); ++i)
+            {
+                const std::string& name = i->first;
+                const unsigned int& value = i->second;
+                unsigned int idx;
+                index_map_t::left_map::const_iterator j;
+                j = index.left.find(name);
+                idx = j->second;
+                out[idx] = value;
+            }
+        }
 
-		void print_util_set()
-		{
-			std::cerr << "Available util sources: " << std::endl;
-			index_map_t::left_map::const_iterator i;
-			for (i = util_map_.left.begin(); i != util_map_.left.end(); ++i)
-				std::cerr << "  " << i->second << ": " << i->first << std::endl;
-		}
+        void print_util_set()
+        {
+            std::cerr << "Available util sources: " << std::endl;
+            index_map_t::left_map::const_iterator i;
+            for (i = util_map_.left.begin(); i != util_map_.left.end(); ++i)
+                std::cerr << "  " << i->second << ": " << i->first << std::endl;
+        }
 
         boost::shared_ptr<T> impl_;
 
-		index_map_t res_map_;
-		index_map_t util_map_;
-		index_map_t strat_map_;
+        index_map_t res_map_;
+        index_map_t util_map_;
+        index_map_t strat_map_;
 
         // Model and requirements data.
         // We're currently keeping 2-3 copies of the same data since we force
@@ -329,6 +350,7 @@ namespace iw_solver_interface
         // types used by the solver library.
         
         matrix_t util_mtx_;
+        matrix_t u_min_mtx_;
         matrix_t cost_mtx_;
         bool model_updated_;
 
@@ -336,9 +358,11 @@ namespace iw_solver_interface
         bool res_updated_;
         costs_t umin_;
         bool util_updated_;
-
-	};
-	
+        costs_t u_min_;
+        bool u_min_updated_;
+        
+    };
+    
 }
 
 #endif

@@ -10,6 +10,5 @@
   <url></url> 
   <depend package="hbba_msgs"/>
   <depend package="roscpp"/>
+  <rosdep name="qt-dev"/>
 </package>
-
-

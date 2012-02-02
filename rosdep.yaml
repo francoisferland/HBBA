@@ -1,2 +1,5 @@
 libv8:
     ubuntu: libv8-dev
+
+qt-dev:
+    ubuntu: libqt4-dev

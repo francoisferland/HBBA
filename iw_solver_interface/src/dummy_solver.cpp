@@ -63,13 +63,16 @@ int main(int argc, char** argv)
 
 	n.add_resource("CPU");
 	n.add_util("INFO");
-	node_t::strat_vec_t cs, us;
+	node_t::strat_vec_t cs, us, u_min;
 	n.clear_model();
 	cs.push_back(std::make_pair("CPU", 5));
 	us.push_back(std::make_pair("INFO", 2));
-	n.add_strategy("S1", cs, us);
+	u_min.push_back(std::make_pair("",0));
+	n.add_strategy("S1", cs, us, u_min);
 	us[0].second = 3;
-	n.add_strategy("S2", cs, us);
+	u_min[0].first="INFO";
+	u_min[0].second=2;
+	n.add_strategy("S2", cs, us,u_min);
 	n.set_resource_max("CPU", 10);
 	n.set_util_min("INFO", 1);
 	n.clear_reqs();

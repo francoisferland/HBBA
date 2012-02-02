@@ -18,6 +18,7 @@ s1a.bringup_function = "strat1a_bup"
 s1a.bringdown_function = "strat1a_bdn"
 s1a.cost = [ResourceUsage("CPU", 20)]
 s1a.utility = ResourceUsage("front detection", 3)
+s1a.utility_min = [ResourceUsage("",0)]
 s1a.source = """
 function strat1a_bup(params)
 {
@@ -38,6 +39,7 @@ s1b.bringup_function = "strat1b_bup"
 s1b.bringdown_function = "strat1b_bdn"
 s1b.cost = [ResourceUsage("CPU", 25)]
 s1b.utility = ResourceUsage("face detection", 4)
+s1b.utility_min = [ResourceUsage ("front detection",2)]
 s1b.source = """
 function strat1b_bup(params)
 {
@@ -58,6 +60,7 @@ s2a.bringup_function = "strat2a_bup"
 s2a.bringdown_function = "strat2a_bdn"
 s2a.cost = [ResourceUsage("CPU", 30)]
 s2a.utility = ResourceUsage("front detection", 4)
+s2a.utility_min = [ResourceUsage("",0)]
 s2a.source = """
 function strat2a_bup(params)
 {
@@ -78,6 +81,7 @@ s2b.bringup_function = "strat2b_bup"
 s2b.bringdown_function = "strat2b_bdn"
 s2b.cost = [ResourceUsage("CPU", 35)]
 s2b.utility = ResourceUsage("face detection", 5)
+s2b.utility_min = [ResourceUsage("",0)]
 s2b.source = """
 function strat2b_bup(params)
 {
@@ -98,6 +102,7 @@ s3.bringup_function = "strat3_bup"
 s3.bringdown_function = "strat3_bdn"
 s3.cost = [ResourceUsage("CPU", 15)]
 s3.utility = ResourceUsage("face detection", 3)
+s3.utility_min = [ResourceUsage("",0)]
 s3.source = """
 function strat3_bup(params)
 {
@@ -118,6 +123,7 @@ s4a.bringup_function = "strat4a_bup"
 s4a.bringdown_function = "strat4a_bdn"
 s4a.cost = [ResourceUsage("CPU", 10)]
 s4a.utility = ResourceUsage("front detection", 2)
+s4a.utility_min = [ResourceUsage("",0)]
 s4a.source = """
 function strat4a_bup(params)
 {
@@ -138,6 +144,7 @@ s4b.bringup_function = "strat4b_bup"
 s4b.bringdown_function = "strat4b_bdn"
 s4b.cost = [ResourceUsage("CPU", 5)]
 s4b.utility = ResourceUsage("large detection", 5)
+s4b.utility_min = [ResourceUsage("",0)]
 s4b.source = """
 function strat4b_bup(params)
 {
@@ -159,6 +166,7 @@ s5.bringup_function = "strat5_bup"
 s5.bringdown_function = "strat5_bdn"
 s5.cost = [ResourceUsage("CPU", 15)]
 s5.utility = ResourceUsage("face following", 4)
+s5.utility_min = [ResourceUsage("",0)]
 s5.source = """
 function strat5_bup(params)
 {
@@ -179,6 +187,7 @@ s6.bringup_function = "strat6_bup"
 s6.bringdown_function = "strat6_bdn"
 s6.cost = [ResourceUsage("CPU", 20)]
 s6.utility = ResourceUsage("face following", 5)
+s6.utility_min = [ResourceUsage("",0)]
 s6.source = """
 function strat6_bup(params)
 {
@@ -199,6 +208,7 @@ s7.bringup_function = "strat7_bup"
 s7.bringdown_function = "strat7_bdn"
 s7.cost = [ResourceUsage("CPU", 10)]
 s7.utility = ResourceUsage("face following", 3)
+s7.utility_min = [ResourceUsage("",0)]
 s7.source = """
 function strat7_bup(params)
 {
@@ -219,6 +229,7 @@ s8.bringup_function = "strat8_bup"
 s8.bringdown_function = "strat8_bdn"
 s8.cost = [ResourceUsage("CPU", 5)]
 s8.utility = ResourceUsage("face following", 2)
+s8.utility_min = [ResourceUsage("",0)]
 s8.source = """
 function strat8_bup(params)
 {
@@ -240,6 +251,7 @@ s9.bringup_function = "strat9_bup"
 s9.bringdown_function = "strat9_bdn"
 s9.cost = [ResourceUsage("CPU", 20)]
 s9.utility = ResourceUsage("arm motion", 6)
+s9.utility_min = [ResourceUsage("",0)]
 s9.source = """
 function strat9_bup(params)
 {
@@ -254,7 +266,7 @@ function strat9_bdn(params)
 """
 add_strat(s9)
 
-set_max("CPU", 100)
+set_max("CPU", 200)
 
 ##Detection desires 
 des1 = Desire("test_1", "front detection", 1, "{'data' : 1}")

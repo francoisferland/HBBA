@@ -27,12 +27,12 @@ class iw_server:
         self.publish_set()
         return AddDesiresResponse()
 
-    def set_desire_priority_srv(self,req)
-    	for d in self.desires
-		if req.id = d.id
-			d.priority = req.value
-	self.publish_set()
-	return SetDesirePriorityResponse()
+    def set_desire_priority_srv(self,req):
+    	for d in self.desires:
+            if req.id == d.id:
+                d.priority = req.value
+        self.publish_set()
+        return SetDesirePriorityResponse()
 
     def remove_desires_srv(self, req):
         for d in req.ids:

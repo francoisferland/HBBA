@@ -1,0 +1,10 @@
+<launch>
+    <!-- Higher-level HBBA stuff. -->
+    <group ns="hbba">
+        <node name="script_engine" pkg="script_engine" type="script_engine" output="screen"/>
+        <node name="iw_solver" pkg="iw_solver_ortools" type="iw_solver_ortools" output="screen"/>
+        <node name="iw" pkg="iw" type="iw.py"/>
+    </group>
+
+
+</launch>

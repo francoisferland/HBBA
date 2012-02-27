@@ -25,4 +25,18 @@
         <param name="ball_pose/abtr_priority" value="20"/>
     </group>
 
+    <!-- Pose arbitration -->
+    <node name="look_at_pose_abtr" pkg="nodelet" type="nodelet"
+        args="standalone abtr_priority/Generic">
+        <remap from="look_at_pose_abtr/abtr_cmd" to="look_at_pose"/>
+        <remap from="look_at_pose_abtr/cmd/register" to="look_at_pose/register"/>
+    </node>
+    <node name="register_pose" pkg="abtr_priority" type="register"
+      args="/look_at_pose
+        /ball_tracking/ball_pose
+        /manyears/look_at_pose" />
+
+    <!-- Look at pose actuator link -->
+    <include file="$(find jn0_demos)/launch/jn0_lookat.launch"/>
+
 </launch>

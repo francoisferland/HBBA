@@ -1,0 +1,28 @@
+<launch>
+    <!-- Johnny 0 without AZ3, includes Kinect and RTAudio -->
+    <include file="$(find jn0_bringup)/launch/jn0_standalone.launch"/>
+
+    <!-- ManyEars tracking with filter -->
+    <group ns="manyears">
+        <include file="$(find jn0_bringup)/launch/jn0_manyears.launch"/>
+        <node name="stream_filter" pkg="nodelet" type="nodelet"
+            args="standalone topic_filters/GenericDivisor
+                /audio_stream audio_stream"/>
+        <!-- Sound reaction behavior -->
+        <node name="pose_react" pkg="jn0_demos" type="pose_react">
+            <param name="phi_max" value="0.30"/>
+            <remap from="pose" to="source_pose"/>
+        </node>
+        <param name="look_at_pose/abtr_priority" value="50"/>
+    </group>
+
+    <!-- Ball tracking with filter -->
+    <group ns="ball_tracking">
+        <node name="ball_tracker" pkg="jn0_demos" type="ball_tracker"/>
+        <node name="kinect_filter" pkg="nodelet" type="nodelet"
+            args="standalone topic_filters/GenericDivisor
+                /openni/depth_registered/points points"/>
+        <param name="ball_pose/abtr_priority" value="20"/>
+    </group>
+
+</launch>

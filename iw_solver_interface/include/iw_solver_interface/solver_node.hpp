@@ -13,7 +13,7 @@ namespace iw_solver_interface
     /// \brief Default scalar type for values (cost, intensity, ...).
     ///
     /// Should fit with the declared ROS message type(s).
-    typedef int DefaultScalar;
+    typedef double DefaultScalar;
 
     /// \brief A base class for IW solver nodes.
     ///
@@ -160,7 +160,7 @@ namespace iw_solver_interface
         }
 
     private:
-        typedef iw_solver_base<T> base_t;
+        typedef iw_solver_base<T, S> base_t;
         typedef SolverNode<T> this_t;
 
         void publishResMax()

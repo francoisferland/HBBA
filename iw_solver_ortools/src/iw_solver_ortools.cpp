@@ -58,35 +58,36 @@ namespace iw_solver_ortools
 	class ortools_solver 
 	{
 	public:
+        typedef int64 ORScalar; 
         typedef S Scalar;
-        typedef Strategy<S> StrategyT;
+        typedef Strategy<Scalar> StrategyT;
 
 		void set_resource_max(unsigned int i, Scalar max)
 		{
-			cMax_[i] = max;
+			cMax_[i] = ORScalar(max);
 		}
 
 		void set_util_min(unsigned int i, Scalar min)
 		{
-			uMin_[i] = min;
+			uMin_[i] = ORScalar(min);
 		}
 
         void set_util_int(unsigned int i, Scalar intensity)
         {
-            uInt_[i] = intensity;
+            uInt_[i] = ORScalar(intensity);
         }
 
 		void add_strategy(const unsigned int id, const std::vector<Scalar>& cs,
 			const std::vector<Scalar>& us)
 		{
-			strat_[id] = Strategy<Scalar>(id, cs, us); 
+			strat_[id] = StrategyT(id, cs, us); // Converted later.
 		}
 
 		void clear_model(size_t r, size_t i)
 		{	
 			std::cout << "Refreshing model..." << std::endl;
-			cMax_ = std::vector<Scalar>(r,0);
-			uMin_ = std::vector<Scalar>(i,0);
+			cMax_ = std::vector<ORScalar>(r,0);
+			uMin_ = std::vector<ORScalar>(i,0);
 		}
 
 		void clear_reqs()
@@ -129,12 +130,12 @@ namespace iw_solver_ortools
 			{ 
 				int cMax_j = cMax_[j];
 				
-				vector<Scalar> c_j;
+				vector<int64> c_j;
 				typedef typename map<unsigned int, StrategyT >::const_iterator CI ;
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)			
 				{ 
-					Strategy<Scalar> s = i->second;
-					c_j.push_back(s.get_cost(j));
+					StrategyT s = i->second;
+					c_j.push_back(ORScalar(s.get_cost(j)));
 				}
 				
 				solver.AddConstraint(solver.MakeScalProdLessOrEqual(a,c_j, cMax_j));
@@ -146,12 +147,12 @@ namespace iw_solver_ortools
 			for(int k = 0; k<nbClass; k++) //For each class
 			{ 
 				int uMin_k = uMin_[k]; 
-				vector<Scalar> u_k;
+				vector<ORScalar> u_k;
 				typedef typename map< unsigned int, StrategyT >::const_iterator CI;
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)
 				{
-					Strategy<Scalar> s = i->second;
-					u_k.push_back(s.get_utility(k));
+					StrategyT s = i->second;
+					u_k.push_back(ORScalar(s.get_utility(k)));
 				}
 
 				solver.AddConstraint(solver.MakeScalProdGreaterOrEqual(a,u_k, uMin_k));
@@ -230,10 +231,10 @@ namespace iw_solver_ortools
 		}
 		
 	private:
-		typename std::vector<Scalar> cMax_;
-		typename std::vector<Scalar> uMin_;
-        typename std::vector<Scalar> uInt_;
-		typename std::map<unsigned int, Strategy<Scalar> > strat_;
+		typename std::vector<ORScalar> cMax_;
+		typename std::vector<ORScalar> uMin_;
+        typename std::vector<ORScalar> uInt_;
+		typename std::map<unsigned int, StrategyT > strat_;
 	};
 }
 

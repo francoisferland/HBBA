@@ -3,7 +3,7 @@
 string id           # Desire instance identification string.
 
 string type         # Desire utility class, e.g. "goto", "detect_person".
-int32 utility       # Mimimum utility needed, varies from class to
+float54 utility      # Mimimum utility needed, varies from class to
                     # class.
 
 float64 intensity   # The intensity value of this desire. Used for priorization

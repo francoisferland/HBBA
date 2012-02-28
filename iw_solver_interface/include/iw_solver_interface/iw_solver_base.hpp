@@ -63,7 +63,7 @@ namespace iw_solver_interface
     ///  - clear_reqs()
     ///    Clear information utility requirements.
     ///
-    template <class T, class S = int>
+    template <class T, class S>
     class iw_solver_base
     {
     public:
@@ -216,7 +216,7 @@ namespace iw_solver_interface
                             uf[j] = us[j] - u_min[j];
                         else
                             uf[j] = us[j];
-                        printf(" %d ", uf[j]);
+                        //printf(" %d ", uf[j]);
                     }
                    printf("\n");
                     

@@ -77,6 +77,10 @@ namespace iw_solver_interface
         /// \brief Vector type for ordered cost and utility values.
         typedef std::vector<Scalar> costs_t;
 
+        iw_solver_base(const boost::shared_ptr<T>& impl): impl_(impl)
+        {
+        }
+
         iw_solver_base(): impl_(new T()) 
         {
         }

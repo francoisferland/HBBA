@@ -62,19 +62,23 @@ namespace iw_solver_ortools
         typedef S Scalar;
         typedef Strategy<Scalar> StrategyT;
 
+        ortools_solver(Scalar scaling): scaling_(scaling)
+        {
+        }
+
 		void set_resource_max(unsigned int i, Scalar max)
 		{
-			cMax_[i] = ORScalar(max);
+			cMax_[i] = ORScalar(scaling_ * max);
 		}
 
 		void set_util_min(unsigned int i, Scalar min)
 		{
-			uMin_[i] = ORScalar(min);
+			uMin_[i] = ORScalar(scaling_ * min);
 		}
 
         void set_util_int(unsigned int i, Scalar intensity)
         {
-            uInt_[i] = ORScalar(intensity);
+            uInt_[i] = ORScalar(scaling_ * intensity);
         }
 
 		void add_strategy(const unsigned int id, const std::vector<Scalar>& cs,
@@ -135,7 +139,7 @@ namespace iw_solver_ortools
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)			
 				{ 
 					StrategyT s = i->second;
-					c_j.push_back(ORScalar(s.get_cost(j)));
+					c_j.push_back(ORScalar(scaling_ * s.get_cost(j)));
 				}
 				
 				solver.AddConstraint(solver.MakeScalProdLessOrEqual(a,c_j, cMax_j));
@@ -152,7 +156,7 @@ namespace iw_solver_ortools
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)
 				{
 					StrategyT s = i->second;
-					u_k.push_back(ORScalar(s.get_utility(k)));
+					u_k.push_back(ORScalar(scaling_ * s.get_utility(k)));
 				}
 
 				solver.AddConstraint(solver.MakeScalProdGreaterOrEqual(a,u_k, uMin_k));
@@ -235,6 +239,7 @@ namespace iw_solver_ortools
 		typename std::vector<ORScalar> uMin_;
         typename std::vector<ORScalar> uInt_;
 		typename std::map<unsigned int, StrategyT > strat_;
+        Scalar scaling_; // Conversion ratio when goint to int64.
 	};
 }
 
@@ -242,11 +247,16 @@ int main(int argc, char** argv)
 {
     using namespace iw_solver_interface;
     using namespace iw_solver_ortools;
-    
-    typedef SolverNode< ortools_solver<DefaultScalar>, DefaultScalar> node_t;
+    typedef ortools_solver<DefaultScalar> SolverT;
+    typedef SolverNode<SolverT, DefaultScalar> NodeT; 
 
     ros::init(argc, argv, "ortools_solver");
-    node_t n;
+    ros::NodeHandle np("~");
+    // Scaling factor when going from double to int.
+    double scaling;
+    np.param("scaling_factor", scaling, 1000.0); 
+    boost::shared_ptr<SolverT> solver(new SolverT(scaling));
+    NodeT node(solver);
 
     ros::spin();
 }

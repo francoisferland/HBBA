@@ -29,7 +29,11 @@ namespace iw_solver_interface
     {
     public:
         typedef S Scalar;
-        SolverNode(const ros::NodeHandle& n = ros::NodeHandle()): n_(n)
+        typedef iw_solver_base<T, S> BaseType;
+        SolverNode(
+            const boost::shared_ptr<T>& impl = boost::shared_ptr<T>(new T()),
+            const ros::NodeHandle& n = ros::NodeHandle()): 
+            BaseType(impl), n_(n)
         {
             srv_add_strat_ = n_.advertiseService("add_strategy",
                 &this_t::addStrategySrv, this);

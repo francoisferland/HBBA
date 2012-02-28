@@ -63,16 +63,19 @@ namespace iw_solver_interface
     ///  - clear_reqs()
     ///    Clear information utility requirements.
     ///
-    template <class T>
+    template <class T, class S = int>
     class iw_solver_base
     {
     public:
+        /// \brief Scalar type used for values (cost, utility, intensity).
+        typedef S Scalar;
+        typedef std::pair<std::string, Scalar> ScalarTag;
         /// \brief Vector type for cost/utility tag/value pairs.
-        typedef std::vector< std::pair< std::string, int > > strat_vec_t;
+        typedef std::vector<ScalarTag> strat_vec_t;
         /// \brief Vector type for strategy activation tag/value pairs.
         typedef std::vector< std::pair< std::string, bool > > sol_vec_t;
         /// \brief Vector type for ordered cost and utility values.
-        typedef std::vector<int> costs_t;
+        typedef std::vector<Scalar> costs_t;
 
         iw_solver_base(): impl_(new T()) 
         {
@@ -94,7 +97,7 @@ namespace iw_solver_interface
         }
 
         /// \brief Sets a resource utilization limit.
-        void set_resource_max(const std::string& name, const int max)
+        void set_resource_max(const std::string& name, const Scalar max)
         {
             unsigned int i = index(res_map_.left, name);
             if (i >= cmax_.size())
@@ -115,7 +118,7 @@ namespace iw_solver_interface
         }
 
         /// \brief Sets a desired information minimum utility.
-        void set_util_min(const std::string& name, const int min)
+        void set_util_min(const std::string& name, const Scalar min)
         {
             unsigned int i = index(util_map_.left, name);
             if (i >= umin_.size())
@@ -126,7 +129,7 @@ namespace iw_solver_interface
         }
 
         /// \brief Sets a desired information intensity.
-        void set_util_int(const std::string& name, const int intensity)
+        void set_util_int(const std::string& name, const Scalar intensity)
         {
             unsigned int i = index(util_map_.left, name);
             if (i >= uint_.size())
@@ -206,7 +209,7 @@ namespace iw_solver_interface
                         u_min.begin());
 
                     costs_t uf(util_mtx_.shape()[1]);   
-                    printf("Utilité finale strat %d  ",(int)i);
+                    //printf("Utilité finale strat %d  ",i);
                     for(size_t j =0; j<us.size(); ++j)
                     {
                         if (j < u_min.size())
@@ -280,7 +283,7 @@ namespace iw_solver_interface
             if (i >= mtx.shape()[0])
                 mtx.resize(boost::extents[i + 1][mtx.shape()[1]]);
 
-            typedef strat_vec_t::const_iterator jj_t;
+            typedef typename strat_vec_t::const_iterator jj_t;
             for (jj_t jj = in.begin(); jj != in.end(); ++jj)
             {
                 size_t j = index(map.left, jj->first);
@@ -327,7 +330,8 @@ namespace iw_solver_interface
         void build_indexed_vector(const strat_vec_t& in, costs_t& out,
             index_map_t& index)
         {
-            for (strat_vec_t::const_iterator i = in.begin(); i != in.end(); ++i)
+            typedef typename strat_vec_t::const_iterator it_t;
+            for (it_t i = in.begin(); i != in.end(); ++i)
             {
                 const std::string& name = i->first;
                 unsigned int idx;
@@ -336,7 +340,7 @@ namespace iw_solver_interface
                     idx = update_index(index.left, name);
             }
             out = costs_t(index.right.size(),0);
-            for (strat_vec_t::const_iterator i = in.begin(); i != in.end(); ++i)
+            for (it_t i = in.begin(); i != in.end(); ++i)
             {
                 const std::string& name = i->first;
                 const unsigned int& value = i->second;

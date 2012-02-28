@@ -10,6 +10,11 @@
 
 namespace iw_solver_interface
 {
+    /// \brief Default scalar type for values (cost, intensity, ...).
+    ///
+    /// Should fit with the declared ROS message type(s).
+    typedef int DefaultScalar;
+
     /// \brief A base class for IW solver nodes.
     ///
     /// You need to provide it with your low-level solver class, for instance
@@ -19,10 +24,11 @@ namespace iw_solver_interface
     ///
     /// RAII design, could be used in a nodelet context if you create the
     /// object at the right time.
-    template <class T>
-    class SolverNode: public iw_solver_base<T>
+    template <class T, class S = DefaultScalar>
+    class SolverNode: public iw_solver_base<T, S>
     {
     public:
+        typedef S Scalar;
         SolverNode(const ros::NodeHandle& n = ros::NodeHandle()): n_(n)
         {
             srv_add_strat_ = n_.advertiseService("add_strategy",
@@ -161,7 +167,7 @@ namespace iw_solver_interface
         {
             hbba_msgs::ResourcesSet msg;
             msg.set.reserve(resource_max_.size());
-            std::map<std::string, int>::const_iterator i;
+            typename std::map<std::string, Scalar>::const_iterator i;
             for (i = resource_max_.begin(); i != resource_max_.end(); ++i)
             {
                 hbba_msgs::ResourceUsage u; 
@@ -173,7 +179,7 @@ namespace iw_solver_interface
         }
 
         std::map<std::string, hbba_msgs::Strategy> strategies_;
-        std::map<std::string, int> resource_max_;
+        std::map<std::string, Scalar> resource_max_;
 
         ros::NodeHandle n_;
         ros::ServiceServer srv_add_strat_;

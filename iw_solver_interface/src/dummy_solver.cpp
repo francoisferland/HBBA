@@ -6,26 +6,27 @@
 
 namespace {
 	/// \brief A dummy solver to test compilations issues with the interface.
-	class dummy_solver 
+    template <class Scalar>
+	class dummy_solver
 	{
 	public:
-		void set_resource_max(unsigned int i, int max)
+		void set_resource_max(unsigned int i, Scalar max)
 		{
 			res_[i] = max;
 		}
 
-		void set_util_min(unsigned int i, int min)
+		void set_util_min(unsigned int i, Scalar min)
 		{
 			info_[i] = min;
 		}
 
-        void set_util_int(unsigned int i, int intensity)
+        void set_util_int(unsigned int i, Scalar intensity)
         {
             intensity_[i] = intensity;
         }
 
-		void add_strategy(const unsigned int id, const std::vector<int>& cs,
-			const std::vector<int>& us)
+		void add_strategy(const unsigned int id, const std::vector<Scalar>& cs,
+			const std::vector<Scalar>& us)
 		{
 		}
 
@@ -33,8 +34,8 @@ namespace {
 		{
 			
 			std::cout << "Refreshing model..." << std::endl;
-			res_ = std::vector<int>(r);
-			info_ = std::vector<int>(i);
+			res_ = std::vector<Scalar>(r);
+			info_ = std::vector<Scalar>(i);
 		}
 
 		void clear_reqs()
@@ -49,10 +50,10 @@ namespace {
 
 
 	private:
-		std::vector<int> res_;
-		std::vector<int> info_;
-        std::vector<int> intensity_;
-		std::vector<int> strat_;
+		std::vector<Scalar> res_;
+		std::vector<Scalar> info_;
+        std::vector<Scalar> intensity_;
+		std::vector<Scalar> strat_;
 	};
 
 
@@ -62,7 +63,7 @@ int main(int argc, char** argv)
 {
     using namespace iw_solver_interface;
 
-    typedef SolverNode<dummy_solver> node_t;
+    typedef SolverNode< dummy_solver<DefaultScalar>, DefaultScalar> node_t;
 
     ros::init(argc, argv, "dummy_solver");
     node_t n;

@@ -13,27 +13,30 @@
 
 namespace iw_solver_ortools 
 {	
+    template <class S>
 	class Strategy 
 	{
 	public :
+        typedef S Scalar;
 	
 		Strategy()
 		{
 		}
 		
-		Strategy(const unsigned int id, const std::vector<int>& cs, const std::vector<int>& us)
+		Strategy(const unsigned int id, 
+            const std::vector<Scalar>& cs, const std::vector<Scalar>& us)
 		{
 			id_ = id;
 			cs_ = cs;
 			us_ = us;
 		}
 		
-		int get_cost(int j)
+		Scalar get_cost(int j)
 		{
 			return cs_[j];
 		}
 	
-		int get_utility(int k)
+		Scalar get_utility(int k)
 		{
 			return us_[k];
 		}
@@ -45,41 +48,45 @@ namespace iw_solver_ortools
 		
 	private:  
 		int id_;
-		std::vector<int> cs_;
-		std::vector<int> us_;
+		typename std::vector<Scalar> cs_;
+		typename std::vector<Scalar> us_;
 
 	};
 
 	/// \or-tools solver 
+    template <class S>
 	class ortools_solver 
 	{
 	public:
-		void set_resource_max(unsigned int i, int max)
+        typedef S Scalar;
+        typedef Strategy<S> StrategyT;
+
+		void set_resource_max(unsigned int i, Scalar max)
 		{
 			cMax_[i] = max;
 		}
 
-		void set_util_min(unsigned int i, int min)
+		void set_util_min(unsigned int i, Scalar min)
 		{
 			uMin_[i] = min;
 		}
 
-        void set_util_int(unsigned int i, int intensity)
+        void set_util_int(unsigned int i, Scalar intensity)
         {
             uInt_[i] = intensity;
         }
 
-		void add_strategy(const unsigned int id, const std::vector<int>& cs,
-			const std::vector<int>& us)
+		void add_strategy(const unsigned int id, const std::vector<Scalar>& cs,
+			const std::vector<Scalar>& us)
 		{
-			strat_[id] = Strategy(id, cs, us); 
+			strat_[id] = Strategy<Scalar>(id, cs, us); 
 		}
 
 		void clear_model(size_t r, size_t i)
 		{	
 			std::cout << "Refreshing model..." << std::endl;
-			cMax_ = std::vector<int>(r,0);
-			uMin_ = std::vector<int>(i,0);
+			cMax_ = std::vector<Scalar>(r,0);
+			uMin_ = std::vector<Scalar>(i,0);
 		}
 
 		void clear_reqs()
@@ -103,7 +110,7 @@ namespace iw_solver_ortools
 			int nbClass = uMin_.size(); 
 			
 			int nbStrat = 0; 
-			typedef map<unsigned int, Strategy>::const_iterator CI ;
+			typedef typename map< unsigned int, StrategyT >::const_iterator CI ;
 			for(CI i = strat_.begin(); i != strat_.end(); ++i)			
 			{ 
 				nbStrat++;
@@ -122,11 +129,11 @@ namespace iw_solver_ortools
 			{ 
 				int cMax_j = cMax_[j];
 				
-				vector<int> c_j;
-				typedef map<unsigned int, Strategy>::const_iterator CI ;
+				vector<Scalar> c_j;
+				typedef typename map<unsigned int, StrategyT >::const_iterator CI ;
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)			
 				{ 
-					Strategy s = i->second;
+					Strategy<Scalar> s = i->second;
 					c_j.push_back(s.get_cost(j));
 				}
 				
@@ -139,11 +146,11 @@ namespace iw_solver_ortools
 			for(int k = 0; k<nbClass; k++) //For each class
 			{ 
 				int uMin_k = uMin_[k]; 
-				vector<int> u_k;
-				typedef map<unsigned int, Strategy>::const_iterator CI;
+				vector<Scalar> u_k;
+				typedef typename map< unsigned int, StrategyT >::const_iterator CI;
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)
 				{
-					Strategy s = i->second;
+					Strategy<Scalar> s = i->second;
 					u_k.push_back(s.get_utility(k));
 				}
 
@@ -182,10 +189,10 @@ namespace iw_solver_ortools
 			for(int k = 0; k<nbClass; k++) //For each class
 			{ 
 				vector<IntVar*> aDes ; //Variables corresponding of the class k 
-				typedef map<unsigned int, Strategy>::const_iterator CI;
+				typedef typename map< unsigned int, StrategyT >::const_iterator CI;
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)
 				{
-					Strategy s = i->second;
+					StrategyT s = i->second;
 					if (s.get_utility(k) > 0)
 					{
 						aDes.push_back(a[s.get_id()]);
@@ -223,10 +230,10 @@ namespace iw_solver_ortools
 		}
 		
 	private:
-		std::vector<int> cMax_;
-		std::vector<int> uMin_;
-        std::vector<int> uInt_;
-		std::map<unsigned int, Strategy> strat_;
+		typename std::vector<Scalar> cMax_;
+		typename std::vector<Scalar> uMin_;
+        typename std::vector<Scalar> uInt_;
+		typename std::map<unsigned int, Strategy<Scalar> > strat_;
 	};
 }
 
@@ -235,7 +242,7 @@ int main(int argc, char** argv)
     using namespace iw_solver_interface;
     using namespace iw_solver_ortools;
     
-    typedef SolverNode<ortools_solver> node_t;
+    typedef SolverNode< ortools_solver<DefaultScalar>, DefaultScalar> node_t;
 
     ros::init(argc, argv, "ortools_solver");
     node_t n;

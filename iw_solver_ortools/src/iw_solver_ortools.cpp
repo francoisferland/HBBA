@@ -31,17 +31,17 @@ namespace iw_solver_ortools
 			us_ = us;
 		}
 		
-		Scalar get_cost(int j)
+		Scalar get_cost(int j) const
 		{
 			return cs_[j];
 		}
 	
-		Scalar get_utility(int k)
+		Scalar get_utility(int k) const
 		{
 			return us_[k];
 		}
 		
-		int get_id()
+		int get_id() const
 		{
 			return id_;
 		}
@@ -93,7 +93,7 @@ namespace iw_solver_ortools
 		void add_strategy(const unsigned int id, const std::vector<Scalar>& cs,
 			const std::vector<Scalar>& us)
 		{
-			strat_[id] = StrategyT(id, cs, us); // Converted later.
+			strat_[id] = StrategyT(id, cs, us); // Converted and scaled later.
 		}
 
 		void clear_model(size_t r, size_t i)
@@ -101,11 +101,13 @@ namespace iw_solver_ortools
 			std::cout << "Refreshing model..." << std::endl;
 			cMax_ = std::vector<ORScalar>(r,0);
 			uMin_ = std::vector<ORScalar>(i,0);
+            uInt_ = std::vector<ORScalar>(i,0);
 		}
 
 		void clear_reqs()
 		{
 			std::fill(uMin_.begin(), uMin_.end(), 0);
+			std::fill(uInt_.begin(), uInt_.end(), 0);
 		}
 
 		void solve(std::vector<bool>& res)
@@ -139,6 +141,7 @@ namespace iw_solver_ortools
 
 			//Create Resource constraints
 			vector<IntVar*> objectivesRes_var_array;		
+            printf("c_ji:\n");
 			for(int j = 0; j<nbResources; j++) //For each resources
 			{ 
 				int cMax_j = cMax_[j];
@@ -149,7 +152,9 @@ namespace iw_solver_ortools
 				{ 
 					StrategyT s = i->second;
 					c_j.push_back(ORScalar(scaling_ * s.get_cost(j)));
+                    printf("%i ", (int)(scaling_ * s.get_cost(j)));
 				}
+                printf("| max: %i\n", (int)cMax_j);
 				
 				solver.AddConstraint(solver.MakeScalProdLessOrEqual(a,c_j, cMax_j));
 				objectivesRes_var_array.push_back(solver.MakeScalProd(a,c_j)->Var());
@@ -158,6 +163,7 @@ namespace iw_solver_ortools
 			//Create Utility constraints		
 			vector<IntVar*> objectiveUti_var_array; 
 			vector<IntVar*> objectiveInt_var_array; 
+            printf("u_ki:\n");
 			for(int k = 0; k<nbClass; k++) //For each class
 			{ 
 				int uMin_k = uMin_[k]; 
@@ -172,26 +178,15 @@ namespace iw_solver_ortools
                     ORScalar u_ik = ORScalar(scaling_ * s.get_utility(k)); 
 					u_k.push_back(u_ik);
                     u_k_s_k.push_back(u_ik * s_k);
+                    printf("%i ", (int)u_ik);
 				}
+                printf(" | min: %i \n", (int)uMin_k);
 
 				solver.AddConstraint(solver.MakeScalProdGreaterOrEqual(a,u_k, uMin_k));
 				objectiveUti_var_array.push_back(solver.MakeScalProd(a,u_k)->Var());
                 objectiveInt_var_array.push_back(solver.MakeScalProd(a, u_k_s_k)->Var());
 			}
-			/*
-			//Utility of each strategy display
-			typedef map<unsigned int, Strategy>::const_iterator CI ;
-			for(CI i = strat_.begin(); i != strat_.end(); ++i)			
-			{ 
-				Strategy s = i->second;
-				printf("Strategie %d : ", s.get_id()); 
-				for (int j = 0 ; j <  nbClass ; j++) 
-				{
-					printf(" %d ", s.get_utility(j)) ; 
-				}
-				printf("\n"); 
-			}
-			*/
+			
 			vector<SearchMonitor*> monitors;
 
 			//Optimization 
@@ -292,10 +287,10 @@ int main(int argc, char** argv)
     np.param("scaling_factor", scaling, 1000.0); 
     int flags = 0;
     bool b;
-    np.param("optimize_intensity", b, true);
+    np.param("optimize_intensity", b, false);
     if (b)
         flags |= SolverT::OPT_TOTAL_INT_MAX;
-    np.param("optimize_utility", b, true);
+    np.param("optimize_utility", b, false);
     if (b)
         flags |= SolverT::OPT_TOTAL_UTIL_MAX;
     

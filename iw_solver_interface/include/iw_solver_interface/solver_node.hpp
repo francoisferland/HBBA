@@ -108,11 +108,16 @@ namespace iw_solver_interface
             typedef typename u_vec_t::const_iterator u_vec_it;
             base_t::clear_reqs();
             for (u_vec_it i = desires.begin(); i != desires.end(); ++i)
+            {
                 base_t::set_util_min(i->type, i->utility);
+                base_t::set_util_int(i->type, i->intensity);
+            }
 
             // Automatically call the solver.
             typename base_t::sol_vec_t result(base_t::strat_count());
             base_t::solve(result);
+
+            ROS_INFO("Solving done.");
 
             // Publish the intention set for diagnostic purposes
             // Note that desire fields can be empty, since not every single 
@@ -146,8 +151,9 @@ namespace iw_solver_interface
                 {   
                     if(s.utility.id == d->type)
                     {
-                        script += d->params;
-                        intent.desires[j] = d->id;
+                        // TEMP!
+                        //script += d->params;
+                        //intent.desires[j] = d->id;
                     }
                 }   
                 script += ");";

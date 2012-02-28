@@ -14,6 +14,7 @@
   <depend package="topic_filters"/>
   <depend package="topic_filters_manager"/>
   <depend package="rospy"/>
+  <depend package="roscpp"/>
   <depend package="smach"/>
   <depend package="smach_ros"/>
   <depend package="geometry_msgs"/>

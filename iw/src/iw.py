@@ -46,13 +46,14 @@ class iw_server:
 
     def filter_set(self):
         # Go through each desires, find duplicates in a utility class, keep the
-        # most intensive ones.
+        # most intensive ones, flush those with intensity == 0.
         class_map = {}
         dset = []
         for d in self.desires.values():
-            if d.type not in class_map:
-                class_map[d.type] = []
-            class_map[d.type].append(d)
+            if d.intensity > 0.001:
+                if d.type not in class_map:
+                    class_map[d.type] = []
+                class_map[d.type].append(d)
         for ds in class_map.values():
             dm = ds[0]
             for d in ds:

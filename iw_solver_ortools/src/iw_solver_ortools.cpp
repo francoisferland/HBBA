@@ -62,7 +62,16 @@ namespace iw_solver_ortools
         typedef S Scalar;
         typedef Strategy<Scalar> StrategyT;
 
-        ortools_solver(Scalar scaling): scaling_(scaling)
+        /// \brief Optimization flags
+        enum Opts
+        {
+            OPT_TOTAL_INT_MAX = 1,  // Maximal total intensity
+            OPT_TOTAL_UTIL_MAX = 2, // Maximal total utility
+            OPT_CLASS_ACT_MAX = 4,  // Maximal activation in each desire class
+            OPT_EACH_RES_MAX = 8    // Maximize resource allocation in each class.
+        };
+
+        ortools_solver(Scalar scaling, int flags): scaling_(scaling), flags_(flags)
         {
         }
 
@@ -148,19 +157,26 @@ namespace iw_solver_ortools
 
 			//Create Utility constraints		
 			vector<IntVar*> objectiveUti_var_array; 
+			vector<IntVar*> objectiveInt_var_array; 
 			for(int k = 0; k<nbClass; k++) //For each class
 			{ 
 				int uMin_k = uMin_[k]; 
+                ORScalar s_k = uInt_[k]; 
+
 				vector<ORScalar> u_k;
+                vector<ORScalar> u_k_s_k;
 				typedef typename map< unsigned int, StrategyT >::const_iterator CI;
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)
 				{
 					StrategyT s = i->second;
-					u_k.push_back(ORScalar(scaling_ * s.get_utility(k)));
+                    ORScalar u_ik = ORScalar(scaling_ * s.get_utility(k)); 
+					u_k.push_back(u_ik);
+                    u_k_s_k.push_back(u_ik * s_k);
 				}
 
 				solver.AddConstraint(solver.MakeScalProdGreaterOrEqual(a,u_k, uMin_k));
 				objectiveUti_var_array.push_back(solver.MakeScalProd(a,u_k)->Var());
+                objectiveInt_var_array.push_back(solver.MakeScalProd(a, u_k_s_k)->Var());
 			}
 			/*
 			//Utility of each strategy display
@@ -179,36 +195,54 @@ namespace iw_solver_ortools
 			vector<SearchMonitor*> monitors;
 
 			//Optimization 
-			vector<OptimizeVar*> objectivesRes;
-			for(int j = 0; j<nbResources; j++) //For each resources 
-			{  
-				objectivesRes.push_back(solver.MakeOptimize(0,objectivesRes_var_array[j], 1));//Optimization of one resource 
-				monitors.push_back(objectivesRes[j]);
-			}
-	
-			IntVar* objectiveUti_var = solver.MakeSum(objectiveUti_var_array)->Var(); // Total utility
-			OptimizeVar* const objectiveUti = solver.MakeMaximize(objectiveUti_var, 1);//Maximization of total utility
-			monitors.push_back(objectiveUti);
+            
+            if (flags_ & OPT_EACH_RES_MAX)
+            {
+                vector<OptimizeVar*> objectivesRes;
+                for(int j = 0; j<nbResources; j++) //For each resources 
+                {  
+                    objectivesRes.push_back(solver.MakeOptimize(0,objectivesRes_var_array[j], 1));//Optimization of one resource 
+                    monitors.push_back(objectivesRes[j]);
+                }
+	        }
+
+            if (flags_ & OPT_TOTAL_UTIL_MAX)
+            {
+                IntVar* objectiveUti_var = solver.MakeSum(objectiveUti_var_array)->Var(); // Total utility
+                OptimizeVar* const objectiveUti = solver.MakeMaximize(objectiveUti_var, 1);//Maximization of total utility
+                    monitors.push_back(objectiveUti);
+            }
+
+            // Intensity maximization.
+            if (flags_ & OPT_TOTAL_INT_MAX)
+            {
+                IntVar* objectiveInt_var = solver.MakeSum(
+                    objectiveInt_var_array)->Var();
+                OptimizeVar* const objectiveInt = solver.MakeMaximize(objectiveInt_var, 1);
+                monitors.push_back(objectiveInt);
+            }
 			
-			
-			for(int k = 0; k<nbClass; k++) //For each class
-			{ 
-				vector<IntVar*> aDes ; //Variables corresponding of the class k 
-				typedef typename map< unsigned int, StrategyT >::const_iterator CI;
-				for(CI i = strat_.begin(); i != strat_.end(); ++i)
-				{
-					StrategyT s = i->second;
-					if (s.get_utility(k) > 0)
-					{
-						aDes.push_back(a[s.get_id()]);
-					}
-				}
-				//Maximization of activated strategies for each class
-				IntVar* objectiveDes_var = solver.MakeSum(aDes)->Var() ; 
-				OptimizeVar* const objectiveDes = solver.MakeMaximize(objectiveDes_var, 1);
-				monitors.push_back(objectiveDes);
-			}
-		
+            if (flags_ & OPT_CLASS_ACT_MAX)
+            {
+                for(int k = 0; k<nbClass; k++) //For each class
+                { 
+                    vector<IntVar*> aDes ; //Variables corresponding of the class k 
+                    typedef typename map< unsigned int, StrategyT >::const_iterator CI;
+                    for(CI i = strat_.begin(); i != strat_.end(); ++i)
+                    {
+                        StrategyT s = i->second;
+                        if (s.get_utility(k) > 0)
+                        {
+                            aDes.push_back(a[s.get_id()]);
+                        }
+                    }
+                    //Maximization of activated strategies for each class
+                    IntVar* objectiveDes_var = solver.MakeSum(aDes)->Var() ; 
+                    OptimizeVar* const objectiveDes = solver.MakeMaximize(objectiveDes_var, 1);
+                    monitors.push_back(objectiveDes);
+                }
+		    }
+
 			//Searching solutions
 			DecisionBuilder* const db = solver.MakePhase(a, Solver::CHOOSE_RANDOM, Solver::ASSIGN_MAX_VALUE);
 			SearchMonitor* const log = solver.MakeSearchLog(100000);
@@ -240,6 +274,7 @@ namespace iw_solver_ortools
         typename std::vector<ORScalar> uInt_;
 		typename std::map<unsigned int, StrategyT > strat_;
         Scalar scaling_; // Conversion ratio when goint to int64.
+        int flags_;     // Optimization flags.
 	};
 }
 
@@ -252,10 +287,19 @@ int main(int argc, char** argv)
 
     ros::init(argc, argv, "ortools_solver");
     ros::NodeHandle np("~");
-    // Scaling factor when going from double to int.
+
     double scaling;
     np.param("scaling_factor", scaling, 1000.0); 
-    boost::shared_ptr<SolverT> solver(new SolverT(scaling));
+    int flags = 0;
+    bool b;
+    np.param("optimize_intensity", b, true);
+    if (b)
+        flags |= SolverT::OPT_TOTAL_INT_MAX;
+    np.param("optimize_utility", b, true);
+    if (b)
+        flags |= SolverT::OPT_TOTAL_UTIL_MAX;
+    
+    boost::shared_ptr<SolverT> solver(new SolverT(scaling, flags));
     NodeT node(solver);
 
     ros::spin();

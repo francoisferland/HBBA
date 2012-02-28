@@ -48,6 +48,8 @@ namespace iw_solver_interface
     ///    Set the resource at index id to maximum cost v.
     ///  - set_util_min(int id, int v)
     ///    Set the information at index id to minimum utility v.
+    ///  - set_util_int(int id, int i)
+    ///    Set the information at index id to intensity i.
     ///  - add_strategy(int id, std::vector<int> c, std::vector<int> u)
     ///  - Add a strategy at index id with costs c and utilities u.
     ///  - solve(std::vector<bool>& result)
@@ -119,8 +121,18 @@ namespace iw_solver_interface
             if (i >= umin_.size())
                 umin_.resize(i + 1);
             umin_[i] = min;
-            util_updated_ = true;
+            umin_updated_ = true;
 
+        }
+
+        /// \brief Sets a desired information intensity.
+        void set_util_int(const std::string& name, const int intensity)
+        {
+            unsigned int i = index(util_map_.left, name);
+            if (i >= uint_.size())
+                uint_.resize(i + 1);
+            uint_[i] = intensity;
+            uint_updated_ = true;
         }
         
         /// \brief Refresh the model according to the added resources and info
@@ -134,12 +146,15 @@ namespace iw_solver_interface
             impl_->clear_model(res_map_.size(), util_map_.size());
         }
 
-        /// \brief Clears the requirements (util_min) for the solution.
+        /// \brief Clears the requirements (util_min, util_int) for the 
+        /// solution.
         void clear_reqs()
         {
             impl_->clear_reqs();
             umin_.resize(0);
-            util_updated_ = true;
+            uint_.resize(0);
+            umin_updated_ = true;
+            uint_updated_ = true;
         }
 
         /// \brief Add a strategy to the set.
@@ -191,7 +206,7 @@ namespace iw_solver_interface
                         u_min.begin());
 
                     costs_t uf(util_mtx_.shape()[1]);   
-                    printf("Utilité finale strat %d  ",i);
+                    printf("Utilité finale strat %d  ",(int)i);
                     for(size_t j =0; j<us.size(); ++j)
                     {
                         if (j < u_min.size())
@@ -207,11 +222,17 @@ namespace iw_solver_interface
                 model_updated_ = false;
             }
 
-            if (util_updated_)
+            if (umin_updated_)
             {
                 for (unsigned int i = 0; i < umin_.size(); ++i)
                     impl_->set_util_min(i, umin_[i]);
-                util_updated_ = false;
+                umin_updated_ = false;
+            }
+            if (uint_updated_)
+            {
+                for (unsigned int i = 0; i < uint_.size(); ++i)
+                    impl_->set_util_int(i, uint_[i]);
+                uint_updated_ = false;
             }
             if (res_updated_)
             {
@@ -219,7 +240,6 @@ namespace iw_solver_interface
                     impl_->set_resource_max(i, cmax_[i]);
                 res_updated_ = false;
             }
-            if (u_min_updated_)
 
             typedef std::vector<bool> iv_t;
             std::vector<bool> strats(strat_map_.size());
@@ -357,9 +377,9 @@ namespace iw_solver_interface
         costs_t cmax_;
         bool res_updated_;
         costs_t umin_;
-        bool util_updated_;
-        costs_t u_min_;
-        bool u_min_updated_;
+        bool umin_updated_;
+        costs_t uint_;
+        bool uint_updated_;
         
     };
     

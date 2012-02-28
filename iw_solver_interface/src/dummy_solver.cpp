@@ -19,6 +19,11 @@ namespace {
 			info_[i] = min;
 		}
 
+        void set_util_int(unsigned int i, int intensity)
+        {
+            intensity_[i] = intensity;
+        }
+
 		void add_strategy(const unsigned int id, const std::vector<int>& cs,
 			const std::vector<int>& us)
 		{
@@ -46,6 +51,7 @@ namespace {
 	private:
 		std::vector<int> res_;
 		std::vector<int> info_;
+        std::vector<int> intensity_;
 		std::vector<int> strat_;
 	};
 

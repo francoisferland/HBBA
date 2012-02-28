@@ -64,6 +64,11 @@ namespace iw_solver_ortools
 			uMin_[i] = min;
 		}
 
+        void set_util_int(unsigned int i, int intensity)
+        {
+            uInt_[i] = intensity;
+        }
+
 		void add_strategy(const unsigned int id, const std::vector<int>& cs,
 			const std::vector<int>& us)
 		{
@@ -220,6 +225,7 @@ namespace iw_solver_ortools
 	private:
 		std::vector<int> cMax_;
 		std::vector<int> uMin_;
+        std::vector<int> uInt_;
 		std::map<unsigned int, Strategy> strat_;
 	};
 }

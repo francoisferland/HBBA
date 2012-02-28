@@ -58,7 +58,7 @@ s2 = Strategy()
 s2.id = "track_ball"
 s2.bringup_function = "track_ball_bup"
 s2.bringdown_function = "track_ball_bdn"
-s2.cost = [ResourceUsage("CPU", 90)]
+s2.cost = [ResourceUsage("CPU", 80)]
 s2.utility = ResourceUsage("BallTracking", 2)
 s2.source = """
 function track_ball_bup(params)

@@ -7,11 +7,16 @@
         <include file="$(find jn0_bringup)/launch/jn0_manyears.launch"/>
         <node name="stream_filter" pkg="nodelet" type="nodelet"
             args="standalone topic_filters/GenericDivisor
-                /audio_stream audio_stream"/>
+                /audio_stream audio_stream">
+            <param name="latch_size" value="20"/>
+        </node>
         <!-- Sound reaction behavior -->
-        <node name="pose_react" pkg="jn0_demos" type="pose_react">
-            <param name="phi_max" value="0.30"/>
+        <node name="pose_react" pkg="jn0_demos" type="pose_react" output="screen">
+            <param name="phi_max" value="0.75"/>
+            <param name="theta_max" value="0.40"/>
+            <param name="talk_msg" value="Comment?"/>
             <remap from="pose" to="source_pose"/>
+            <remap from="voice/say" to="/voice/say"/>
         </node>
         <param name="look_at_pose/abtr_priority" value="50"/>
     </group>
@@ -42,6 +47,6 @@
 
     <!-- Look at pose actuator link -->
     <include file="$(find jn0_demos)/launch/jn0_lookat.launch"/>
-    <param name="look_at_pos/neutral_tilt" value="-0.5"/>
+    <param name="look_at_pos/neutral_tilt" value="-0.75"/>
 
 </launch>

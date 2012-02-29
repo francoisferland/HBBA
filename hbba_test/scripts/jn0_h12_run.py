@@ -26,8 +26,8 @@ s1 = Strategy()
 s1.id = "locate_voice"
 s1.bringup_function = "locate_voice_bup"
 s1.bringdown_function = "locate_voice_bdn"
-s1.cost = [ResourceUsage("CPU", 20)]
-s1.utility = ResourceUsage("LocateVoice", 2)
+s1.cost = [ResourceUsage("CPU", 40)]
+s1.utility = ResourceUsage("LocateVoice", 1)
 s1.source = """
 // These two methods will be available to all strategies.
 function activate(name)
@@ -55,29 +55,49 @@ function locate_voice_bdn(params)
 add_strat(s1)
 
 s2 = Strategy()
-s2.id = "track_ball"
+s2.id = "track_ball_full"
 s2.bringup_function = "track_ball_bup"
 s2.bringdown_function = "track_ball_bdn"
-s2.cost = [ResourceUsage("CPU", 80)]
-s2.utility = ResourceUsage("BallTracking", 2)
+s2.cost = [ResourceUsage("CPU", 80), ResourceUsage("BallTracker", 1)]
+s2.utility = ResourceUsage("BallTracking", 4)
 s2.source = """
 function track_ball_bup(params)
 {
-	se_log('track_ball bringup');
+	se_log('track_ball /1 bringup');
 	activate('/ball_tracking/kinect_filter');
 }
 
 function track_ball_bdn(params)
 {
-	se_log('track_ball bringdown');
+	se_log('track_ball /1 bringdown');
 	deactivate('/ball_tracking/kinect_filter');
 }
 """
 add_strat(s2)
 
+s3 = Strategy()
+s3.id = "track_ball_quarter"
+s3.bringup_function = "track_ball_quarter_bup"
+s3.bringdown_function = "track_ball_quarter_bdn"
+s3.cost = [ResourceUsage("CPU", 40), ResourceUsage("BallTracker", 1)]
+s3.utility = ResourceUsage("BallTracking", 1)
+s3.source = """
+function track_ball_quarter_bup(params)
+{
+	se_log('track_ball /4 bringup');
+    setDivisorRate('/ball_tracking/kinect_filter', 4);
+}
+
+function track_ball_quarter_bdn(params)
+{
+	se_log('track_ball /4 bringdown');
+    setDivisorRate('/ball_tracking/kinect_filter', 4);
+}
+"""
+add_strat(s3)
+
 # Resource allocations
 
-#set_res_max("LocateVoice", 1)
-#set_res_max("BallTracking", 1)
+set_res_max("BallTracker", 1)
 set_res_max("CPU", 100)
 

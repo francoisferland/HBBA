@@ -2,8 +2,9 @@
     <!-- HBBA structure -->
     <group ns="hbba">
         <node name="script_engine" pkg="script_engine" type="script_engine" output="screen"/>
-        <node name="iw_solver" pkg="iw_solver_ortools" type="iw_solver_ortools" output="screen"
-            launch-prefix="xterm -e gdb --args"/>
+        <node name="iw_solver" pkg="iw_solver_ortools" type="iw_solver_ortools" output="screen">
+            <param name="optimize_intensity" value="true"/>
+        </node>
         <node name="iw" pkg="iw" type="iw.py"/>
     </group>
 

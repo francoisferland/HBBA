@@ -1,0 +1,8 @@
+<launch>
+    <!-- Motivations -->
+    <node name="motivations" pkg="hbba_test" type="jn0_h12_motivation" output="screen">
+        <remap from="add_desires" to="hbba/add_desires"/>
+        <param name="int_grad" value="2.0"/>
+    </node>
+
+</launch>

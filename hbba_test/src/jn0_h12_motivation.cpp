@@ -21,7 +21,7 @@ namespace hbba_test
             sub_poke_ = n_.subscribe("poke", 1,
                 &Motivations::interruptCB, this);
 
-            ros::NodeHandle np;
+            ros::NodeHandle np("~");
             // Intensity lost at each update:
             np.param("int_grad", int_grad_, 0.10);
             // Intensity update period:

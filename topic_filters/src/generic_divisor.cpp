@@ -3,6 +3,7 @@
 #include <topic_tools/shape_shifter.h>
 #include <topic_filters/SetDivisorRate.h>
 #include <ros/ros.h>
+#include <deque>
 
 namespace topic_filters
 {
@@ -40,7 +41,9 @@ namespace topic_filters
             ros::NodeHandle np = getPrivateNodeHandle();
             srv_rate_ = np.advertiseService("set_divisor_rate",
                 &GenericDivisor::rateCB, this);
-            np.param("latch", latch_, true);
+            int ls;
+            np.param("latch_size", ls, 1);
+            latch_size_ = abs(ls);
 
         }
 
@@ -54,8 +57,8 @@ namespace topic_filters
                 // Note that this filter couldn't actually change its type
                 // after getting a first message, and that the output topic
                 // will be advertised even if the filter is deactivated.
-                //ROS_INFO("Advertising %s ...", output_name_.c_str());
-                pub_ = msg->advertise(n_, output_name_, 10, latch_);
+                // ROS_INFO("Advertising %s ...", output_name_.c_str());
+                pub_ = msg->advertise(n_, output_name_, 10, latch_size_ > 0);
                 advertised_ = true;
                 // TODO Don't understand why, but at first the publisher think
                 // there is no subscribers, dropping the first message. Latching
@@ -74,7 +77,11 @@ namespace topic_filters
                 pub_.publish(msg);
             }
 
-            last_msg_ = msg;
+            //last_msg_ = msg;
+            latch_buffer_.push_back(msg);
+            if (latch_buffer_.size() > latch_size_)
+                latch_buffer_.pop_front();
+
             count_++;
         }
 
@@ -87,11 +94,14 @@ namespace topic_filters
 
             if (rate_ > 0)
             {
-                //ROS_INFO("Turning on %s", output_name_.c_str()); 
-                if (latch_ && advertised_)
+                if ((latch_size_ > 0) && advertised_)
                 {
-                    //ROS_INFO("Releasing latched message.");
-                    pub_.publish(last_msg_);
+                    while (!latch_buffer_.empty())
+                    {
+                        MsgPtr m = latch_buffer_.front();
+                        pub_.publish(m);
+                        latch_buffer_.pop_front();
+                    }
                 }
             }
             else
@@ -105,7 +115,7 @@ namespace topic_filters
         int rate_;
         int count_;
         bool advertised_;
-        bool latch_;
+        size_t latch_size_;
         std::string output_name_;
 
         ros::NodeHandle n_;
@@ -113,7 +123,9 @@ namespace topic_filters
         ros::Publisher pub_;
         ros::ServiceServer srv_rate_;
 
-        topic_tools::ShapeShifter::ConstPtr last_msg_;
+        typedef topic_tools::ShapeShifter::ConstPtr MsgPtr;
+        typedef std::deque<MsgPtr> QueueType;
+        QueueType latch_buffer_;
 
     };
 }

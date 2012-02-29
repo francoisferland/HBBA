@@ -42,5 +42,6 @@
 
     <!-- Look at pose actuator link -->
     <include file="$(find jn0_demos)/launch/jn0_lookat.launch"/>
+    <param name="look_at_pos/neutral_tilt" value="-0.5"/>
 
 </launch>

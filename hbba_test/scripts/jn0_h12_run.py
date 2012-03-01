@@ -85,7 +85,7 @@ s3.source = """
 function track_ball_quarter_bup(params)
 {
 	se_log('track_ball /4 bringup');
-    setDivisorRate('/ball_tracking/kinect_filter', 4);
+    setDivisorRate('/ball_tracking/kinect_filter', 20);
 }
 
 function track_ball_quarter_bdn(params)

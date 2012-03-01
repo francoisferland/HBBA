@@ -7,6 +7,7 @@
 #include <hbba_msgs/Intention.h>
 #include <script_engine/EvalScript.h>
 #include <ros/ros.h>
+#include <algorithm>
 
 namespace iw_solver_interface
 {
@@ -116,6 +117,13 @@ namespace iw_solver_interface
             // Automatically call the solver.
             typename base_t::sol_vec_t result(base_t::strat_count());
             base_t::solve(result);
+
+            // Sort the results on activation result so that bringdown scripts
+            // are called before bringup ones.
+            // Important for mutually exclusive strategies.
+            std::sort(result.begin(), result.end(),
+                boost::bind(&base_t::sol_t::second, _1) <
+                boost::bind(&base_t::sol_t::second, _2));
 
             ROS_INFO("Solving done.");
 

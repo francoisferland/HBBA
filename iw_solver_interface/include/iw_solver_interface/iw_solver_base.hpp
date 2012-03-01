@@ -72,8 +72,10 @@ namespace iw_solver_interface
         typedef std::pair<std::string, Scalar> ScalarTag;
         /// \brief Vector type for cost/utility tag/value pairs.
         typedef std::vector<ScalarTag> strat_vec_t;
+        /// \brief Type for strategy activation tag/value pairs.
+        typedef std::pair<std::string, bool> sol_t;
         /// \brief Vector type for strategy activation tag/value pairs.
-        typedef std::vector< std::pair< std::string, bool > > sol_vec_t;
+        typedef std::vector<sol_t> sol_vec_t;
         /// \brief Vector type for ordered cost and utility values.
         typedef std::vector<Scalar> costs_t;
 
@@ -251,7 +253,7 @@ namespace iw_solver_interface
             typedef std::vector<bool> iv_t;
             std::vector<bool> strats(strat_map_.size());
             impl_->solve(strats);
-            // TODO: We only keep the first solution for now, optimizations are
+            // We only keep the first solution for now, optimizations are
             // currently fixed in the lower level solver.
             index_map_t::right_map::const_iterator i = strat_map_.right.begin();
             for (; i != strat_map_.right.end(); ++i)

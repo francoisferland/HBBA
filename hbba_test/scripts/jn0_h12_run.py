@@ -91,7 +91,7 @@ function track_ball_quarter_bup(params)
 function track_ball_quarter_bdn(params)
 {
 	se_log('track_ball /4 bringdown');
-    setDivisorRate('/ball_tracking/kinect_filter', 4);
+    setDivisorRate('/ball_tracking/kinect_filter', 0);
 }
 """
 add_strat(s3)

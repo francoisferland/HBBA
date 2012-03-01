@@ -161,7 +161,7 @@ namespace iw_solver_interface
                 // Run the corresponding script.
                 script_engine::EvalScript eval;
                 eval.request.source = script;
-                ROS_INFO("Function call: %s", script.c_str());
+                //ROS_INFO("Function call: %s", script.c_str());
                 scl_eval_script_.call(eval);
             }
 

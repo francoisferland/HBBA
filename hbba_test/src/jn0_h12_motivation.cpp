@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <hbba_msgs/AddDesires.h>
 #include <std_msgs/Time.h>
+#include <geometry_msgs/PoseStamped.h>
 
 namespace hbba_test
 {
@@ -20,6 +21,8 @@ namespace hbba_test
                 &Motivations::interruptCB, this);
             sub_poke_ = n_.subscribe("poke", 1,
                 &Motivations::interruptCB, this);
+            sub_sound_pose_ = n_.subscribe("sound_pose", 1,
+                &Motivations::poseCB, this);
 
             ros::NodeHandle np("~");
             // Intensity lost at each update:
@@ -64,6 +67,13 @@ namespace hbba_test
             updateDesires();
         }
 
+        void poseCB(const geometry_msgs::PoseStamped&)
+        {
+            // Keep the locator intensity level high if we're successfully
+            // tracking sound poses.
+            locate_int_ = 10.0;
+        }
+
         void timerCB(const ros::TimerEvent&)
         {
             const double EPS = 0.1;
@@ -84,6 +94,7 @@ namespace hbba_test
         ros::ServiceClient srv_add_des_;
         ros::Subscriber sub_sound_;
         ros::Subscriber sub_poke_;
+        ros::Subscriber sub_sound_pose_;
         ros::Timer timer_;
 
         hbba_msgs::AddDesires req_;

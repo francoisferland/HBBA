@@ -6,6 +6,7 @@
 #include <hbba_msgs/ResourcesSet.h>
 #include <hbba_msgs/Intention.h>
 #include <script_engine/EvalScript.h>
+#include <std_msgs/Duration.h>
 #include <ros/ros.h>
 #include <algorithm>
 
@@ -51,6 +52,10 @@ namespace iw_solver_interface
             ros::service::waitForService("eval_script");
             scl_eval_script_ = 
                n_.serviceClient<script_engine::EvalScript>("eval_script", true);
+
+            ros::NodeHandle np("~");
+            pub_solve_time_ =
+                np.advertise<std_msgs::Duration>("solve_time", 1);
         }
 
         bool addStrategySrv(hbba_msgs::AddStrategy::Request& req,
@@ -102,6 +107,8 @@ namespace iw_solver_interface
             // Do not solve empty desire sets for now.
             if (msg->desires.size() < 1) 
                 return;
+
+            ros::Time start_time = ros::Time::now();
 
             // Build the utility requests vector.
             typedef std::vector<hbba_msgs::Desire> u_vec_t;
@@ -173,6 +180,9 @@ namespace iw_solver_interface
                 scl_eval_script_.call(eval);
             }
 
+            std_msgs::Duration solve_time;
+            solve_time.data = ros::Time::now() - start_time;
+            pub_solve_time_.publish(solve_time);
             pub_intention_.publish(intent);
             
         }
@@ -207,6 +217,7 @@ namespace iw_solver_interface
         ros::Subscriber sub_desires_;
         ros::Publisher pub_intention_;
         ros::Publisher pub_res_max_;
+        ros::Publisher pub_solve_time_;
 
 
     };

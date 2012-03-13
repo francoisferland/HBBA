@@ -8,7 +8,7 @@
         <node name="stream_filter" pkg="nodelet" type="nodelet"
             args="standalone topic_filters/GenericDivisor
                 /audio_stream audio_stream">
-            <param name="latch_size" value="10"/>
+            <param name="latch_size" value="20"/>
         </node>
         <!-- Sound reaction behavior -->
         <node name="pose_react" pkg="jn0_demos" type="pose_react" output="screen">
@@ -51,7 +51,7 @@
 
     <!-- Look at pose actuator link -->
     <include file="$(find jn0_demos)/launch/jn0_lookat.launch"/>
-    <param name="look_at_pos/threshold" value="0.05"/>
-    <param name="look_at_pos/neutral_tilt" value="-0.75"/>
+    <param name="look_at_pose/threshold" value="0.05"/>
+    <param name="look_at_pose/neutral_tilt" value="-0.75"/>
 
 </launch>

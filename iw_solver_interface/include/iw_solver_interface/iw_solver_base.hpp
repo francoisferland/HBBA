@@ -329,35 +329,6 @@ namespace iw_solver_interface
                 return i->second;
         }
 
-        /// \brief Builds an indexed vector from a name/value pairs vector.
-        ///
-        /// Updates index when encountering new names.
-        /// TODO: Remove this when the update_matrix(...) model works.
-        void build_indexed_vector(const strat_vec_t& in, costs_t& out,
-            index_map_t& index)
-        {
-            typedef typename strat_vec_t::const_iterator it_t;
-            for (it_t i = in.begin(); i != in.end(); ++i)
-            {
-                const std::string& name = i->first;
-                unsigned int idx;
-                index_map_t::left_map::const_iterator j;
-                if ((j = index.left.find(name)) == index.left.end())
-                    idx = update_index(index.left, name);
-            }
-            out = costs_t(index.right.size(),0);
-            for (it_t i = in.begin(); i != in.end(); ++i)
-            {
-                const std::string& name = i->first;
-                const unsigned int& value = i->second;
-                unsigned int idx;
-                index_map_t::left_map::const_iterator j;
-                j = index.left.find(name);
-                idx = j->second;
-                out[idx] = value;
-            }
-        }
-
         void print_util_set()
         {
             std::cerr << "Available util sources: " << std::endl;

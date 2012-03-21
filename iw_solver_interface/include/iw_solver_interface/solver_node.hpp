@@ -105,6 +105,7 @@ namespace iw_solver_interface
         void desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
         {
             // Do not solve empty desire sets for now.
+            // TODO: Disable every strategies then ?
             if (msg->desires.size() < 1) 
                 return;
 
@@ -125,14 +126,14 @@ namespace iw_solver_interface
             typename base_t::sol_vec_t result(base_t::strat_count());
             base_t::solve(result);
 
-            // Sort the results on activation result so that bringdown scripts
+            // Sort the results on activation value so that bringdown scripts
             // are called before bringup ones.
             // Important for mutually exclusive strategies.
             std::sort(result.begin(), result.end(),
                 boost::bind(&base_t::sol_t::second, _1) <
                 boost::bind(&base_t::sol_t::second, _2));
 
-            ROS_INFO("Solving done.");
+            ROS_DEBUG("Solving done.");
 
             // Publish the intention set for diagnostic purposes
             // Note that desire fields can be empty, since not every single 
@@ -166,7 +167,8 @@ namespace iw_solver_interface
                 {   
                     if(s.utility.id == d->type)
                     {
-                        // TEMP!
+                        // TODO: Re-enable this!
+                        // String copy error somewhere.
                         //script += d->params;
                         //intent.desires[j] = d->id;
                     }
@@ -218,7 +220,6 @@ namespace iw_solver_interface
         ros::Publisher pub_intention_;
         ros::Publisher pub_res_max_;
         ros::Publisher pub_solve_time_;
-
 
     };
 

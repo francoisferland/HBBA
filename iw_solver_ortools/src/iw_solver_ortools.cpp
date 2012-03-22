@@ -68,7 +68,8 @@ namespace iw_solver_ortools
             OPT_TOTAL_INT_MAX = 1,  // Maximal total intensity
             OPT_TOTAL_UTIL_MAX = 2, // Maximal total utility
             OPT_CLASS_ACT_MAX = 4,  // Maximal activation in each desire class
-            OPT_EACH_RES_MAX = 8    // Maximize resource allocation in each class.
+            OPT_EACH_RES_MAX = 8,   // Maximize resource allocation in each class.
+            DEBUG_PRINT = 16,       // Print debug info to stdout.
         };
 
         ortools_solver(Scalar scaling, int flags): scaling_(scaling), flags_(flags)
@@ -141,7 +142,8 @@ namespace iw_solver_ortools
 
 			//Create Resource constraints
 			vector<IntVar*> objectivesRes_var_array;		
-            printf("c_ji:\n");
+            if (flags_ & DEBUG_PRINT)
+                printf("c_ji:\n");
 			for(int j = 0; j<nbResources; j++) //For each resources
 			{ 
 				int cMax_j = cMax_[j];
@@ -152,9 +154,11 @@ namespace iw_solver_ortools
 				{ 
 					StrategyT s = i->second;
 					c_j.push_back(ORScalar(scaling_ * s.get_cost(j)));
-                    printf("%i ", (int)(scaling_ * s.get_cost(j)));
+                    if (flags_ & DEBUG_PRINT)
+                        printf("%i ", (int)(scaling_ * s.get_cost(j)));
 				}
-                printf("| max: %i\n", (int)cMax_j);
+                if (flags_ & DEBUG_PRINT)
+                    printf("| max: %i\n", (int)cMax_j);
 				
 				solver.AddConstraint(solver.MakeScalProdLessOrEqual(a,c_j, cMax_j));
 				objectivesRes_var_array.push_back(solver.MakeScalProd(a,c_j)->Var());
@@ -163,7 +167,8 @@ namespace iw_solver_ortools
 			//Create Utility constraints		
 			vector<IntVar*> objectiveUti_var_array; 
 			vector<IntVar*> objectiveInt_var_array; 
-            printf("u_ki:\n");
+            if (flags_ & DEBUG_PRINT)
+                printf("u_ki:\n");
 			for(int k = 0; k<nbClass; k++) //For each class
 			{ 
 				int uMin_k = uMin_[k]; 
@@ -178,9 +183,11 @@ namespace iw_solver_ortools
                     ORScalar u_ik = ORScalar(scaling_ * s.get_utility(k)); 
 					u_k.push_back(u_ik);
                     u_k_s_k.push_back(u_ik * s_k);
-                    printf("%i ", (int)u_ik);
+                    if (flags_ & DEBUG_PRINT)
+                        printf("%i ", (int)u_ik);
 				}
-                printf(" | min: %i \n", (int)uMin_k);
+                if (flags_ & DEBUG_PRINT)
+                    printf(" | min: %i \n", (int)uMin_k);
 
 				solver.AddConstraint(solver.MakeScalProdGreaterOrEqual(a,u_k, uMin_k));
 				objectiveUti_var_array.push_back(solver.MakeScalProd(a,u_k)->Var());
@@ -240,24 +247,30 @@ namespace iw_solver_ortools
 
 			//Searching solutions
 			DecisionBuilder* const db = solver.MakePhase(a, Solver::CHOOSE_RANDOM, Solver::ASSIGN_MAX_VALUE);
-			SearchMonitor* const log = solver.MakeSearchLog(100000);
-			monitors.push_back(log);
+            if (flags_ & DEBUG_PRINT)
+            {
+                SearchMonitor* const log = solver.MakeSearchLog(100000);
+                monitors.push_back(log);
+            }
 
 			solver.NewSearch(db, monitors);
 
 			while (solver.NextSolution()) 
 			{
-				printf("Solution found : \n");
+                if (flags_ & DEBUG_PRINT)
+                    printf("Solution found : \n");
 				for(int i = 0; i<nbStrat; i++)
 				{
 					if(a[i]->Value() == 1){res[i] = true; }
 					else{res[i] = false;}
-					printf(" %3lld \n", a[i]->Value());
+                    if (flags_ & DEBUG_PRINT)
+                        printf(" %3lld \n", a[i]->Value());
 				}
 			} 
 			if (solver.NextSolution() == false) 
 			{
-				printf("No more solutions found \n");
+                if (flags_ & DEBUG_PRINT)
+                    printf("No more solutions found \n");
 			}		
 	
 			solver.EndSearch();
@@ -293,6 +306,9 @@ int main(int argc, char** argv)
     np.param("optimize_utility", b, false);
     if (b)
         flags |= SolverT::OPT_TOTAL_UTIL_MAX;
+    np.param("debug_print", b, false);
+    if (b)
+        flags |= SolverT::DEBUG_PRINT;
     
     boost::shared_ptr<SolverT> solver(new SolverT(scaling, flags));
     NodeT node(solver);

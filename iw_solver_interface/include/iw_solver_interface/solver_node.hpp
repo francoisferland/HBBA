@@ -32,17 +32,19 @@ namespace iw_solver_interface
     public:
         typedef S Scalar;
         typedef iw_solver_base<T, S> BaseType;
+        typedef SolverNode<T, S> ThisType;
+
         SolverNode(
             const boost::shared_ptr<T>& impl = boost::shared_ptr<T>(new T()),
             const ros::NodeHandle& n = ros::NodeHandle()): 
             BaseType(impl), n_(n)
         {
             srv_add_strat_ = n_.advertiseService("add_strategy",
-                &this_t::addStrategySrv, this);
+                &ThisType::addStrategySrv, this);
             srv_set_res_max_ = n_.advertiseService("set_resource_max",
-                &this_t::setResourceMaxSrv, this);
+                &ThisType::setResourceMaxSrv, this);
             sub_desires_ = n_.subscribe("desires_set", 10,
-                &this_t::desiresCB, this);
+                &ThisType::desiresCB, this);
 
             pub_intention_ = 
                 n_.advertise<hbba_msgs::Intention>("intention", 10);
@@ -79,24 +81,25 @@ namespace iw_solver_interface
             strategies_[strat.id] = strat;
 
             // Convert the cost, utility and utility needed vectors
-            typename base_t::strat_vec_t c(req.strategy.cost.size());
+            typename BaseType::strat_vec_t c(req.strategy.cost.size());
             for (size_t i = 0; i < c.size(); ++i)
                 c[i] = std::make_pair(strat.cost[i].id, strat.cost[i].value);
-            typename base_t::strat_vec_t u(1);
+            typename BaseType::strat_vec_t u(1);
             u[0] = std::make_pair(strat.utility.id, strat.utility.value);
-            typename base_t::strat_vec_t u_min(req.strategy.utility_min.size());
+            typename BaseType::strat_vec_t 
+                u_min(req.strategy.utility_min.size());
             for (size_t i = 0; i < u_min.size(); ++i)
                 u_min[i] = std::make_pair(strat.utility_min[i].id, 
                     strat.utility_min[i].value);
 
-            base_t::add_strategy(strat.id, c, u, u_min);
+            BaseType::add_strategy(strat.id, c, u, u_min);
             return true;
         }
 
         bool setResourceMaxSrv(hbba_msgs::SetResourceMax::Request& req,
             hbba_msgs::SetResourceMax::Response&)
         {
-            base_t::set_resource_max(req.id, req.value);
+            BaseType::set_resource_max(req.id, req.value);
             resource_max_[req.id] = req.value;
             publishResMax();
             return true;
@@ -104,36 +107,59 @@ namespace iw_solver_interface
 
         void desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
         {
+            typename BaseType::sol_vec_t result(BaseType::strat_count());
+
             // Do not solve empty desire sets for now.
-            // TODO: Disable every strategies then ?
             if (msg->desires.size() < 1) 
+            {
+                // Set every strategies to disabled first.
+                strats_map_t::const_iterator i;
+                int j = 0;
+                for (i = strategies_.begin(); i != strategies_.end(); ++i, ++j)
+                    result[j] = std::make_pair(i->first, false);
+                applyStrats(result, msg->desires);
+
                 return;
+            }
 
             ros::Time start_time = ros::Time::now();
 
             // Build the utility requests vector.
-            typedef std::vector<hbba_msgs::Desire> u_vec_t;
             const u_vec_t& desires = msg->desires;
             typedef typename u_vec_t::const_iterator u_vec_it;
-            base_t::clear_reqs();
+            BaseType::clear_reqs();
             for (u_vec_it i = desires.begin(); i != desires.end(); ++i)
             {
-                base_t::set_util_min(i->type, i->utility);
-                base_t::set_util_int(i->type, i->intensity);
+                BaseType::set_util_min(i->type, i->utility);
+                BaseType::set_util_int(i->type, i->intensity);
             }
 
             // Automatically call the solver.
-            typename base_t::sol_vec_t result(base_t::strat_count());
-            base_t::solve(result);
+            BaseType::solve(result);
+            ROS_DEBUG("Solving done.");
 
+            applyStrats(result, desires);
+
+            std_msgs::Duration solve_time;
+            solve_time.data = ros::Time::now() - start_time;
+            pub_solve_time_.publish(solve_time);
+        }
+
+
+    private:
+        typedef std::vector<hbba_msgs::Desire> u_vec_t;
+
+        /// \brief Apply strategies according to a result set.
+        void applyStrats(typename BaseType::sol_vec_t& result, 
+            const u_vec_t& desires)
+        {
             // Sort the results on activation value so that bringdown scripts
             // are called before bringup ones.
             // Important for mutually exclusive strategies.
             std::sort(result.begin(), result.end(),
-                boost::bind(&base_t::sol_t::second, _1) <
-                boost::bind(&base_t::sol_t::second, _2));
+                boost::bind(&BaseType::sol_t::second, _1) <
+                boost::bind(&BaseType::sol_t::second, _2));
 
-            ROS_DEBUG("Solving done.");
 
             // Publish the intention set for diagnostic purposes
             // Note that desire fields can be empty, since not every single 
@@ -141,10 +167,10 @@ namespace iw_solver_interface
             // We only keep direct associations.
             hbba_msgs::Intention intent;
             intent.strategies.reserve(result.size());
-            intent.desires.reserve(result.size());
+            intent.desires.resize(result.size());
             intent.enabled.resize(result.size()); 
 
-            typedef typename base_t::sol_vec_t::const_iterator CI;
+            typedef typename BaseType::sol_vec_t::const_iterator CI;
             size_t j = 0; // Used to map desires to strategies.
             for (CI i = result.begin(); i != result.end(); ++i, ++j)
             {
@@ -167,10 +193,8 @@ namespace iw_solver_interface
                 {   
                     if(s.utility.id == d->type)
                     {
-                        // TODO: Re-enable this!
-                        // String copy error somewhere.
-                        //script += d->params;
-                        //intent.desires[j] = d->id;
+                        script += d->params;
+                        intent.desires[j] = d->id;
                     }
                 }   
                 script += ");";
@@ -182,16 +206,9 @@ namespace iw_solver_interface
                 scl_eval_script_.call(eval);
             }
 
-            std_msgs::Duration solve_time;
-            solve_time.data = ros::Time::now() - start_time;
-            pub_solve_time_.publish(solve_time);
             pub_intention_.publish(intent);
             
         }
-
-    private:
-        typedef iw_solver_base<T, S> base_t;
-        typedef SolverNode<T> this_t;
 
         void publishResMax()
         {
@@ -208,7 +225,8 @@ namespace iw_solver_interface
             pub_res_max_.publish(msg);
         }
 
-        std::map<std::string, hbba_msgs::Strategy> strategies_;
+        typedef std::map<std::string, hbba_msgs::Strategy> strats_map_t;
+        strats_map_t strategies_;
         std::map<std::string, Scalar> resource_max_;
 
         ros::NodeHandle n_;

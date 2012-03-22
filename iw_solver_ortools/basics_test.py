@@ -269,22 +269,22 @@ add_strat(s9)
 set_max("CPU", 200)
 
 ##Detection desires 
-des1 = Desire("test_1", "front detection", 1, "{'data' : 1}")
-des2 = Desire("test_2", "face detection", 1, "{'data' : 2}")
-des3 = Desire("test_3", "large detection", 1, "{'data' : 3}")
+des1 = Desire("test_1", "front detection", 1, 1, "{'data' : 1}", False, rospy.Time())
+des2 = Desire("test_2", "face detection", 1, 1, "{'data' : 2}", False, rospy.Time())
+des3 = Desire("test_3", "large detection", 1, 1, "{'data' : 3}", False, rospy.Time())
 
 ##Following desire
-des4 = Desire("test_4", "face following", 2, "{'data' : 4}")
+des4 = Desire("test_4", "face following", 2, 1, "{'data' : 4}", False, rospy.Time())
 
 ##Arm motion desire 
-des5 = Desire("test_5", "arm motion", 5, "{'data' : 5}")
+des5 = Desire("test_5", "arm motion", 5, 1, "{'data' : 5}", False, rospy.Time())
 
 desires = DesiresSet()
 desires.desires = [des1, des2, des3, des4, des5]
 
 
 
-r = rospy.Rate(1) # 1 Hz
+r = rospy.Rate(1) # Once every sec
 while not rospy.is_shutdown():
     pub_desires.publish(desires)
     r.sleep()

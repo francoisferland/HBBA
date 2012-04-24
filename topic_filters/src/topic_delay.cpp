@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <topic_tools/shape_shifter.h>
 #include <std_msgs/Float64.h>
+#include <queue>
 
 namespace topic_tools
 {
@@ -18,6 +19,12 @@ namespace topic_tools
         {
             sub_in_ = n_.subscribe("in", 1, &TopicDelay::msgCB, this);
             sub_delay_ = n_.subscribe("delay", 1, &TopicDelay::delayCB, this);
+
+            double period;
+            n_.param("period", period, 0.05);
+
+            timer_ = n_.createTimer(ros::Duration(period), 
+                &TopicDelay::timerCB, this);
         }
 
         void msgCB(const topic_tools::ShapeShifter::ConstPtr& msg)
@@ -28,8 +35,7 @@ namespace topic_tools
                 advertised_ = true;
             }
 
-            delay_.sleep();
-            pub_out_.publish(msg);
+            queue_.push(std::make_pair(ros::Time::now(), msg));
         }
 
         void delayCB(const std_msgs::Float64::ConstPtr& msg)
@@ -37,16 +43,29 @@ namespace topic_tools
             delay_ = ros::Duration(msg->data);
         }
 
+        void timerCB(const ros::TimerEvent&)
+        {
+            ros::Time now = ros::Time::now();
+            while ((!queue_.empty()) && ((queue_.front().first + delay_) < now))
+            {
+               pub_out_.publish(queue_.front().second); 
+               queue_.pop();
+            }
+        }
 
     private:
         ros::NodeHandle n_;
         ros::Subscriber sub_in_;
         ros::Subscriber sub_delay_;
         ros::Publisher pub_out_;
+        ros::Timer timer_;
 
         bool advertised_;
         ros::Duration delay_;
     
+        typedef std::pair<ros::Time, topic_tools::ShapeShifter::ConstPtr> 
+            PairType;
+        std::queue<PairType> queue_;
     };
 
 }

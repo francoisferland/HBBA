@@ -30,4 +30,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(example ${PROJECT_NAME})
 
 rosbuild_add_executable(iw_solver_ortools src/iw_solver_ortools.cpp)
+target_link_libraries(iw_solver_ortools constraint_solver linear_solver
+    CoinUtils OsiCbc OsiClp Clp Osi Cbc Cgl CbcSolver util base protobuf gflags)
 

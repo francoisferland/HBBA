@@ -127,7 +127,7 @@ namespace iw_solver_ortools
 			int nbClass = uMin_.size(); 
 			
 			int nbStrat = 0; 
-			typedef typename map< unsigned int, StrategyT >::const_iterator CI ;
+			typedef typename std::map< unsigned int, StrategyT >::const_iterator CI ;
 			for(CI i = strat_.begin(); i != strat_.end(); ++i)			
 			{ 
 				nbStrat++;
@@ -149,7 +149,7 @@ namespace iw_solver_ortools
 				int cMax_j = cMax_[j];
 				
 				vector<int64> c_j;
-				typedef typename map<unsigned int, StrategyT >::const_iterator CI ;
+				typedef typename std::map<unsigned int, StrategyT >::const_iterator CI ;
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)			
 				{ 
 					StrategyT s = i->second;
@@ -176,7 +176,7 @@ namespace iw_solver_ortools
 
 				vector<ORScalar> u_k;
                 vector<ORScalar> u_k_s_k;
-				typedef typename map< unsigned int, StrategyT >::const_iterator CI;
+				typedef typename std::map< unsigned int, StrategyT >::const_iterator CI;
 				for(CI i = strat_.begin(); i != strat_.end(); ++i)
 				{
 					StrategyT s = i->second;
@@ -229,7 +229,7 @@ namespace iw_solver_ortools
                 for(int k = 0; k<nbClass; k++) //For each class
                 { 
                     vector<IntVar*> aDes ; //Variables corresponding of the class k 
-                    typedef typename map< unsigned int, StrategyT >::const_iterator CI;
+                    typedef typename std::map< unsigned int, StrategyT >::const_iterator CI;
                     for(CI i = strat_.begin(); i != strat_.end(); ++i)
                     {
                         StrategyT s = i->second;

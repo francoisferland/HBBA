@@ -14,10 +14,10 @@ class iw_server:
         self.desires = {}
         self.srv_add = \
             rospy.Service('add_desires', AddDesires, self.add_desires_srv)
-        self.srv_up = rospy.Service('set_desire_priority', \
-			SetDesirePriority, self.set_desire_priority_srv)
-        self.srv_del = \
-            rospy.Service('remove_desires', RemoveDesires, self.remove_desires_srv)
+        self.srv_up = rospy.Service('set_desire_intensity', \
+			SetDesireIntensity, self.set_desire_intensity_srv)
+        self.srv_del = rospy.Service('remove_desires', RemoveDesires, \
+			self.remove_desires_srv)
         self.pub_set = rospy.Publisher('desires_set', DesiresSet)
 
     def add_desires_srv(self, req):
@@ -27,12 +27,12 @@ class iw_server:
         self.publish_set()
         return AddDesiresResponse()
 
-    def set_desire_priority_srv(self,req):
+    def set_desire_intensity_srv(self,req):
     	for d in self.desires:
             if req.id == d.id:
-                d.priority = req.value
+                d.intensity = req.value
         self.publish_set()
-        return SetDesirePriorityResponse()
+        return SetDesireIntensityResponse()
 
     def remove_desires_srv(self, req):
         for d in req.ids:

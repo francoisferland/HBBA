@@ -1,0 +1,12 @@
+<library path="lib/libiw_nodelets">
+
+  <!-- IW -->
+  <class name="iw/IntentionWorkspaceNodelet" 
+  	type="iw::IntentionWorkspaceNodelet" 
+	base_class_type="nodelet::Nodelet">
+  <description>
+  	Nodelet for the Cpp version of the IW server
+  </description>
+  </class>
+
+</library>

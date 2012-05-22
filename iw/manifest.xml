@@ -7,8 +7,11 @@
   <review status="unreviewed" notes=""/>
   <url></url>
   <depend package="roscpp"/>
+  <depend package="nodelet"/>
+  <depend package="pluginlib"/>
   <depend package="rospy"/>
   <depend package="hbba_msgs"/>
+  <depend package="std_srvs"/>
 
   <export>
     <cpp cflags="-I${prefix}/msg/cpp"/>

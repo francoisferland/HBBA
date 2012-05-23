@@ -160,7 +160,6 @@ namespace iw_solver_interface
                 boost::bind(&BaseType::sol_t::second, _1) <
                 boost::bind(&BaseType::sol_t::second, _2));
 
-
             // Publish the intention set for diagnostic purposes
             // Note that desire fields can be empty, since not every single 
             // strategy can directly be mapped to a desire.
@@ -168,7 +167,7 @@ namespace iw_solver_interface
             hbba_msgs::Intention intent;
             intent.strategies.reserve(result.size());
             intent.desires.resize(result.size());
-            intent.enabled.resize(result.size()); 
+            intent.enabled.resize(result.size());
 
             typedef typename BaseType::sol_vec_t::const_iterator CI;
             size_t j = 0; // Used to map desires to strategies.
@@ -205,9 +204,11 @@ namespace iw_solver_interface
                 //ROS_INFO("Function call: %s", script.c_str());
                 scl_eval_script_.call(eval);
             }
+	    
+	    // Stamp the message
+	    intent.stamp = ros::Time::now();
 
             pub_intention_.publish(intent);
-            
         }
 
         void publishResMax()

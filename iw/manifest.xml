@@ -15,6 +15,7 @@
 
   <export>
     <cpp cflags="-I${prefix}/msg/cpp"/>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
   </export>
 </package>
 

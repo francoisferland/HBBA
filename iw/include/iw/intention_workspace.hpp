@@ -25,10 +25,13 @@ class IntentionWorkspaceServer
 {
 	public:
 	
+	// Constructor for nodelets. It calls init() after
 	IntentionWorkspaceServer() { /*		EMPTY	 	*/}
 
+	// Constructor for nodes
 	IntentionWorkspaceServer(ros::NodeHandle n)
 	{
+		// Init function
 		init(n);
 	}
 
@@ -42,14 +45,15 @@ class IntentionWorkspaceServer
 					("/desires_set", 1000 );
 		
 		// Service Server to manage desires
-		server_add = nh.advertiseService("add_desires", 
+		server_add = nh.advertiseService("/add_desires", 
 				&IntentionWorkspaceServer::add_cb, this);
-		server_rm = nh.advertiseService("rm_desires", 
+		server_rm = nh.advertiseService("/rm_desires", 
 				&IntentionWorkspaceServer::rm_cb, this);
-		server_pub = nh.advertiseService("pub_desires", 
+		server_pub = nh.advertiseService("/pub_desires", 
 				&IntentionWorkspaceServer::pub_cb, this);
-		server_intensity = nh.advertiseService("set_desire_intensity",
-				&IntentionWorkspaceServer::intensity_cb, this);
+		server_intensity = nh.advertiseService(
+				"/set_desire_intensity",
+			&IntentionWorkspaceServer::intensity_cb, this);
 
 		desires.clear();
 	}
@@ -79,8 +83,9 @@ class IntentionWorkspaceServer
 			{
 				flag = false;
 
-				ROS_ERROR("IW : Could not add already \
-				existing %s desire.", it->id.c_str());
+				ROS_ERROR("IW : Could not add already "
+					"existing %s desire.", 
+						it->id.c_str());
 			}
 		}
 
@@ -104,8 +109,9 @@ class IntentionWorkspaceServer
 			// If it doesnt already exist, call ROS_ERROR
 			if( desires.count(*it) == 0)
 			{
-				ROS_ERROR("IW : Could not remove \
-				non-existing %s desire.", it->c_str());
+				ROS_ERROR("IW : Could not remove "
+					"non-existing %s desire.", 
+						it->c_str());
 
 				flag = false;
 			}
@@ -166,7 +172,7 @@ class IntentionWorkspaceServer
 						// Erase the one with lowest
 						// intensity
 						if( it2->second.intensity >
-							it->second.intensity)
+						it->second.intensity)
 						{
 							desires.erase(it);
 							break;
@@ -194,8 +200,8 @@ class IntentionWorkspaceServer
 		// if the id exist
 		if( desires.count(req.id) != 0 )
 		{
-			ROS_INFO("IW : Changing intensity of %s desire \
-				from %f to %f", req.id.c_str(), 
+			ROS_INFO("IW : Changing intensity of %s desire "
+				" from %f to %f", req.id.c_str(), 
 				desires[req.id].intensity, req.value);
 
 			desires[req.id].intensity = req.value;
@@ -203,8 +209,8 @@ class IntentionWorkspaceServer
 			return true;
 		}
 
-		ROS_ERROR("IW : Can't change intensity of non-existing %s desire",
-					req.id.c_str());
+		ROS_ERROR("IW : Can't change intensity of non-existing "
+				"%s desire", req.id.c_str());
 		
 		// Return false if the desire doesn't exist
 		return false;

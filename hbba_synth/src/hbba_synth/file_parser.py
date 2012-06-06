@@ -1,31 +1,6 @@
 from structure import *
 import yaml
-
-class LaunchDef:
-    def __init__(self, content, verbose=False):
-        self.pkg = content['pkg']
-        self.name = content['name']
-        if verbose:
-            print "Emitted launch element for {0}.".format(self.name)
-
-class BehaviorDef:
-    def __init__(self, content, structure, verbose=False):
-        self.name = content['name']
-        self.launch = LaunchDef(content['launch'], verbose)
-        if verbose:
-            print "Emitted Behavior '{0}'.".format(self.name)
-
-class ProcModuleDef:
-    def __init__(self, content, structure, verbose=False):
-        self.name = content['name']
-        self.launch = LaunchDef(content['launch'], verbose)
-        if verbose:
-            print "Emitted ProcModule '{0}'.".format(self.name)
-
-typemap = {
-    'behavior': BehaviorDef,
-    'procmodule': ProcModuleDef
-}
+from definitions import *
 
 class FileParser:
     def __init__(self, filename, structure):

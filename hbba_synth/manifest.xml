@@ -1,0 +1,17 @@
+<package>
+  <description brief="hbba_synth">
+
+      hbba_synth - A set of script to automate the configuration of a full HBBA 
+      setup.
+
+  </description>
+  <author>François Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/hbba_synth</url>
+  <depend package="rospy"/>
+  <depend package="hbba_msgs"/>
+
+</package>
+
+

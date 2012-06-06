@@ -1,0 +1,11 @@
+# Simple config file to test the parser.
+# Not supposed to work on any particular robot configuration.
+
+behavior:
+    name: Stop
+    launch: {pkg: "autonav", name: "stop.launch"}
+
+procmodule:
+    name: Manyears
+    launch: {pkg: "jn0_bringup", name: "jn0_manyears.launch"}
+

@@ -19,7 +19,7 @@ def main():
     (opts, args) = opt_parser.parse_args()
 
     if len(args) < 1:
-        parser.error("Incorrect number of files")
+        opt_parser.error("Requires at least one input file")
         exit(-1)
 
     structure = Structure()

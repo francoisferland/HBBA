@@ -68,14 +68,55 @@ class BehaviorDef:
                 'args': "{0} {1}/{2}".format(o, self.name,
                     outputFilterTopic(o))
                 }))
+
+        # TODO: Filter registration (out of XML, actually)!
+
         return elems
 
 class ProcModuleDef:
     def __init__(self, content, structure, verbose=False):
+        if not 'name' in content:
+            print "Error: procmodule element with no name."
+            exit(-1)
         self.name = content['name']
-        self.launch = LaunchDef(content['launch'], verbose)
+
+        try:
+            self.launch = LaunchDef(content['launch'], verbose)
+            self.input = content['input']
+        except KeyError as e:
+            print "Error: Missing {0} in {1}".format(e, self.name)
+
+        structure.addProcModule(self)
+
         if verbose:
             print "Emitted ProcModule '{0}'.".format(self.name)
+
+    def createInputFilter(self, name):
+        return Element("node", attrib = {
+            'name': "{0}_{1}_filter".format(self.name, name),
+            'pkg': 'nodelet',
+            'type': 'nodelet',
+            'args': 
+                "standalone topic_filters/GenericDivisor {0} {1}/{0}".format(
+                    name, self.name)
+            })
+
+    def generateXML(self):
+        elems = []
+        grp = Element("group", attrib={'ns': self.name})
+        elems.append(grp)
+        grp.extend(self.launch.generateXML())
+        for i in self.input:
+            if type(i) != dict:
+                elems.extend(self.createInputFilter(i))
+            else:
+                # TODO: Switch on actual filter type.
+                print "Generating for {0}".format(i.keys()[0])
+                elems.append(self.createInputFilter(i.keys()[0]))
+
+        # TODO: Filter registration (out of XML, actually)!
+
+        return elems 
 
 typemap = {
     'behavior': BehaviorDef,

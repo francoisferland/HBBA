@@ -5,18 +5,22 @@ from xml.dom import minidom
 class Structure:
     def __init__(self):
         self.behaviors = []
-        self.perceptmodules = []
+        self.procmodules = []
         self.strategies = []
         self.filters = []
 
     def addBehavior(self, b):
         self.behaviors.append(b)
 
+    def addProcModule(self, p):
+        self.procmodules.append(p)
+
     def generate(self, basepath, verbose):
         launch_elem = Element("launch")
+        for p in self.procmodules:
+            launch_elem.extend(p.generateXML())
         for b in self.behaviors:
-            elems = b.generateXML()
-            launch_elem.extend(elems)
+            launch_elem.extend(b.generateXML())
 
         launch_tree = ElementTree(launch_elem)
         if verbose:

@@ -8,17 +8,19 @@ filtertype:
     function: "setDivisorRate"
 
 behavior:
-    name: Stop
+    name: stop
     launch: {pkg: "autonav", path: "stop.launch"}
     output:
         - cmd_vel
     priority: 10
 
 procmodule:
-    name: ManyEars
+    name: manyears 
     launch: {pkg: "jn0_bringup", path: "jn0_manyears.launch"}
     input:
+        # NOTE: Filter types are ignored for now
         - audio_stream: {type: GenericDivisor}
+        - audio_stream_2
 
 procstrat:
     name: LocateVoiceFull
@@ -37,5 +39,6 @@ bhvrstrat:
     costs: {}
     dependencies: {LocateVoice: 100}
     modules:
-        - LookAt
+        LookAt
+        LookAt2
 

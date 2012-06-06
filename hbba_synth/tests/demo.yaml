@@ -1,6 +1,12 @@
 # Simple config file to test the parser.
 # Not supposed to work on any particular robot configuration.
 
+filtertype:
+    name: GenericDivisor
+    # Function signature: func("{module}_{input}_filter", value)
+    # A value of 0 always deactivate the filter
+    function: "setDivisorRate"
+
 behavior:
     name: Stop
     launch: {pkg: "autonav", path: "stop.launch"}
@@ -8,8 +14,28 @@ behavior:
         - cmd_vel
     priority: 10
 
-
 procmodule:
-    name: Manyears
+    name: ManyEars
     launch: {pkg: "jn0_bringup", path: "jn0_manyears.launch"}
+    input:
+        - audio_stream: {type: GenericDivisor}
+
+procstrat:
+    name: LocateVoiceFull
+    class: LocateVoice
+    utility: 100
+    costs: {CPU: 100}
+    dependencies: {} # utility_min
+    modules: 
+        - ManyEars:
+            audio_stream: 1 # Filter level for activation
+
+bhvrstrat:
+    name: LookAtVoice
+    class: LookAtVoice
+    utility: 1
+    costs: {}
+    dependencies: {LocateVoice: 100}
+    modules:
+        - LookAt
 

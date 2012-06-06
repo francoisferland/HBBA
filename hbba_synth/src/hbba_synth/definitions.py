@@ -4,6 +4,7 @@ class LaunchDef:
     def __init__(self, content, verbose=False):
         self.pkg = content['pkg']
         self.path = content['path']
+
         if verbose:
             print "Emitted launch element for {0}/{1}.".format(self.pkg,
                 self.path)
@@ -24,10 +25,18 @@ def outputFilterTopic(name):
 
 class BehaviorDef:
     def __init__(self, content, structure, verbose=False):
+        if not 'name' in content:
+            print "Error: behavior element with no name."
+            exit(-1)
         self.name = content['name']
-        self.launch = LaunchDef(content['launch'], verbose)
-        self.output = content['output']
-        self.priority = content['priority']
+        try:
+            self.launch = LaunchDef(content['launch'], verbose)
+            self.output = content['output']
+            self.priority = content['priority']
+        except KeyError as e:
+            print "Error: Missing {0} in {1}".format(e, self.name)
+            exit(-1)
+
         structure.addBehavior(self)
         if verbose:
             print "Emitted Behavior '{0}'.".format(self.name)

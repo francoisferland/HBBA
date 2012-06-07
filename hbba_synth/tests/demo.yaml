@@ -20,7 +20,6 @@ procmodule:
     input:
         # NOTE: Filter types are ignored for now
         - audio_stream: {type: GenericDivisor}
-        - audio_stream_2
 
 procstrat:
     name: LocateVoiceFull
@@ -40,5 +39,4 @@ bhvrstrat:
     dependencies: {LocateVoice: 100}
     modules:
         LookAt
-        LookAt2
 

@@ -15,7 +15,11 @@ class Structure:
     def addProcModule(self, p):
         self.procmodules.append(p)
 
+    def addStrategy(self, s):
+        self.strategies.append(s)
+
     def generate(self, basepath, verbose):
+        # XML launch file
         launch_elem = Element("launch")
         for p in self.procmodules:
             launch_elem.extend(p.generateXML())
@@ -32,4 +36,14 @@ class Structure:
 
         launch_tree.write(basepath + ".launch")
 
+        # Python script
+        pyscript = ""
+        # TODO: Pre-start template (filter activation methods ?).
+        for s in self.strategies:
+            pyscript += s.generatePy()
 
+        if verbose:
+            print "Generated Python script:\n"
+            print pyscript
+
+        # TODO: Write the file.

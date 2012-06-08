@@ -6,16 +6,33 @@ from xml.etree.ElementTree import Element, tostring
 # {3}: dependencies (ResourceUsage array string)
 # {3}: source (javascript escaped string)
 
-StratTemplate = """
-strat_{0} = Strategy()
-strat_{0}.id = '{0}'
-strat_{0}.bringup_function = '{0}_bringup'
-strat_{0}.bringdown_function = '{0}_bringdown'
-strat_{0}.utility = {1}
-strat_{0}.cost = {2}
-strat_{0}.utility_min = {3}
-strat_{0}.source = "{4}"
-"""
+StratTemplate = "\n\
+strat_{0} = Strategy()\n\
+strat_{0}.id = '{0}'\n\
+strat_{0}.bringup_function = '{0}_bup'\n\
+strat_{0}.bringdown_function = '{0}_bdn'\n\
+strat_{0}.utility = {1}\n\
+strat_{0}.cost = {2}\n\
+strat_{0}.utility_min = {3}\n\
+strat_{0}.source = \"\"\"\n{4}\"\"\"\n\
+add_strat(strat_{0})\
+"
+
+class FilterDef:
+    def __init__(self, name, type):
+        self.name = name
+        self.type = type
+
+class FilterTypeDef:
+    def __init__(self, content, structure, verbose=False):
+        self.name = content['name']
+        if verbose:
+            print "Emitted filter type {0}.".format(self.name)
+        self.function = content['function']
+        structure.addFilterType(self.name, self)
+
+    def generateSetLevel(self, name, level):
+        return "{0}({1}, {2})".format(self.func, name, level)
 
 class LaunchDef:
     def __init__(self, content, verbose=False):
@@ -68,7 +85,7 @@ class BehaviorDef:
                 'pkg': 'nodelet',
                 'type': 'nodelet',
                 'args': 
-                    "standalone topic_filters/GenericDivisor {0} {1}".format(
+                    "standalone topic_filters/GenericDivider {0} {1}".format(
                         o, self.outputFilterTopic(o))
                 }))
             grp.append(Element("rosparam", attrib={
@@ -97,6 +114,8 @@ class BehaviorDef:
 
 class ProcModuleDef:
     def __init__(self, content, structure, verbose=False):
+        self.structure = structure
+
         if not 'name' in content:
             print "Error: procmodule element with no name."
             exit(-1)
@@ -116,12 +135,15 @@ class ProcModuleDef:
     def createInputFilter(self, name):
         elems = []
         filter_name = "{0}_{1}_filter".format(self.name, name)
+        filter_type = "GenericDivider"
+        self.structure.addFilter(filter_name, FilterDef(filter_name,
+            filter_type))
         elems.append(Element("node", attrib = {
             'name': filter_name,
             'pkg': 'nodelet',
             'type': 'nodelet',
             'args': 
-                "standalone topic_filters/GenericDivisor {0} {1}/{0}".format(
+                "standalone topic_filters/GenericDivider {0} {1}/{0}".format(
                     name, self.name)
             }))
         elems.append(Element("node", attrib={
@@ -142,7 +164,6 @@ class ProcModuleDef:
                 elems.extend(self.createInputFilter(i))
             else:
                 # TODO: Switch on actual filter type.
-                print "Generating for {0}".format(i.keys()[0])
                 elems.extend(self.createInputFilter(i.keys()[0]))
 
 
@@ -165,16 +186,64 @@ def generateCostDefArrayPy(costs):
         cstr += costs[l-1].generatePy()
     return cstr + "]"
 
-class ModuleDef:
-    def __init__(self, content, verbose=False):
-        self.content = content # TODO!
+class ModuleLinkDef:
+    def __init__(self, content, structure, verbose=False):
+        self.structure = structure
+        if type(content) is dict:
+            self.module_name = content.keys()[0]
+            self.filters = content.values()[0]
+        else:
+            # Behavior link:
+            self.module_name = content
+            # TODO: Get output topics in time.
+            self.filters = [content + "_output_filter"]
 
-class ProcStratDef:
+    def generateJSCall(self, func, fname, level):
+        return "{0}('{1}', {2});\n".format(func, fname, level)
+
+    def parseFilter(self, f):
+        if type(f) is dict:
+            fname = self.module_name + "_" + f.keys()[0] + "_filter"
+            level = f.values()[0]
+            try:
+                ftype = self.structure.filters[fname].type
+            except KeyError as e:
+                print "Unknown filter {0}".format(e)
+                exit(-1)
+        else:
+            # Behavior module link, default values:
+            fname = f
+            level = 1 # Activation default value
+            ftype = "GenericDivider"
+        try:
+            ffunc = self.structure.filterTypes[ftype].function
+        except KeyError as e:
+            print "Unknown filter type {0}".format(e)
+            exit(-1)
+
+        return (fname, ftype, ffunc, level)
+
+    def generateActivationJS(self):
+        src = ""
+        for f in self.filters:
+            (fname, ftype, ffunc, level) = self.parseFilter(f)
+            src += self.generateJSCall(ffunc, fname, level)
+        return src
+
+    def generateDeactivationJS(self):
+        src = ""
+        for f in self.filters:
+            (fname, ftype, ffunc, level) = self.parseFilter(f)
+            src += self.generateJSCall(ffunc, fname, 0)
+        return src
+
+class StratDef:
     def __init__(self, content, structure, verbose=False):
         if not 'name' in content:
             print "Error: procstrat element with no name."
             exit(-1)
         self.name = content['name']
+        self.structure = structure
         try:
             utility_class = content['class']
             utility = content['utility']
@@ -189,29 +258,43 @@ class ProcStratDef:
                     self.dependencies.append(CostDef(d, verbose))
             self.modules = []
             for m in content['modules']:
-                self.modules.append(ModuleDef(m, verbose))
+                self.modules.append(ModuleLinkDef(m, self.structure, verbose))
         except KeyError as e:
             print "Error: Missing {0} in {1}".format(e, self.name)
+            exit(-1)
+        
+        if verbose:
+            print "Emitted strategy {0}".format(self.name)
 
         structure.addStrategy(self)
 
     def generatePy(self):
         costs = "["
         l = len(self.costs)
+
+        bup_name = "{0}_bup".format(self.name)
+        bdn_name = "{0}_bdn".format(self.name)
+        js_source = "function {0}(params) {{\n".format(bup_name)
+        for m in self.modules:
+            js_source += "  " + m.generateActivationJS()
+        js_source += "}\n"
+
+        js_source += "function {0}(params) {{\n".format(bdn_name)
+        for m in self.modules:
+            js_source += "  " + m.generateDeactivationJS()
+        js_source += "}\n"
         
         return StratTemplate.format(
             self.name, # TODO!
             self.utility.generatePy(),
             generateCostDefArrayPy(self.costs),
             generateCostDefArrayPy(self.dependencies),
-            "JAVASCRIPT")
-
-
-
+            js_source)
 
 typemap = {
     'behavior': BehaviorDef,
     'procmodule': ProcModuleDef,
-    'procstrat': ProcStratDef
+    'strat': StratDef,
+    'filtertype': FilterTypeDef
 }
 

@@ -28,12 +28,16 @@ class FileParser:
 
         # The parser look for every main elements and hand it to other analysers 
         # for each recognized element.
-        for key, content in doc.iteritems():
-            if key in typemap:
-                e = typemap[key](content, self.structure, verbose)
-            else:
-                if (verbose):
-                    print "Warning: unrecognized element {0}".format(key)
+        # conf_name contains the first element, and is ignored.
+        for conf_name, conf_content in doc.iteritems():
+            for elem in conf_content:
+                key = elem.keys()[0]
+                content = elem.values()[0]
+                if key in typemap:
+                    e = typemap[key](content, self.structure, verbose)
+                else:
+                    if (verbose):
+                        print "Warning: unrecognized element {0}".format(key)
 
 
         if (verbose):

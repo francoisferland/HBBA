@@ -2,12 +2,26 @@ from definitions import *
 from xml.etree.ElementTree import ElementTree, Element, tostring 
 from xml.dom import minidom
 
+python_header = """
+import roslib; roslib.load_manifest("hbba_synth")
+import rospy;
+from hbba_msgs.msg import *
+from hbba_msgs.srv import *
+
+rospy.init_node("hbba_struct", anonymous=True)
+
+rospy.wait_for_service("add_strategy", 1.0)
+add_strat = rospy.ServiceProxy("add_strategy", AddStrategy)
+
+"""
+
 class Structure:
     def __init__(self):
         self.behaviors = []
         self.procmodules = []
         self.strategies = []
-        self.filters = []
+        self.filters = {}
+        self.filterTypes = {}
 
     def addBehavior(self, b):
         self.behaviors.append(b)
@@ -17,6 +31,12 @@ class Structure:
 
     def addStrategy(self, s):
         self.strategies.append(s)
+
+    def addFilter(self, n, f):
+        self.filters[n] = f
+
+    def addFilterType(self, n, ft):
+        self.filterTypes[n] = ft
 
     def generate(self, basepath, verbose):
         # XML launch file
@@ -45,5 +65,9 @@ class Structure:
         if verbose:
             print "Generated Python script:\n"
             print pyscript
+
+        pyfile = file(basepath + ".py", "w")
+        pyfile.write(python_header)
+        pyfile.write(pyscript)
 
         # TODO: Write the file.

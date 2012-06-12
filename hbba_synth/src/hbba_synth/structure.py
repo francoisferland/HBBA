@@ -58,7 +58,6 @@ class Structure:
 
         # Python script
         pyscript = ""
-        # TODO: Pre-start template (filter activation methods ?).
         for s in self.strategies:
             pyscript += s.generatePy()
 
@@ -70,4 +69,7 @@ class Structure:
         pyfile.write(python_header)
         pyfile.write(pyscript)
 
-        # TODO: Write the file.
+        # Last pass: register behavior priorities and strategies to the
+        # exploitation matcher.
+        # TODO!
+

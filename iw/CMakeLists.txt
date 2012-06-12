@@ -23,3 +23,6 @@ rosbuild_gensrv()
 
 rosbuild_add_library(iw_nodelets src/intention_workspace_nodelet.cpp)
 rosbuild_add_executable(iw_cpp src/intention_workspace.cpp)
+
+rosbuild_add_executable(exploitation_matcher src/exploitation_matcher.cpp)
+

@@ -16,6 +16,14 @@ hbba_conf:
         - cmd_vel
     priority: 10
 
+- behavior:
+    name: look_at_voice
+    launch: {pkg: "jn0_behaviors", path: "lookat.launch"}
+    output:
+        - look_at_pose
+        - dummy_output
+    priority: 10
+
 - procmodule:
     name: manyears 
     launch: {pkg: "jn0_bringup", path: "jn0_manyears.launch"}
@@ -39,5 +47,5 @@ hbba_conf:
     costs: {}
     dependencies: {LocateVoice: 100}
     modules:
-        - LookAt
+        - look_at_voice
 

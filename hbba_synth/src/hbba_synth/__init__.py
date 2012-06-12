@@ -12,6 +12,10 @@ def main():
     opt_parser.add_option("-n", "--name", dest="basename",
             default="hbba_struct",
             help="generated files base name (default: %default)")
+    opt_parser.add_option("-a", "--generate-arbitration", action="store_true",
+            dest="generate_arbitration", default=True,
+            help="generic arbitration nodes are generated for each behavior \
+            output topic")
     opt_parser.add_option("-v", "--verbose", action="store_true",
             dest="verbose", default=False,
             help="verbose output")
@@ -32,6 +36,6 @@ def main():
         print "Generating XML..."
 
     basepath = os.path.abspath(opts.directory) + "/" + opts.basename
-    structure.generate(basepath, opts.verbose)
+    structure.generate(basepath, opts)
 
 

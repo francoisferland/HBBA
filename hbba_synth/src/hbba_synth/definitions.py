@@ -29,7 +29,7 @@ class FilterTypeDef:
         if verbose:
             print "Emitted filter type {0}.".format(self.name)
         self.function = content['function']
-        structure.addFilterType(self.name, self)
+        structure.addFilterType(self)
 
     def generateSetLevel(self, name, level):
         return "{0}({1}, {2})".format(self.func, name, level)
@@ -136,8 +136,7 @@ class ProcModuleDef:
         elems = []
         filter_name = "{0}_{1}_filter".format(self.name, name)
         filter_type = "GenericDivider"
-        self.structure.addFilter(filter_name, FilterDef(filter_name,
-            filter_type))
+        self.structure.addFilter(FilterDef(filter_name, filter_type))
         elems.append(Element("node", attrib = {
             'name': filter_name,
             'pkg': 'nodelet',
@@ -245,9 +244,9 @@ class StratDef:
         self.name = content['name']
         self.structure = structure
         try:
-            utility_class = content['class']
+            self.utility_class = content['class']
             utility = content['utility']
-            self.utility = CostDef(utility_class, utility)
+            self.utility = CostDef(self.utility_class, utility)
             self.costs = []
             if ('costs' in content):
                 for key,val in content['costs'].iteritems():

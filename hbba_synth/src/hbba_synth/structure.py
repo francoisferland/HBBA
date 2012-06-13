@@ -18,12 +18,12 @@ add_strat = rospy.ServiceProxy("add_strategy", AddStrategy)
 
 """
 
-priority_match_sp = """
-register_pm=rospy.ServiceProxy("{0}/register_priority_match", ExploitationMatch)"""
-priority_match_call = """
-register_pm({0}, {1})"""
+exploitation_match_sp = """
+register_em=rospy.ServiceProxy("{0}/register_exploitation_match", RegisterExploitationMatch)"""
+exploitation_match_call = """
+register_em({0}, {1})"""
 
-def generateArbitration(topic):
+def generateArbitrationXML(topic):
     node_name = "abtr_{0}".format(topic)
     n = Element("node", attrib = {
         'name': node_name,
@@ -35,11 +35,27 @@ def generateArbitration(topic):
         'from': "{0}/abtr_cmd".format(node_name),
         'to': topic}))
     n.append(Element("remap", attrib = {
+        'from': "{0}/priority".format(node_name),
+        'to': "{0}/priority".format(topic)}))
+    n.append(Element("remap", attrib = {
         'from': "{0}/cmd/register".format(node_name),
         'to': "{0}/register".format(topic)}))
 
     return [n]
 
+def generateExploitationMatcherXML(topic):
+    node_name = "exploitation_matcher_{0}".format(topic)
+    n = Element("node", attrib = {
+        'name': node_name,
+        'pkg': 'iw',
+        'type': 'exploitation_matcher'})
+    n.append(Element("remap", attrib = {
+        'from': 'priority',
+        'to': "{0}/priority".format(topic)}))
+    n.append(Element("remap", attrib = {
+        'from': 'register',
+        'to': "{0}/register_exploitation_match".format(topic)}))
+    return [n]
 
 class Structure:
     def __init__(self):
@@ -48,7 +64,7 @@ class Structure:
         self.strategies = {}
         self.filters = {}
         self.filterTypes = {}
-        self.priorityMatches = {}
+        self.exploitationMatches = {}
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -65,22 +81,22 @@ class Structure:
     def addFilterType(self, ft):
         self.filterTypes[ft.name] = ft
 
-    def registerPriorityMatch(self, b, d):
+    def registerExploitationMatch(self, b, d):
         p = b.priority
         for o in b.output:
-            if o not in self.priorityMatches:
-                self.priorityMatches[o] = {}
-            matches = self.priorityMatches[o]
+            if o not in self.exploitationMatches:
+                self.exploitationMatches[o] = {}
+            matches = self.exploitationMatches[o]
             if p not in matches:
                 matches[p] = []
             matches[p].append(d)
 
-    def generatePriorityMatchesPy(self):
+    def generateExploitationMatchesPy(self):
         out = ""
-        for t, ms in self.priorityMatches.iteritems():
-            out += priority_match_sp.format(t)
+        for t, ms in self.exploitationMatches.iteritems():
+            out += exploitation_match_sp.format(t)
             for p, ds in ms.iteritems():
-                out += priority_match_call.format(p,ds)
+                out += exploitation_match_call.format(p,ds)
         return out
 
     def generate(self, basepath, opts):
@@ -103,10 +119,10 @@ class Structure:
                 if module_name in self.behaviors:
                     bhvr = self.behaviors[module_name]
                     # Registration script is generated later:
-                    self.registerPriorityMatch(bhvr, u_class)
+                    self.registerExploitationMatch(bhvr, u_class)
 
         if verbose:
-            print "Priority matches: " + str(self.priorityMatches)
+            print "Exploitation matches: " + str(self.exploitationMatches)
         
         # XML launch file
         launch_elem = Element("launch")
@@ -116,7 +132,9 @@ class Structure:
             launch_elem.extend(b.generateXML())
         if opts.generate_arbitration:
             for t in behavior_topics:
-                launch_elem.extend(generateArbitration(t))
+                launch_elem.extend(generateArbitrationXML(t))
+            for t in self.exploitationMatches.keys():
+                launch_elem.extend(generateExploitationMatcherXML(t))
 
         launch_tree = ElementTree(launch_elem)
         if verbose:
@@ -132,8 +150,9 @@ class Structure:
         pyscript = ""
         for s in self.strategies.values():
             pyscript += s.generatePy()
-        pyscript += "\n"
-        pyscript += self.generatePriorityMatchesPy()
+        if opts.generate_arbitration:
+            pyscript += "\n"
+            pyscript += self.generateExploitationMatchesPy()
 
         if verbose:
             print "Generated Python script:\n"

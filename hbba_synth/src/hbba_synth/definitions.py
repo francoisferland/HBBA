@@ -15,7 +15,7 @@ strat_{0}.utility = {1}\n\
 strat_{0}.cost = {2}\n\
 strat_{0}.utility_min = {3}\n\
 strat_{0}.source = \"\"\"\n{4}\"\"\"\n\
-add_strat(strat_{0})\
+add_strat(strat_{0})\n\
 "
 
 class FilterDef:

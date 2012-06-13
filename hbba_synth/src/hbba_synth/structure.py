@@ -3,6 +3,8 @@ from xml.etree.ElementTree import ElementTree, Element, tostring
 from xml.dom import minidom
 from sets import Set
 
+# Some constant expressions that are formatted later:
+
 python_header = """
 import roslib; roslib.load_manifest("hbba_synth")
 import rospy;
@@ -15,6 +17,11 @@ rospy.wait_for_service("add_strategy", 1.0)
 add_strat = rospy.ServiceProxy("add_strategy", AddStrategy)
 
 """
+
+priority_match_sp = """
+register_pm=rospy.ServiceProxy("{0}/register_priority_match", ExploitationMatch)"""
+priority_match_call = """
+register_pm({0}, {1})"""
 
 def generateArbitration(topic):
     node_name = "abtr_{0}".format(topic)
@@ -41,6 +48,7 @@ class Structure:
         self.strategies = {}
         self.filters = {}
         self.filterTypes = {}
+        self.priorityMatches = {}
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -57,6 +65,24 @@ class Structure:
     def addFilterType(self, ft):
         self.filterTypes[ft.name] = ft
 
+    def registerPriorityMatch(self, b, d):
+        p = b.priority
+        for o in b.output:
+            if o not in self.priorityMatches:
+                self.priorityMatches[o] = {}
+            matches = self.priorityMatches[o]
+            if p not in matches:
+                matches[p] = []
+            matches[p].append(d)
+
+    def generatePriorityMatchesPy(self):
+        out = ""
+        for t, ms in self.priorityMatches.iteritems():
+            out += priority_match_sp.format(t)
+            for p, ds in ms.iteritems():
+                out += priority_match_call.format(p,ds)
+        return out
+
     def generate(self, basepath, opts):
         verbose = opts.verbose
         # Analysis pass: Gather every behavior topics.
@@ -71,20 +97,17 @@ class Structure:
         # exploitation matcher.
         # NOTE: Could be combined to the previous pass ?
         for s in self.strategies.values():
+            u_class = s.utility_class
             for m in s.modules:
-                d_set = Set([])
                 module_name = m.module_name
                 if module_name in self.behaviors:
-                    u_class = s.utility_class
                     bhvr = self.behaviors[module_name]
-                    d_set.add(u_class)
-                    if verbose:
-                        print "Matching {0} of {1} to {2}".format(
-                            bhvr.priority,
-                            bhvr.output, 
-                            u_class)
-                    # TODO: Add registration script.
+                    # Registration script is generated later:
+                    self.registerPriorityMatch(bhvr, u_class)
 
+        if verbose:
+            print "Priority matches: " + str(self.priorityMatches)
+        
         # XML launch file
         launch_elem = Element("launch")
         for p in self.procmodules.values():
@@ -109,6 +132,8 @@ class Structure:
         pyscript = ""
         for s in self.strategies.values():
             pyscript += s.generatePy()
+        pyscript += "\n"
+        pyscript += self.generatePriorityMatchesPy()
 
         if verbose:
             print "Generated Python script:\n"

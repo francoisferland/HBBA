@@ -32,9 +32,6 @@ def main():
         p = FileParser(f, structure)
         p.parse(opts.verbose)
 
-    if (opts.verbose):
-        print "Generating XML..."
-
     basepath = os.path.abspath(opts.directory) + "/" + opts.basename
     structure.generate(basepath, opts)
 

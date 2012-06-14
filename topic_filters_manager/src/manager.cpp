@@ -1,6 +1,6 @@
 #include "topic_filters_manager/manager.hpp"
 #include <topic_filters/SetState.h>
-#include <topic_filters/SetDivisorRate.h>
+#include <topic_filters/SetDividerRate.h>
 
 using namespace topic_filters_manager;
 
@@ -8,7 +8,7 @@ namespace topic_filters_manager
 {
 	template<> size_t proxy_index<topic_filters::SetState>() 
 		{return 0;}
-	template<> size_t proxy_index<topic_filters::SetDivisorRate>() 
+	template<> size_t proxy_index<topic_filters::SetDividerRate>() 
 		{return 1;}
 
 	template<> void filter::state<topic_filters::SetState>(
@@ -20,8 +20,8 @@ namespace topic_filters_manager
 			state_ = "false";
 	}
 
-	template<> void filter::state<topic_filters::SetDivisorRate>(
-		const topic_filters::SetDivisorRate& req)
+	template<> void filter::state<topic_filters::SetDividerRate>(
+		const topic_filters::SetDividerRate& req)
 	{
 		state_ = req.request.divisor;
 	}
@@ -31,7 +31,7 @@ namespace topic_filters_manager
 		bool valid(const std::string& ns)
 		{
 			return ros::service::exists(ns + "/switch_set_state", true) &&
-				ros::service::exists(ns + "/set_divisor_rate", true);
+				ros::service::exists(ns + "/set_divider_rate", true);
 		}
 
 		void add_proxies(ros::NodeHandle& n,
@@ -41,9 +41,9 @@ namespace topic_filters_manager
 			proxies[proxy_index<topic_filters::SetState>()] = 
 				n.serviceClient<topic_filters::SetState>(
 					ns + "/switch_set_state");
-			proxies[proxy_index<topic_filters::SetDivisorRate>()] = 
-				n.serviceClient<topic_filters::SetDivisorRate>(
-					ns + "/set_divisor_rate");
+			proxies[proxy_index<topic_filters::SetDividerRate>()] = 
+				n.serviceClient<topic_filters::SetDividerRate>(
+					ns + "/set_divider_rate");
 
 			manager::filter_t filter("switch_filter", proxies);
 			map[ns] = filter;
@@ -52,12 +52,12 @@ namespace topic_filters_manager
 
 	};
 
-    struct GenericDivisorHandler: public filter_handler
+    struct GenericDividerHandler: public filter_handler
     {
         bool valid(const std::string& ns)
         {
             ros::NodeHandle n(ns);
-            std::string service_name = n.resolveName("set_divisor_rate");
+            std::string service_name = n.resolveName("set_divider_rate");
             ros::service::waitForService(service_name, ros::Duration(10.0));
             return ros::service::exists(service_name, true);
         }
@@ -67,11 +67,11 @@ namespace topic_filters_manager
         {
             std::vector<ros::ServiceClient> proxies(2);
             ros::NodeHandle np(ns);
-			proxies[proxy_index<topic_filters::SetDivisorRate>()] = 
-				np.serviceClient<topic_filters::SetDivisorRate>(
-					"set_divisor_rate", true);
+			proxies[proxy_index<topic_filters::SetDividerRate>()] = 
+				np.serviceClient<topic_filters::SetDividerRate>(
+					"set_divider_rate", true);
 
-            manager::filter_t filter("GenericDivisor", proxies);
+            manager::filter_t filter("GenericDivider", proxies);
             map[ns] = filter;
         }
 
@@ -91,7 +91,7 @@ manager::manager()
 
 	// Register default handlers.
 	handlers_map_["switch_filter"] = new switch_filter_handler();
-    handlers_map_["GenericDivisor"] = new GenericDivisorHandler();
+    handlers_map_["GenericDivider"] = new GenericDividerHandler();
 
 }
 

@@ -2,7 +2,7 @@
 #define FILTERED_PUBLISHER_HPP
 
 #include "topic_filters/SetState.h"
-#include "topic_filters/SetDivisorRate.h"
+#include "topic_filters/SetDividerRate.h"
 #include <ros/ros.h>
 
 namespace topic_filters
@@ -39,7 +39,7 @@ namespace topic_filters
 			
 			srv_state_ = n.advertiseService("switch_set_state", 
 				&filtered_publisher::srv_state_cb, this);
-			srv_rate_ = n.advertiseService("set_divisor_rate", 
+			srv_rate_ = n.advertiseService("set_divider_rate", 
 				&filtered_publisher::srv_rate_cb, this);
 		
 		}
@@ -60,8 +60,8 @@ namespace topic_filters
 			return true;
 		}
 
-		bool srv_rate_cb(topic_filters::SetDivisorRate::Request& req, 
-			topic_filters::SetDivisorRate::Response& res)
+		bool srv_rate_cb(topic_filters::SetDividerRate::Request& req, 
+			topic_filters::SetDividerRate::Response& res)
 		{
 			rate_ = req.divisor;
 			return true;

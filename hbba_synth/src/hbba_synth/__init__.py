@@ -16,6 +16,9 @@ def main():
             dest="generate_arbitration", default=True,
             help="generic arbitration nodes are generated for each behavior \
             output topic")
+    opt_parser.add_option("-p", "--pretty", action="store_true",
+            dest="pretty", default=False,
+            help="more human-readable XML output")
     opt_parser.add_option("-v", "--verbose", action="store_true",
             dest="verbose", default=False,
             help="verbose output")

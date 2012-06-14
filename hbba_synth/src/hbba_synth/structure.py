@@ -137,14 +137,17 @@ class Structure:
                 launch_elem.extend(generateExploitationMatcherXML(t))
 
         launch_tree = ElementTree(launch_elem)
+        xml_output = tostring(launch_elem)
+        if opts.pretty:
+            reparsed = minidom.parseString(xml_output)
+            xml_output = reparsed.toprettyxml(indent="  ")
+
         if verbose:
             print "Generated XML:\n"
-            rough = tostring(launch_elem)
-            reparsed = minidom.parseString(rough)
-            print reparsed.toprettyxml(indent="  ")
+            print xml_output
 
-
-        launch_tree.write(basepath + ".launch")
+        xmlfile = file(basepath + ".launch", "w")
+        xmlfile.write(xml_output)
 
         # Python script
         pyscript = ""

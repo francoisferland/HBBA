@@ -2,7 +2,7 @@
 #define FILTERED_SUBSCRIBER_HPP
 
 #include "topic_filters/SetState.h"
-#include "topic_filters/SetDivisorRate.h"
+#include "topic_filters/SetDividerRate.h"
 #include <ros/ros.h>
 
 namespace topic_filters
@@ -94,11 +94,11 @@ namespace topic_filters
 			
 			srv_state_ = n.advertiseService("switch_set_state", 
 				&filtered_subscriber_impl<T, M>::srv_state_cb, this);
-			srv_rate_ = n.advertiseService("set_divisor_rate", 
+			srv_rate_ = n.advertiseService("set_divider_rate", 
 				&filtered_subscriber_impl<T, M>::srv_rate_cb, this);
 
 			n.param("active", active_, true);
-			n.param("divisor_rate", rate_, 1);
+			n.param("divider_rate", rate_, 1);
 
 		}
 		~filtered_subscriber_impl()
@@ -122,8 +122,8 @@ namespace topic_filters
 			return true;
 		}
 
-		bool srv_rate_cb(topic_filters::SetDivisorRate::Request& req, 
-			topic_filters::SetDivisorRate::Response& res)
+		bool srv_rate_cb(topic_filters::SetDividerRate::Request& req, 
+			topic_filters::SetDividerRate::Response& res)
 		{
 			rate_ = req.divisor;
 			return true;

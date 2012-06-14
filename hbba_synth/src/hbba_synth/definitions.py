@@ -18,6 +18,11 @@ strat_{0}.source = \"\"\"\n{4}\"\"\"\n\
 add_strat(strat_{0})\n\
 "
 
+def generateRootRemapXML(topic):
+    return Element("remap", attrib = {
+        'from': topic,
+        'to': '/' + topic})
+
 class FilterDef:
     def __init__(self, name, type):
         self.name = name
@@ -63,6 +68,10 @@ class BehaviorDef:
         except KeyError as e:
             print "Error: Missing {0} in {1}".format(e, self.name)
             exit(-1)
+        if 'input' in content:
+            self.input = content['input']
+        else:
+            self.input = []
 
         structure.addBehavior(self)
         if verbose:
@@ -76,6 +85,10 @@ class BehaviorDef:
     def generateXML(self):
         elems = []
         grp = Element("group", attrib={'ns': self.name})
+        # Input remaps, have to go first to affect included nodes:
+        for i in self.input:
+            grp.append(generateRootRemapXML(i))
+
         grp.extend(self.launch.generateXML())
         elems.append(grp)
         for o in self.output:
@@ -88,7 +101,7 @@ class BehaviorDef:
                     "standalone topic_filters/GenericDivider {0} {1}".format(
                         o, self.outputFilterTopic(o))
                 }))
-            grp.append(Element("rosparam", attrib={
+            grp.append(Element("param", attrib={
                 'name': self.outputFilterTopic(o) + "/abtr_priority",
                 'value': str(self.priority)
                 }))
@@ -126,6 +139,10 @@ class ProcModuleDef:
             self.input = content['input']
         except KeyError as e:
             print "Error: Missing {0} in {1}".format(e, self.name)
+        if 'output' in content:
+            self.output = content['output']
+        else:
+            self.output = []
 
         structure.addProcModule(self)
 
@@ -157,6 +174,11 @@ class ProcModuleDef:
         elems = []
         grp = Element("group", attrib={'ns': self.name})
         elems.append(grp)
+
+        # Output remaps (unfiltered, needed for included nodes.):
+        for o in self.output: 
+            grp.append(generateRootRemapXML(o))
+
         grp.extend(self.launch.generateXML())
         for i in self.input:
             if type(i) != dict:

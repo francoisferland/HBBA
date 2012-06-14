@@ -9,27 +9,30 @@ hbba_conf:
     # A value of 0 always deactivate the filter
     function: "setDividerRate"
 
-- behavior:
-    name: stop
-    launch: {pkg: "autonav", path: "stop.launch"}
-    output:
-        - cmd_vel
-    priority: 10
+#- behavior:
+#    name: stop
+#    launch: {pkg: "autonav", path: "stop.launch"}
+#    output:
+#        - cmd_vel
+#    priority: 10
 
 - behavior:
     name: look_at_voice
-    launch: {pkg: "jn0_behaviors", path: "lookat.launch"}
+    launch: {pkg: "jn0_bringup", path: "launch/jn0_bhvr_look_at.launch"}
+    input: # Automatically remapped to root.
+        - source_pose
     output:
         - look_at_pose
-        - dummy_output
     priority: 10
 
 - procmodule:
     name: manyears 
-    launch: {pkg: "jn0_bringup", path: "jn0_manyears.launch"}
+    launch: {pkg: "jn0_bringup", path: "launch/jn0_manyears.launch"}
     input:
         # NOTE: Filter types are ignored for now
         - audio_stream: {type: GenericDivisor}
+    output: # Automatically remapped to root.
+        - source_pose
 
 - strat:
     name: LocateVoiceFull

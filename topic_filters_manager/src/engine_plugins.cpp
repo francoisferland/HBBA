@@ -1,6 +1,6 @@
 #include "script_engine/engine_module.hpp"
 #include "topic_filters/SetState.h"
-#include "topic_filters/SetDivisorRate.h"
+#include "topic_filters/SetDividerRate.h"
 #include <pluginlib/class_list_macros.h>
 #include <topic_filters_manager/manager.hpp>
 
@@ -18,7 +18,7 @@ namespace topic_filters_manager
 			global->Set(v8::String::New("deactivateFilter"), 
 				v8::FunctionTemplate::New(
                     &ScriptEnginePlugins::js_tfmcall<false>));
-            global->Set(v8::String::New("setDivisorRate"),
+            global->Set(v8::String::New("setDividerRate"),
                 v8::FunctionTemplate::New(
                     &ScriptEnginePlugins::js_ratecall));
 		}
@@ -43,7 +43,7 @@ namespace topic_filters_manager
             v8::Integer* v = v8::Integer::Cast(*rv);
             int rate = v->Value();
 
-            topic_filters::SetDivisorRate req;
+            topic_filters::SetDividerRate req;
             req.request.divisor = rate;
             tfm_.call_filter(name, req);
 

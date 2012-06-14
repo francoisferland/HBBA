@@ -27,12 +27,12 @@ s1.source = """
 // These two methods will be available to all strategies.
 function activate(name)
 {
-    setDivisorRate(name, 1);
+    setDividerRate(name, 1);
 }
 
 function deactivate(name)
 {
-    setDivisorRate(name, 0);
+    setDividerRate(name, 0);
 }
 
 function strat1_bup(params)

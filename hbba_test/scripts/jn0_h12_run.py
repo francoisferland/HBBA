@@ -13,8 +13,8 @@ rospy.init_node('jn0_h12_run')
 rospy.wait_for_service('/hbba/register_filter')
 register_filter = rospy.ServiceProxy('/hbba/register_filter', RegisterFilter)
 
-register_filter("/manyears/stream_filter", "GenericDivisor")
-register_filter("/ball_tracking/kinect_filter", "GenericDivisor")
+register_filter("/manyears/stream_filter", "GenericDivider")
+register_filter("/ball_tracking/kinect_filter", "GenericDivider")
 
 # Strategies
 
@@ -32,12 +32,12 @@ s1.source = """
 // These two methods will be available to all strategies.
 function activate(name)
 {
-    setDivisorRate(name, 1);
+    setDividerRate(name, 1);
 }
 
 function deactivate(name)
 {
-    setDivisorRate(name, 0);
+    setDividerRate(name, 0);
 }
 
 function locate_voice_bup(params)
@@ -85,13 +85,13 @@ s3.source = """
 function track_ball_quarter_bup(params)
 {
 	se_log('track_ball /4 bringup');
-    setDivisorRate('/ball_tracking/kinect_filter', 20);
+    setDividerRate('/ball_tracking/kinect_filter', 20);
 }
 
 function track_ball_quarter_bdn(params)
 {
 	se_log('track_ball /4 bringdown');
-    setDivisorRate('/ball_tracking/kinect_filter', 0);
+    setDividerRate('/ball_tracking/kinect_filter', 0);
 }
 """
 add_strat(s3)

@@ -1,15 +1,15 @@
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 #include <topic_tools/shape_shifter.h>
-#include <topic_filters/SetDivisorRate.h>
+#include <topic_filters/SetDividerRate.h>
 #include <ros/ros.h>
 #include <deque>
 
 namespace topic_filters
 {
-    /// \brief A switch/divisor generic topic filter nodelet.
+    /// \brief A switch/divider generic topic filter nodelet.
     ///
-    /// The rate of the divisor sets how many messages should be skipped.
+    /// The rate of the divider sets how many messages should be skipped.
     /// The default is 1.
     /// A rate of 1 republishes all messages, a rate 2 is half, a rate of 4 is
     /// a quarter, etc.
@@ -18,11 +18,11 @@ namespace topic_filters
     ///
     /// In latch mode, the filter sends the last received message as soon
     /// as it's reactivated.
-    class GenericDivisor: public nodelet::Nodelet
+    class GenericDivider: public nodelet::Nodelet
     {
     public:
         /// \brief Default constructor. Default rate is 1.
-        GenericDivisor(): rate_(0), count_(0), advertised_(false) {}
+        GenericDivider(): rate_(0), count_(0), advertised_(false) {}
 
         virtual void onInit()
         {
@@ -35,12 +35,12 @@ namespace topic_filters
             }
 
             n_ = getNodeHandle();
-            sub_ = n_.subscribe(args[0], 10, &GenericDivisor::msgCB, this);
+            sub_ = n_.subscribe(args[0], 10, &GenericDivider::msgCB, this);
             output_name_ = args[1];
             
             ros::NodeHandle np = getPrivateNodeHandle();
-            srv_rate_ = np.advertiseService("set_divisor_rate",
-                &GenericDivisor::rateCB, this);
+            srv_rate_ = np.advertiseService("set_divider_rate",
+                &GenericDivider::rateCB, this);
             int ls;
             np.param("latch_size", ls, 1);
             latch_size_ = abs(ls);
@@ -85,8 +85,8 @@ namespace topic_filters
             count_++;
         }
 
-        bool rateCB(topic_filters::SetDivisorRate::Request& req,
-            topic_filters::SetDivisorRate::Response&)
+        bool rateCB(topic_filters::SetDividerRate::Request& req,
+            topic_filters::SetDividerRate::Response&)
         {
             rate_ = req.divisor;
             if (rate_ < 0)
@@ -130,6 +130,6 @@ namespace topic_filters
     };
 }
 
-PLUGINLIB_DECLARE_CLASS(topic_filters, GenericDivisor,
-    topic_filters::GenericDivisor, nodelet::Nodelet)
+PLUGINLIB_DECLARE_CLASS(topic_filters, GenericDivider,
+    topic_filters::GenericDivider, nodelet::Nodelet)
 

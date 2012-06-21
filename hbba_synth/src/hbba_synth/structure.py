@@ -13,11 +13,11 @@ from hbba_msgs.srv import *
 
 rospy.init_node("hbba_struct", anonymous=True)
 
-rospy.wait_for_service("add_strategy", 1.0)
-add_strat = rospy.ServiceProxy("add_strategy", AddStrategy)
+rospy.wait_for_service("hbba/add_strategy", 1.0)
+add_strat = rospy.ServiceProxy("hbba/add_strategy", AddStrategy)
 
-rospy.wait_for_service("set_resource_max", 1.0)
-set_resource_max = rospy.ServiceProxy("set_resource_max", SetResourceMax)
+rospy.wait_for_service("hbba/set_resource_max", 1.0)
+set_resource_max = rospy.ServiceProxy("hbba/set_resource_max", SetResourceMax)
 
 """
 
@@ -25,6 +25,11 @@ exploitation_match_sp = """
 register_em=rospy.ServiceProxy("{0}/register_exploitation_match", RegisterExploitationMatch)"""
 exploitation_match_call = """
 register_em({0}, {1})"""
+
+def baseNodesXML():
+    e = Element("include", attrib = {
+        'file': "$(find hbba_synth)/launch/base_nodes.launch"})
+    return e
 
 def generateArbitrationXML(topic):
     node_name = "abtr_{0}".format(topic)
@@ -133,6 +138,10 @@ class Structure:
         
         # XML launch file
         launch_elem = Element("launch")
+        if opts.base_nodes:
+            if verbose:
+                print "Adding base HBBA nodes"
+            launch_elem.append(baseNodesXML())
         for p in self.procmodules.values():
             launch_elem.extend(p.generateXML())
         for b in self.behaviors.values():

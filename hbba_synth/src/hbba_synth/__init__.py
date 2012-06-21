@@ -14,8 +14,10 @@ def main():
             help="generated files base name (default: %default)")
     opt_parser.add_option("-a", "--generate-arbitration", action="store_true",
             dest="generate_arbitration", default=True,
-            help="generic arbitration nodes are generated for each behavior \
-            output topic")
+            help="generic arbitration nodes are generated for each behavior output topic (default: %default)")
+    opt_parser.add_option("-b", "--base_nodes", action="store_true",
+            dest="base_nodes", default=True,
+            help="add base HBBA nodes such as iw and script_engine (default: %default)")
     opt_parser.add_option("-p", "--pretty", action="store_true",
             dest="pretty", default=False,
             help="more human-readable XML output")

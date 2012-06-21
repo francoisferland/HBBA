@@ -10,14 +10,14 @@ if len(sys.argv) < 2:
     exit(-1)
 
 rospy.init_node("register_filter", anonymous=True)
-rospy.wait_for_service("register_filter", timeout=5.0)
+rospy.wait_for_service("hbba/register_filter", timeout=5.0)
 
-register_filter = rospy.ServiceProxy("register_filter", RegisterFilter)
+register_filter = rospy.ServiceProxy("hbba/register_filter", RegisterFilter)
 
 if len(sys.argv) < 3:
-    filter_type = "GenericDivisor"
+    filter_type = "GenericDivider"
 else:
-    filter_type = argv[2]
+    filter_type = sys.argv[2]
 
 register_filter(sys.argv[1], filter_type)
 

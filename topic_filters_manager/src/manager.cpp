@@ -56,9 +56,10 @@ namespace topic_filters_manager
     {
         bool valid(const std::string& ns)
         {
-            ros::NodeHandle n(ns);
+            ros::NodeHandle n("/" + ns);
+            ROS_DEBUG("Looking for set_divider_rate in /%s...", ns.c_str());
             std::string service_name = n.resolveName("set_divider_rate");
-            ros::service::waitForService(service_name, ros::Duration(10.0));
+            ros::service::waitForService(service_name, ros::Duration(5.0));
             return ros::service::exists(service_name, true);
         }
 

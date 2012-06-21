@@ -78,7 +78,9 @@ class BehaviorDef:
             print "Emitted Behavior '{0}'.".format(self.name)
 
     def outputFilterName(self, name):
-        return self.name + "_" + name + "_output_filter"
+        return self.name + "/" + name + "_output_filter"
+    def outputFilterNodeName(self, name):
+        return name + "_output_filter"
     def outputFilterTopic(self, name):
         return name + "_out"
 
@@ -94,7 +96,7 @@ class BehaviorDef:
         for o in self.output:
             # Add output filter, registration script.
             grp.append(Element("node", attrib={
-                'name': self.outputFilterName(o),
+                'name': self.outputFilterNodeName(o),
                 'pkg': 'nodelet',
                 'type': 'nodelet',
                 'args': 
@@ -114,11 +116,11 @@ class BehaviorDef:
                     self.outputFilterTopic(o))
                 }))
             elems.append(Element("node", attrib={
-                'name': "register_{0}".format(self.outputFilterName(o)),
+                'name': "register_{0}_filter".format(self.outputFilterNodeName(o)),
                 'pkg': 'topic_filters_manager',
                 'type': 'register',
-                'args': "{0} {1}/{2}".format(self.outputFilterName(o), 
-                    self.name, self.outputFilterName(o))
+                'args': "{0} GenericDivider".format(
+                    self.outputFilterName(o))
                 }))
 
         # TODO: Filter registration (out of XML, actually)!
@@ -128,6 +130,7 @@ class BehaviorDef:
 class ProcModuleDef:
     def __init__(self, content, structure, verbose=False):
         self.structure = structure
+        self.verbose = verbose
 
         if not 'name' in content:
             print "Error: procmodule element with no name."
@@ -149,24 +152,27 @@ class ProcModuleDef:
         if verbose:
             print "Emitted ProcModule '{0}'.".format(self.name)
 
-    def createInputFilter(self, name):
+    def createInputFilter(self, topic):
         elems = []
-        filter_name = "{0}_{1}_filter".format(self.name, name)
+        filter_name = "{0}_{1}_filter".format(self.name, topic)
+        node_name = "{0}_{1}_filter".format(self.name, topic)
         filter_type = "GenericDivider"
+        if self.verbose:
+            print "Adding filter {0}".format(filter_name)
         self.structure.addFilter(FilterDef(filter_name, filter_type))
         elems.append(Element("node", attrib = {
-            'name': filter_name,
+            'name': node_name,
             'pkg': 'nodelet',
             'type': 'nodelet',
             'args': 
-                "standalone topic_filters/GenericDivider {0} {1}/{0}".format(
-                    name, self.name)
+                "standalone topic_filters/{0} {1} {2}".format(
+                    filter_type, topic, filter_name)
             }))
         elems.append(Element("node", attrib={
-            'name': "register_{0}".format(filter_name),
+            'name': "register_{0}".format(node_name),
             'pkg': 'topic_filters_manager',
             'type': 'register',
-            'args': "{0} {1}/{2}".format(filter_name, self.name, filter_name)
+            'args': "{0} {1}".format(filter_name, filter_type)
             }))
         return elems
 
@@ -224,7 +230,7 @@ class ModuleLinkDef:
 
     def parseFilter(self, f):
         if type(f) is dict:
-            fname = self.module_name + "_" + f.keys()[0] + "_filter"
+            fname = "{0}_{1}_filter".format(self.module_name, f.keys()[0])
             level = f.values()[0]
             try:
                 ftype = self.structure.filters[fname].type

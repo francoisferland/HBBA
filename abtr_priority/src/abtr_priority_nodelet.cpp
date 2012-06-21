@@ -65,10 +65,8 @@ namespace abtr_priority
 	public:
 		virtual void onInit()
 		{
-			// NOTE! Using the private node handle is really important.
-			// This ensures that topics will be registered in the correct
-			// namespace.
-			ros::NodeHandle n = getPrivateNodeHandle();
+            // NOTE: The root namespace will be the same as the nodelet manager.
+			ros::NodeHandle n = getNodeHandle();
 
 			back_.reset(new BackEndType(n, "abtr_cmd"));
 			// WARNING! Can't remap subscription topic names in a nodelet ?

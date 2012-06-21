@@ -41,8 +41,9 @@
     <!-- Pose arbitration -->
     <node name="look_at_pose_abtr" pkg="nodelet" type="nodelet"
         args="standalone abtr_priority/Generic">
-        <remap from="look_at_pose_abtr/abtr_cmd" to="look_at_pose"/>
-        <remap from="look_at_pose_abtr/cmd/register" to="look_at_pose/register"/>
+        <remap from="abtr_cmd" to="look_at_pose"/>
+        <remap from="priority" to="look_at_pose/priority"/>
+        <remap from="cmd/register" to="look_at_pose/register"/>
     </node>
     <node name="register_pose" pkg="abtr_priority" type="register"
       args="/look_at_pose

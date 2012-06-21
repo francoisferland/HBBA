@@ -40,13 +40,13 @@ def generateArbitrationXML(topic):
         'args': 'standalone abtr_priority/Generic'
         })
     n.append(Element("remap", attrib = {
-        'from': "{0}/abtr_cmd".format(node_name),
+        'from': "abtr_cmd",
         'to': topic}))
     n.append(Element("remap", attrib = {
-        'from': "{0}/priority".format(node_name),
+        'from': "priority",
         'to': "{0}/priority".format(topic)}))
     n.append(Element("remap", attrib = {
-        'from': "{0}/cmd/register".format(node_name),
+        'from': "cmd/register",
         'to': "{0}/register".format(topic)}))
 
     return [n]

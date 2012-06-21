@@ -82,9 +82,8 @@ namespace abtr_priority
 		int getPriority(const std::string& pubname) const
 		{
 			int p;
-			std::string paramname = pubname + "/abtr_priority";
-			//ROS_INFO("Looking for priority in %s", paramname.c_str());
-			n_.param(paramname, p, -1);
+            ros::NodeHandle np(pubname);
+			np.param("abtr_priority", p, -1);
 			return p;
 		}
 

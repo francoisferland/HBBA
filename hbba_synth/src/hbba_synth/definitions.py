@@ -306,16 +306,34 @@ class StratDef:
         js_source += "}\n"
         
         return StratTemplate.format(
-            self.name, # TODO!
+            self.name,
             self.utility.generatePy(),
             generateCostDefArrayPy(self.costs),
             generateCostDefArrayPy(self.dependencies),
             js_source)
 
+class ResourceDef:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+    def generatePy(self):
+        return "set_resource_max('{0}', {1})\n".format(self.name, self.value)
+
+class ResourceSetDef:
+    def __init__(self, content, structure, verbose=False):
+        if type(content) is not dict:
+            print "Error: resources element is not a dictionary."
+            print type(content)
+            exit(-1)
+        for r_k, r_v in content.iteritems():
+            structure.addResource(ResourceDef(r_k, r_v))
+
 typemap = {
     'behavior': BehaviorDef,
     'procmodule': ProcModuleDef,
     'strat': StratDef,
-    'filtertype': FilterTypeDef
+    'filtertype': FilterTypeDef,
+    'resources': ResourceSetDef
 }
 

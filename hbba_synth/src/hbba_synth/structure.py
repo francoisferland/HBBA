@@ -16,6 +16,9 @@ rospy.init_node("hbba_struct", anonymous=True)
 rospy.wait_for_service("add_strategy", 1.0)
 add_strat = rospy.ServiceProxy("add_strategy", AddStrategy)
 
+rospy.wait_for_service("set_resource_max", 1.0)
+set_resource_max = rospy.ServiceProxy("set_resource_max", SetResourceMax)
+
 """
 
 exploitation_match_sp = """
@@ -65,6 +68,7 @@ class Structure:
         self.filters = {}
         self.filterTypes = {}
         self.exploitationMatches = {}
+        self.resources = {}
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -80,6 +84,9 @@ class Structure:
 
     def addFilterType(self, ft):
         self.filterTypes[ft.name] = ft
+
+    def addResource(self, r):
+        self.resources[r.name] = r
 
     def registerExploitationMatch(self, b, d):
         p = b.priority
@@ -153,6 +160,9 @@ class Structure:
         pyscript = ""
         for s in self.strategies.values():
             pyscript += s.generatePy()
+        pyscript += "\n# Resources\n"
+        for r in self.resources.values():
+            pyscript += r.generatePy()
         if opts.generate_arbitration:
             pyscript += "\n"
             pyscript += self.generateExploitationMatchesPy()

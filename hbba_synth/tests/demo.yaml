@@ -9,6 +9,10 @@ hbba_conf:
     # A value of 0 always deactivate the filter
     function: "setDividerRate"
 
+- resources:
+    CPU: 100
+    sound: 1
+
 #- behavior:
 #    name: stop
 #    launch: {pkg: "autonav", path: "stop.launch"}

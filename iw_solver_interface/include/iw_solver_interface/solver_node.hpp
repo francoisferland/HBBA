@@ -194,6 +194,7 @@ namespace iw_solver_interface
                     {
                         script += d->params;
                         intent.desires[j] = d->id;
+                        intent.desire_types[j] = d->type;
                     }
                 }   
                 script += ");";

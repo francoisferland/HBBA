@@ -29,6 +29,7 @@ class FileParser:
         # The parser look for every main elements and hand it to other analysers 
         # for each recognized element.
         # conf_name contains the first element, and is ignored.
+        from definitions import typemap
         for conf_name, conf_content in doc.iteritems():
             for elem in conf_content:
                 key = elem.keys()[0]

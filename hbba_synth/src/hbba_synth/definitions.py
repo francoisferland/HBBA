@@ -1,4 +1,5 @@
 from xml.etree.ElementTree import Element, tostring
+from file_parser import FileParser
 
 # {0}: name
 # {1}: utility (ResourceUsage string)
@@ -335,11 +336,43 @@ class ResourceSetDef:
         for r_k, r_v in content.iteritems():
             structure.addResource(ResourceDef(r_k, r_v))
 
+class IncludeDef:
+    def __init__(self, content, structure, verbose=False):
+        if type(content) is not dict:
+            print "Error: include clause is not a dictionary."
+            exit(-1)
+        try:
+            self.pkg = content['pkg']
+            self.fname = content['file']
+        except KeyError as e:
+            print "Error: Missing {0} in {1}.".format(e, content)
+            exit(-1)
+
+        if verbose:
+            print "Including file {0} from package {1}.".format(
+                self.fname,
+                self.pkg)
+
+        p = FileParser(self.getPath(), structure)
+        p.parse(verbose)
+
+
+    def getPath(self):
+        from roslib.packages import find_resource
+        loc = find_resource(self.pkg, self.fname)
+        if len(loc) > 1:
+            print "Warning: more than one {0} exists in {1}.".format(
+                self.fname, self.pkg)
+        return loc[0]
+
+
+
 typemap = {
     'behavior': BehaviorDef,
     'procmodule': ProcModuleDef,
     'strat': StratDef,
     'filtertype': FilterTypeDef,
-    'resources': ResourceSetDef
+    'resources': ResourceSetDef,
+    'include': IncludeDef
 }
 

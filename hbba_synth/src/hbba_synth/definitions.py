@@ -1,12 +1,12 @@
 from xml.etree.ElementTree import Element, tostring
 from file_parser import FileParser
+from time import time
 
 # {0}: name
 # {1}: utility (ResourceUsage string)
 # {2}: cost (ResourceUsage array string)
 # {3}: dependencies (ResourceUsage array string)
 # {3}: source (javascript escaped string)
-
 StratTemplate = "\n\
 strat_{0} = Strategy()\n\
 strat_{0}.id = '{0}'\n\
@@ -19,10 +19,8 @@ strat_{0}.source = \"\"\"\n{4}\"\"\"\n\
 add_strat(strat_{0})\n\
 "
 
-def generateRootRemapXML(topic):
-    return Element("remap", attrib = {
-        'from': topic,
-        'to': '/' + topic})
+def uniqueName():
+    return str(int(time() * 1e9))
 
 class FilterDef:
     def __init__(self, name, type):
@@ -48,7 +46,7 @@ class LaunchDef:
         if verbose:
             print "Emitted launch element for {0}/{1}.".format(self.pkg,
                 self.path)
-    def generateXML(self):
+    def generateXML(self, structure):
         elems = []
         elems.append(Element("include",
             attrib={
@@ -85,14 +83,14 @@ class BehaviorDef:
     def outputFilterTopic(self, name):
         return name + "_out"
 
-    def generateXML(self):
+    def generateXML(self, structure):
         elems = []
         grp = Element("group", attrib={'ns': self.name})
         # Input remaps, have to go first to affect included nodes:
         for i in self.input:
-            grp.append(generateRootRemapXML(i))
+            grp.append(structure.generateRootRemapXML(i))
 
-        grp.extend(self.launch.generateXML())
+        grp.extend(self.launch.generateXML(structure))
         elems.append(grp)
         for o in self.output:
             # Add output filter, registration script.
@@ -109,15 +107,19 @@ class BehaviorDef:
                 'value': str(self.priority)
                 }))
             elems.append(Element("node", attrib={
-                'name': "register_{0}_{1}".format(self.name,
-                    self.outputFilterTopic(o)),
+                'name': "register_{0}_{1}_{2}".format(
+                    self.name,
+                    self.outputFilterTopic(o),
+                    uniqueName()),
                 'pkg': 'abtr_priority',
                 'type': 'register',
                 'args': "{0} {1}/{2}".format(o, self.name,
                     self.outputFilterTopic(o))
                 }))
             elems.append(Element("node", attrib={
-                'name': "register_{0}_filter".format(self.outputFilterNodeName(o)),
+                'name': "register_{0}_{1}".format(
+                    self.outputFilterNodeName(o),
+                    uniqueName()), 
                 'pkg': 'topic_filters_manager',
                 'type': 'register',
                 'args': "{0} GenericDivider".format(
@@ -177,16 +179,16 @@ class ProcModuleDef:
             }))
         return elems
 
-    def generateXML(self):
+    def generateXML(self, structure):
         elems = []
         grp = Element("group", attrib={'ns': self.name})
         elems.append(grp)
 
         # Output remaps (unfiltered, needed for included nodes.):
         for o in self.output: 
-            grp.append(generateRootRemapXML(o))
+            grp.append(structure.generateRootRemapXML(o))
 
-        grp.extend(self.launch.generateXML())
+        grp.extend(self.launch.generateXML(structure))
         for i in self.input:
             if type(i) != dict:
                 elems.extend(self.createInputFilter(i))
@@ -365,7 +367,23 @@ class IncludeDef:
                 self.fname, self.pkg)
         return loc[0]
 
+class RemapDef:
+    def __init__(self, content, structure, verbose=False):
+        if type(content) is not dict:
+            print "Error: remap clause is not a dictionary."
+            exit(-1)
+        try:
+            self.topic = content['from']
+            self.to = content['to']
+        except KeyError as e:
+            print "Error: Missing {0} in {1}.".format(e, content)
+            exit(-1)
 
+        if verbose:
+            print "Adding a root remap for {0}: {1}.".format(
+                self.topic, self.to)
+
+        structure.addRootRemap(self)
 
 typemap = {
     'behavior': BehaviorDef,
@@ -373,6 +391,7 @@ typemap = {
     'strat': StratDef,
     'filtertype': FilterTypeDef,
     'resources': ResourceSetDef,
-    'include': IncludeDef
+    'include': IncludeDef,
+    'remap': RemapDef
 }
 

@@ -74,6 +74,7 @@ class Structure:
         self.filterTypes = {}
         self.exploitationMatches = {}
         self.resources = {}
+        self.rootRemaps = {}
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -93,6 +94,9 @@ class Structure:
     def addResource(self, r):
         self.resources[r.name] = r
 
+    def addRootRemap(self, rm):
+        self.rootRemaps[rm.topic] = rm.to
+
     def registerExploitationMatch(self, b, d):
         p = b.priority
         for o in b.output:
@@ -110,6 +114,15 @@ class Structure:
             for p, ds in ms.iteritems():
                 out += exploitation_match_call.format(p,ds)
         return out
+
+    def generateRootRemapXML(self, topic):
+        if topic in self.rootRemaps:
+            rootname = self.rootRemaps[topic]
+        else:
+            rootname = '/' + topic
+        return Element("remap", attrib = {
+            'from': topic,
+            'to': rootname})
 
     def generate(self, basepath, opts):
         verbose = opts.verbose
@@ -143,9 +156,9 @@ class Structure:
                 print "Adding base HBBA nodes"
             launch_elem.append(baseNodesXML())
         for p in self.procmodules.values():
-            launch_elem.extend(p.generateXML())
+            launch_elem.extend(p.generateXML(self))
         for b in self.behaviors.values():
-            launch_elem.extend(b.generateXML())
+            launch_elem.extend(b.generateXML(self))
         if opts.generate_arbitration:
             for t in behavior_topics:
                 launch_elem.extend(generateArbitrationXML(t))

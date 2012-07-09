@@ -93,6 +93,7 @@ class BehaviorDef:
         grp.extend(self.launch.generateXML(structure))
         elems.append(grp)
         for o in self.output:
+            root_topic = structure.getRootTopicFullName(o)
             # Add output filter, registration script.
             grp.append(Element("node", attrib={
                 'name': self.outputFilterNodeName(o),
@@ -113,7 +114,7 @@ class BehaviorDef:
                     uniqueName()),
                 'pkg': 'abtr_priority',
                 'type': 'register',
-                'args': "{0} {1}/{2}".format(o, self.name,
+                'args': "{0} {1}/{2}".format(root_topic, self.name,
                     self.outputFilterTopic(o))
                 }))
             elems.append(Element("node", attrib={

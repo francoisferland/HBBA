@@ -31,39 +31,6 @@ def baseNodesXML():
         'file': "$(find hbba_synth)/launch/base_nodes.launch"})
     return e
 
-def generateArbitrationXML(topic):
-    node_name = "abtr_{0}".format(topic)
-    n = Element("node", attrib = {
-        'name': node_name,
-        'pkg': 'nodelet',
-        'type': 'nodelet',
-        'args': 'standalone abtr_priority/Generic'
-        })
-    n.append(Element("remap", attrib = {
-        'from': "abtr_cmd",
-        'to': topic}))
-    n.append(Element("remap", attrib = {
-        'from': "priority",
-        'to': "{0}/priority".format(topic)}))
-    n.append(Element("remap", attrib = {
-        'from': "cmd/register",
-        'to': "{0}/register".format(topic)}))
-
-    return [n]
-
-def generateExploitationMatcherXML(topic):
-    node_name = "exploitation_matcher_{0}".format(topic)
-    n = Element("node", attrib = {
-        'name': node_name,
-        'pkg': 'iw',
-        'type': 'exploitation_matcher'})
-    n.append(Element("remap", attrib = {
-        'from': 'priority',
-        'to': "{0}/priority".format(topic)}))
-    n.append(Element("remap", attrib = {
-        'from': 'register',
-        'to': "{0}/register_exploitation_match".format(topic)}))
-    return [n]
 
 class Structure:
     def __init__(self):
@@ -115,14 +82,52 @@ class Structure:
                 out += exploitation_match_call.format(p,ds)
         return out
 
-    def generateRootRemapXML(self, topic):
+    def getRootTopicFullName(self, topic):
         if topic in self.rootRemaps:
-            rootname = self.rootRemaps[topic]
+            return self.rootRemaps[topic]
         else:
-            rootname = '/' + topic
+            return '/' + topic
+
+    def generateRootRemapXML(self, topic):
         return Element("remap", attrib = {
             'from': topic,
-            'to': rootname})
+            'to': self.getRootTopicFullName(topic)})
+
+    def generateArbitrationXML(self, topic):
+        root_topic = self.getRootTopicFullName(topic)
+        node_name = "abtr_{0}".format(topic)
+        n = Element("node", attrib = {
+            'name': node_name,
+            'pkg': 'nodelet',
+            'type': 'nodelet',
+            'args': 'standalone abtr_priority/Generic'
+            })
+        n.append(Element("remap", attrib = {
+            'from': "abtr_cmd",
+            'to': root_topic}))
+        n.append(Element("remap", attrib = {
+            'from': "priority",
+            'to': "{0}/priority".format(root_topic)}))
+        n.append(Element("remap", attrib = {
+            'from': "cmd/register",
+            'to': "{0}/register".format(root_topic)}))
+
+        return [n]
+
+    def generateExploitationMatcherXML(self, topic):
+        root_topic = self.getRootTopicFullName(topic)
+        node_name = "exploitation_matcher_{0}".format(topic)
+        n = Element("node", attrib = {
+            'name': node_name,
+            'pkg': 'iw',
+            'type': 'exploitation_matcher'})
+        n.append(Element("remap", attrib = {
+            'from': 'priority',
+            'to': "{0}/priority".format(root_topic)}))
+        n.append(Element("remap", attrib = {
+            'from': 'register',
+            'to': "{0}/register_exploitation_match".format(root_topic)}))
+        return [n]
 
     def generate(self, basepath, opts):
         verbose = opts.verbose
@@ -161,9 +166,9 @@ class Structure:
             launch_elem.extend(b.generateXML(self))
         if opts.generate_arbitration:
             for t in behavior_topics:
-                launch_elem.extend(generateArbitrationXML(t))
+                launch_elem.extend(self.generateArbitrationXML(t))
             for t in self.exploitationMatches.keys():
-                launch_elem.extend(generateExploitationMatcherXML(t))
+                launch_elem.extend(self.generateExploitationMatcherXML(t))
 
         launch_tree = ElementTree(launch_elem)
         xml_output = tostring(launch_elem)

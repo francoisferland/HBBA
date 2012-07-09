@@ -7,6 +7,8 @@ hbba_conf:
 # bash ros utils.
 - include: {pkg: "hbba_synth", file: "common.yaml"}
 
+- remap: {from: 'look_at_pose', to: '/face/look_at_pose'}
+
 - resources:
     CPU: 100
     sound: 1

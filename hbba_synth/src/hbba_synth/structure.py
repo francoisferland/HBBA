@@ -125,6 +125,9 @@ class Structure:
             'from': 'priority',
             'to': "{0}/priority".format(root_topic)}))
         n.append(Element("remap", attrib = {
+            'from': 'intention',
+            'to': "hbba/intention"}))
+        n.append(Element("remap", attrib = {
             'from': 'register',
             'to': "{0}/register_exploitation_match".format(root_topic)}))
         return [n]

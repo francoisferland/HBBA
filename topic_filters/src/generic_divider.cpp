@@ -88,9 +88,12 @@ namespace topic_filters
         bool rateCB(topic_filters::SetDividerRate::Request& req,
             topic_filters::SetDividerRate::Response&)
         {
-            rate_ = req.divisor;
+            rate_ = req.divider;
+
             if (rate_ < 0)
                 rate_ = 0;
+
+            ROS_DEBUG("Switching rate to %i", rate_);
 
             if (rate_ > 0)
             {

@@ -23,7 +23,7 @@ namespace topic_filters_manager
 	template<> void filter::state<topic_filters::SetDividerRate>(
 		const topic_filters::SetDividerRate& req)
 	{
-		state_ = req.request.divisor;
+		state_ = req.request.divider;
 	}
 
 	struct switch_filter_handler: public filter_handler
@@ -67,7 +67,7 @@ namespace topic_filters_manager
 			const std::string& ns, manager::filter_map_t& map) const
         {
             std::vector<ros::ServiceClient> proxies(2);
-            ros::NodeHandle np(ns);
+            ros::NodeHandle np("/" + ns);
 			proxies[proxy_index<topic_filters::SetDividerRate>()] = 
 				np.serviceClient<topic_filters::SetDividerRate>(
 					"set_divider_rate", true);

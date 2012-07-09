@@ -93,6 +93,7 @@ namespace topic_filters_manager
 		template <class T> 
 		void call_filter(const std::string& ns, T& req)
 		{
+            ROS_DEBUG("Setting filter rate for %s.", ns.c_str());
 			filter_map_t::iterator i = filter_map_.find(ns);
 			if (i != filter_map_.end())
 			{

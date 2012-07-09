@@ -112,7 +112,8 @@ namespace topic_filters
 				(*fs_)(msg);
 			}
 
-			count_ = ++count_ % rate_;
+            count_++;
+			count_ %= rate_;
 		}
 
 		bool srv_state_cb(topic_filters::SetState::Request& req, 
@@ -125,7 +126,7 @@ namespace topic_filters
 		bool srv_rate_cb(topic_filters::SetDividerRate::Request& req, 
 			topic_filters::SetDividerRate::Response& res)
 		{
-			rate_ = req.divisor;
+			rate_ = req.divider;
 			return true;
 		}
 

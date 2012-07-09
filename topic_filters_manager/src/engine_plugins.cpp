@@ -44,7 +44,7 @@ namespace topic_filters_manager
             int rate = v->Value();
 
             topic_filters::SetDividerRate req;
-            req.request.divisor = rate;
+            req.request.divider = rate;
             tfm_.call_filter(name, req);
 
             return v8::Undefined();

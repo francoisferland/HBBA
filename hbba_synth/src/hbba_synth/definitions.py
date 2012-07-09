@@ -127,8 +127,6 @@ class BehaviorDef:
                     self.outputFilterName(o))
                 }))
 
-        # TODO: Filter registration (out of XML, actually)!
-
         return elems
 
 class ProcModuleDef:
@@ -226,8 +224,10 @@ class ModuleLinkDef:
         else:
             # Behavior link:
             self.module_name = content
-            # TODO: Get output topics in time.
-            self.filters = [content + "_output_filter"]
+            bm = structure.behaviors[self.module_name]
+            self.filters = []
+            for o in bm.output:
+                self.filters.append(bm.outputFilterName(o))
 
     def generateJSCall(self, func, fname, level):
         return "{0}('{1}', {2});\n".format(func, fname, level)
@@ -258,14 +258,14 @@ class ModuleLinkDef:
         src = ""
         for f in self.filters:
             (fname, ftype, ffunc, level) = self.parseFilter(f)
-            src += self.generateJSCall(ffunc, fname, level)
+            src += "  " + self.generateJSCall(ffunc, fname, level)
         return src
 
     def generateDeactivationJS(self):
         src = ""
         for f in self.filters:
             (fname, ftype, ffunc, level) = self.parseFilter(f)
-            src += self.generateJSCall(ffunc, fname, 0)
+            src += "  " + self.generateJSCall(ffunc, fname, 0)
         return src
 
 class StratDef:
@@ -307,12 +307,12 @@ class StratDef:
         bdn_name = "{0}_bdn".format(self.name)
         js_source = "function {0}(params) {{\n".format(bup_name)
         for m in self.modules:
-            js_source += "  " + m.generateActivationJS()
+            js_source += m.generateActivationJS()
         js_source += "}\n"
 
         js_source += "function {0}(params) {{\n".format(bdn_name)
         for m in self.modules:
-            js_source += "  " + m.generateDeactivationJS()
+            js_source += m.generateDeactivationJS()
         js_source += "}\n"
         
         return StratTemplate.format(

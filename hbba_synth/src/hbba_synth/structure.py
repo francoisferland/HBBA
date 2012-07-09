@@ -77,7 +77,7 @@ class Structure:
     def generateExploitationMatchesPy(self):
         out = ""
         for t, ms in self.exploitationMatches.iteritems():
-            out += exploitation_match_sp.format(t)
+            out += exploitation_match_sp.format(self.getRootTopicFullName(t))
             for p, ds in ms.iteritems():
                 out += exploitation_match_call.format(p,ds)
         return out

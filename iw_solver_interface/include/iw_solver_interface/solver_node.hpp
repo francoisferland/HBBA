@@ -167,6 +167,7 @@ namespace iw_solver_interface
             hbba_msgs::Intention intent;
             intent.strategies.reserve(result.size());
             intent.desires.resize(result.size());
+            intent.desire_types.resize(result.size());
             intent.enabled.resize(result.size());
 
             typedef typename BaseType::sol_vec_t::const_iterator CI;

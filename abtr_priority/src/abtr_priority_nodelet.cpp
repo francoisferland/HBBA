@@ -2,22 +2,13 @@
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 #include <topic_tools/shape_shifter.h>
-#include "abtr_priority/abtr_priority.hpp"
+#include "abtr_priority/frontend.hpp"
+#include "abtr_priority/sync_backend.hpp"
+#include "shapeshifter_pub.hpp"
 
 namespace abtr_priority
 {
-	namespace impl_
-	{
-		/// \brief Specialized version for ShapeShifter.
-		template <>
-		ros::Publisher advertise<topic_tools::ShapeShifter>(ros::NodeHandle n,
-			const std::string& topic, const topic_tools::ShapeShifter& msg)
-		{
-			return msg.advertise(n, topic, 10);
-		}
-	}
-
-	/// \brief A generic, priority-based arbitration nodelet.
+	/// \brief A generic, priority-based synchronized arbitration nodelet.
 	///
 	/// The front end provides a service named "cmd/Register" to register a
 	/// command source on the arbitration nodelet.
@@ -58,8 +49,8 @@ namespace abtr_priority
 	/// for the next cycle.
 	/// The default value is false.
 	///
-	/// This class is an union of both the Frontend and Backend classes in their
-	/// default configuration with ShapeShifters for topic types.
+	/// This class is an union of both the Frontend and SyncBackend classes in 
+    /// their default configuration with ShapeShifters for topic types.
 	class GenericNodelet: public nodelet::Nodelet
 	{
 	public:
@@ -76,7 +67,7 @@ namespace abtr_priority
 		}
 
 	private:
-		typedef BackEnd<topic_tools::ShapeShifter> BackEndType;
+		typedef SyncBackEnd<topic_tools::ShapeShifter> BackEndType;
 		BackEndType::Ptr back_;
 		typedef FrontEnd<topic_tools::ShapeShifter, BackEndType> FrontEndType;
 		FrontEndType::Ptr front_;

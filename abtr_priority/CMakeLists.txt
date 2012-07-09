@@ -29,7 +29,10 @@ rosbuild_gensrv()
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-rosbuild_add_library(abtr_priority src/abtr_priority_nodelet.cpp)
+rosbuild_add_library(abtr_priority 
+    src/shapeshifter_pub.cpp
+    src/abtr_priority_nodelet.cpp
+    src/async_abtr_priority_nodelet.cpp)
 
 rosbuild_add_executable(action_mux src/action_mux.cpp)
 target_link_libraries(action_mux topic_tools)

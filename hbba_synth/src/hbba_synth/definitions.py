@@ -386,6 +386,73 @@ class RemapDef:
 
         structure.addRootRemap(self)
 
+class DesireDef:
+    def __init__(self, content, structure, verbose=False):
+        if type(content) is not dict:
+            print "Error: desire clause is not a dictionary: ", content
+            exit(-1)
+        try:
+            self.desire_id = content['id']
+            self.desire_type = content['type']
+            self.utility = content['utility']
+            self.intensity = content['intensity']
+        except KeyError as e:
+            print "Error: Missing {0} in {1}.".format(e, content)
+            exit(-1)
+        if 'params' in content:
+            self.params = content['params']
+        else:
+            self.params = ""
+        if 'security' in content:
+            self.security = bool(content['security'])
+        else:
+            self.security = False
+        # TODO: Add support for expected time.
+        if 'expected_time' in content:
+            print "Warning: 'expected_time' not supported in desire clauses."
+
+        structure.addDesire(self)
+
+    def generatePy(self):
+        d_str = "desire_{0} = Desire()\n".format(self.desire_id)
+        d_str += "desire_{0}.id = \"{0}\"\n".format(self.desire_id)
+        d_str += "desire_{0}.type = \"{1}\"\n".format(self.desire_id,
+            self.desire_type)
+        d_str += "desire_{0}.utility = {1}\n".format(self.desire_id,
+            self.utility)
+        d_str += "desire_{0}.intensity = {1}\n".format(self.desire_id,
+            self.intensity)
+        d_str += "desire_{0}.params = \"{1}\"\n".format(self.desire_id,
+            self.params)
+        d_str += "desire_{0}.security = {1}\n".format(self.desire_id,
+            self.security)
+        d_str += "add_desires([desire_{0}])\n".format(self.desire_id)
+
+        return d_str
+
+class BehaviorPriorityDef:
+    def __init__(self, content, structure, verbose=False):
+        if type(content) is not dict:
+            print "Error: behavior_priority clause is not a dictionary: "
+            print content
+            exit(-1)
+
+        try:
+            name = content['name']
+            p = content['value']
+        except KeyError as e:
+            print "Error: Missing {0} in {1}".format(e, content)
+            exit(-1)
+
+        if verbose:
+            print "Overriding priority for {0} with {1}".format(name, p)
+
+        if name in structure.behaviors:
+            structure.behaviors[name].priority = p
+        else:
+            print "Warning: Behavior priority override ignored for {0}".format(
+                name)
+
 typemap = {
     'behavior': BehaviorDef,
     'procmodule': ProcModuleDef,
@@ -393,6 +460,8 @@ typemap = {
     'filtertype': FilterTypeDef,
     'resources': ResourceSetDef,
     'include': IncludeDef,
-    'remap': RemapDef
+    'remap': RemapDef,
+    'desire': DesireDef,
+    'behavior_priority': BehaviorPriorityDef
 }
 

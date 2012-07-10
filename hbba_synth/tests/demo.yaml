@@ -56,3 +56,15 @@ hbba_conf:
     modules:
         - look_at_voice
 
+# Defines a desire that is automatically added at startup.
+- desire:
+    id: test_desire
+    type: LookAtVoice
+    utility: 1
+    intensity: 1.0
+    params: ""
+    security: False
+
+# Overrides a previous behavior priority, useful for included files.
+- behavior_priority: {name: 'look_at_voice', value: 50}
+

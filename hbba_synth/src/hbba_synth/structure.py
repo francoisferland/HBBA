@@ -19,6 +19,9 @@ add_strat = rospy.ServiceProxy("hbba/add_strategy", AddStrategy)
 rospy.wait_for_service("hbba/set_resource_max", 1.0)
 set_resource_max = rospy.ServiceProxy("hbba/set_resource_max", SetResourceMax)
 
+rospy.wait_for_service("hbba/add_desires", 1.0)
+add_desires = rospy.ServiceProxy("hbba/add_desires", AddDesires)
+
 """
 
 exploitation_match_sp = """
@@ -42,6 +45,7 @@ class Structure:
         self.exploitationMatches = {}
         self.resources = {}
         self.rootRemaps = {}
+        self.desires = {}
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -63,6 +67,9 @@ class Structure:
 
     def addRootRemap(self, rm):
         self.rootRemaps[rm.topic] = rm.to
+
+    def addDesire(self, d):
+        self.desires[d.desire_id] = d
 
     def registerExploitationMatch(self, b, d):
         p = b.priority
@@ -190,9 +197,13 @@ class Structure:
         pyscript = ""
         for s in self.strategies.values():
             pyscript += s.generatePy()
-        pyscript += "\n# Resources\n"
+        pyscript += "\n"
         for r in self.resources.values():
             pyscript += r.generatePy()
+        pyscript += "\n"
+        for d in self.desires.values():
+            pyscript += d.generatePy()
+        pyscript += "\n"
         if opts.generate_arbitration:
             pyscript += "\n"
             pyscript += self.generateExploitationMatchesPy()

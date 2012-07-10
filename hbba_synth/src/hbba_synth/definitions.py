@@ -363,6 +363,10 @@ class IncludeDef:
     def getPath(self):
         from roslib.packages import find_resource
         loc = find_resource(self.pkg, self.fname)
+        if len(loc) < 1:
+            print "Error: {0} cannot be found in {1}.".format(
+                self.fname, self.pkg)
+            exit(-1)
         if len(loc) > 1:
             print "Warning: more than one {0} exists in {1}.".format(
                 self.fname, self.pkg)

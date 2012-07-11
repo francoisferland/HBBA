@@ -2,7 +2,9 @@
     <group ns="hbba">
         <node name="iw" pkg="iw" type="iw.py"/>
         <node name="script_engine" pkg="script_engine" type="script_engine"/>
-        <node name="iw_solver" pkg="iw_solver_ortools" type="iw_solver_ortools"/>
+        <node name="iw_solver" pkg="iw_solver_ortools" type="iw_solver_ortools">
+            <param name="debug_print" value="false"/>
+        </node>
     </group>
 
 </launch>

@@ -172,6 +172,7 @@ namespace iw_solver_interface
 
             typedef typename BaseType::sol_vec_t::const_iterator CI;
             size_t j = 0; // Used to map desires to strategies.
+            bool one_active = false;
             for (CI i = result.begin(); i != result.end(); ++i, ++j)
             {
                 // Add strategy to the intention message.
@@ -185,6 +186,8 @@ namespace iw_solver_interface
                     script = s.bringup_function;
                 else
                     script = s.bringdown_function;
+
+                one_active |= i->second;
 
                 // Map desires params to strategies.
                 script += "(";
@@ -206,9 +209,12 @@ namespace iw_solver_interface
                 //ROS_INFO("Function call: %s", script.c_str());
                 scl_eval_script_.call(eval);
             }
-	    
-	    // Stamp the message
-	    intent.stamp = ros::Time::now();
+
+            if (!one_active)
+                ROS_WARN("No strategies activated.");
+        
+            // Stamp the message
+            intent.stamp = ros::Time::now();
 
             pub_intention_.publish(intent);
         }

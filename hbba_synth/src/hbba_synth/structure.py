@@ -46,6 +46,7 @@ class Structure:
         self.resources = {}
         self.rootRemaps = {}
         self.desires = {}
+        self.arbitrationTypes = {}
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -70,6 +71,9 @@ class Structure:
 
     def addDesire(self, d):
         self.desires[d.desire_id] = d
+
+    def addArbitrationType(self, t):
+        self.arbitrationTypes[t.topic] = t
 
     def registerExploitationMatch(self, b, d):
         p = b.priority
@@ -101,13 +105,20 @@ class Structure:
             'to': self.getRootTopicFullName(topic)})
 
     def generateArbitrationXML(self, topic):
+        if topic in self.arbitrationTypes:
+            abtr_pkg = self.arbitrationTypes[topic].pkg
+            abtr_type = self.arbitrationTypes[topic].node
+        else:
+            abtr_pkg = "abtr_priority"
+            abtr_type = "Generic"
+
         root_topic = self.getRootTopicFullName(topic)
         node_name = "abtr_{0}".format(topic)
         n = Element("node", attrib = {
             'name': node_name,
             'pkg': 'nodelet',
             'type': 'nodelet',
-            'args': 'standalone abtr_priority/Generic'
+            'args': "standalone {0}/{1}".format(abtr_pkg, abtr_type)
             })
         n.append(Element("remap", attrib = {
             'from': "abtr_cmd",

@@ -457,6 +457,29 @@ class BehaviorPriorityDef:
             print "Warning: Behavior priority override ignored for {0}".format(
                 name)
 
+class ArbitrationTypeDef:
+    def __init__(self, content, structure, verbose=False):
+        if type(content) is not dict:
+            print "Error: arbitration_type clause is not a dictionary: "
+            print content
+            exit(-1)
+
+        try:
+            self.topic = content['topic']
+            self.pkg = content['pkg']
+            self.node = content['type']
+        except KeyError as e:
+            print "Error: Missing {0} in {1}".format(e, content)
+            exit(-1)
+
+        if verbose:
+            print "Overriding default arbitration type for {0}".format(
+                self.topic)
+
+        structure.addArbitrationType(self)
+
+
+
 typemap = {
     'behavior': BehaviorDef,
     'procmodule': ProcModuleDef,
@@ -466,6 +489,7 @@ typemap = {
     'include': IncludeDef,
     'remap': RemapDef,
     'desire': DesireDef,
-    'behavior_priority': BehaviorPriorityDef
+    'behavior_priority': BehaviorPriorityDef,
+    'arbitration_type': ArbitrationTypeDef
 }
 

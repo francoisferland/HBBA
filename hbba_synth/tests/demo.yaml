@@ -68,3 +68,6 @@ hbba_conf:
 # Overrides a previous behavior priority, useful for included files.
 - behavior_priority: {name: 'look_at_voice', value: 50}
 
+# Overrides the default arbitration type for a topic
+- arbitration_type: {topic: 'look_at_pose', pkg: 'abtr_priority', type: 'GenericAsync'}
+

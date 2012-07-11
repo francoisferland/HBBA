@@ -167,14 +167,18 @@ class ProcModuleDef:
             'pkg': 'nodelet',
             'type': 'nodelet',
             'args': 
-                "standalone topic_filters/{0} {1} {2}".format(
-                    filter_type, topic, filter_name)
+                "standalone topic_filters/{0} {1} {2}/{3}".format(
+                    filter_type, 
+                    self.structure.getRootTopicFullName(topic), 
+                    self.name, topic)
             }))
         elems.append(Element("node", attrib={
             'name': "register_{0}".format(node_name),
             'pkg': 'topic_filters_manager',
             'type': 'register',
-            'args': "{0} {1}".format(filter_name, filter_type)
+            'args': "{0} {1}".format(
+                filter_name, 
+                filter_type)
             }))
         return elems
 

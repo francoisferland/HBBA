@@ -24,7 +24,8 @@ hbba_conf:
     name: look_at_voice
     launch: {pkg: "jn0_bringup", path: "launch/jn0_bhvr_look_at.launch"}
     input: # Automatically remapped to root.
-        - source_pose
+        - pose: source_pose # The first is what the node listens to, the second its actual remap (to root).
+        - second_pose
     output:
         - look_at_pose
     priority: 10

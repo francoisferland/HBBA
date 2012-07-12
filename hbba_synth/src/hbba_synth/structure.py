@@ -29,9 +29,13 @@ register_em=rospy.ServiceProxy("{0}/register_exploitation_match", RegisterExploi
 exploitation_match_call = """
 register_em({0}, {1})"""
 
-def baseNodesXML():
+def baseNodesXML(debug):
+    if debug:
+        fname = "base_nodes_debug.launch"
+    else:
+        fname = "base_nodes.launch"
     e = Element("include", attrib = {
-        'file': "$(find hbba_synth)/launch/base_nodes.launch"})
+        'file': "$(find hbba_synth)/launch/{0}".format(fname)})
     return e
 
 
@@ -104,9 +108,17 @@ class Structure:
             return '/' + topic
 
     def generateRootRemapXML(self, topic):
+        if type(topic) is dict:
+            iname = topic.keys()[0]
+            oname = topic.values()[0]
+        else:
+            iname = topic
+            oname = topic
+
+
         return Element("remap", attrib = {
-            'from': topic,
-            'to': self.getRootTopicFullName(topic)})
+            'from': iname,
+            'to': self.getRootTopicFullName(oname)})
 
     def generateArbitrationXML(self, topic):
         if topic in self.arbitrationTypes:
@@ -184,7 +196,7 @@ class Structure:
         if opts.base_nodes:
             if verbose:
                 print "Adding base HBBA nodes"
-            launch_elem.append(baseNodesXML())
+            launch_elem.append(baseNodesXML(opts.debug))
         for p in self.procmodules.values():
             launch_elem.extend(p.generateXML(self))
         for b in self.behaviors.values():

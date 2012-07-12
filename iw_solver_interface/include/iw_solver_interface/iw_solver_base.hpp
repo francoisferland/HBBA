@@ -128,7 +128,10 @@ namespace iw_solver_interface
         {
             unsigned int i = index(util_map_.left, name);
             if (i >= umin_.size())
+            {
                 umin_.resize(i + 1);
+                model_updated_ = true;
+            }
             umin_[i] = min;
             umin_updated_ = true;
 
@@ -139,7 +142,10 @@ namespace iw_solver_interface
         {
             unsigned int i = index(util_map_.left, name);
             if (i >= uint_.size())
+            {
                 uint_.resize(i + 1);
+                model_updated_ = true;
+            }
             uint_[i] = intensity;
             uint_updated_ = true;
         }

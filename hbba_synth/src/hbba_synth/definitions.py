@@ -71,6 +71,10 @@ class BehaviorDef:
             self.input = content['input']
         else:
             self.input = []
+        if 'services' in content:
+            self.services = content['services']
+        else:
+            self.services = []
 
         structure.addBehavior(self)
         if verbose:
@@ -89,6 +93,8 @@ class BehaviorDef:
         # Input remaps, have to go first to affect included nodes:
         for i in self.input:
             grp.append(structure.generateRootRemapXML(i))
+        for s in self.services:
+            grp.append(structure.generateRootRemapXML(s))
 
         grp.extend(self.launch.generateXML(structure))
         elems.append(grp)

@@ -441,7 +441,7 @@ class DesireDef:
 class BehaviorPriorityDef:
     def __init__(self, content, structure, verbose=False):
         if type(content) is not dict:
-            print "Error: behavior_priority clause is not a dictionary: "
+            print "Error: behavior_priority clause is not a dictionary:"
             print content
             exit(-1)
 
@@ -464,7 +464,7 @@ class BehaviorPriorityDef:
 class ArbitrationTypeDef:
     def __init__(self, content, structure, verbose=False):
         if type(content) is not dict:
-            print "Error: arbitration_type clause is not a dictionary: "
+            print "Error: arbitration_type clause is not a dictionary:"
             print content
             exit(-1)
 
@@ -482,6 +482,58 @@ class ArbitrationTypeDef:
 
         structure.addArbitrationType(self)
 
+class MotivationDef:
+    def __init__(self, content, structure, verbose=False):
+        if type(content) is not dict:
+            print "Error: motivation clause is not a dictionary:"
+            print content
+            exit(-1)
+
+        try:
+            self.name = content['name']
+            self.launch = LaunchDef(content['launch'], verbose)
+        except KeyError as e:
+            print "Error: Missing {0} in {1}".format(e, content)
+            exit(-1)
+
+        if 'input' in content:
+            self.input = content['input']
+        else:
+            self.input = []
+        if 'output' in content:
+            self.output = content['output']
+        else:
+            self.output = []
+
+        if 'auto_hbba_remap' in content:
+            self.auto_hbba_remap = bool(content['auto_hbba_remap'])
+        else:
+            self.auto_hbba_remap = True
+
+        if self.auto_hbba_remap:
+            self.output.extend([
+                'add_desires', 
+                'remove_desires', 
+                'eval_script'])
+
+        if verbose:
+            print "Adding motivation module {0}.".format(self.name)
+
+        structure.addMotivation(self)
+
+    def generateXML(self, structure):
+        grp = Element("group", attrib={'ns': self.name})
+        elems = [grp]
+        # Input and output remaps :
+        for o in self.output: 
+            grp.append(structure.generateRootRemapXML(o))
+        for i in self.input: 
+            grp.append(structure.generateRootRemapXML(i))
+
+        grp.extend(self.launch.generateXML(structure))
+
+        return elems 
+        
 
 
 typemap = {
@@ -494,6 +546,7 @@ typemap = {
     'remap': RemapDef,
     'desire': DesireDef,
     'behavior_priority': BehaviorPriorityDef,
-    'arbitration_type': ArbitrationTypeDef
+    'arbitration_type': ArbitrationTypeDef,
+    'motivation': MotivationDef
 }
 

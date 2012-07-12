@@ -71,3 +71,16 @@ hbba_conf:
 # Overrides the default arbitration type for a topic
 - arbitration_type: {topic: 'look_at_pose', pkg: 'abtr_priority', type: 'GenericAsync'}
 
+# A motivation module is similar to a proc module, except without filters.
+- motivation:
+    name: base_motivation
+    launch: {pkg: "jn0_demos", path: "launch/base_motivations.launch"}
+    # Automatic HBBA remaps (add_desires, remove_desires, ...) (default: true):
+    # The actual remaps still have to be declared (see
+    # hbba_synth/hbba_cfg/common.yaml)
+    auto_hbba_remap: true
+    input:
+        - sound_pose
+    output:
+        - person_pose
+

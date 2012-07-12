@@ -47,6 +47,7 @@ class Structure:
         self.rootRemaps = {}
         self.desires = {}
         self.arbitrationTypes = {}
+        self.motivations = {}
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -74,6 +75,9 @@ class Structure:
 
     def addArbitrationType(self, t):
         self.arbitrationTypes[t.topic] = t
+
+    def addMotivation(self, m):
+        self.motivations[m.name] = m
 
     def registerExploitationMatch(self, b, d):
         p = b.priority
@@ -185,6 +189,8 @@ class Structure:
             launch_elem.extend(p.generateXML(self))
         for b in self.behaviors.values():
             launch_elem.extend(b.generateXML(self))
+        for m in self.motivations.values():
+            launch_elem.extend(m.generateXML(self))
         if opts.generate_arbitration:
             for t in behavior_topics:
                 launch_elem.extend(self.generateArbitrationXML(t))

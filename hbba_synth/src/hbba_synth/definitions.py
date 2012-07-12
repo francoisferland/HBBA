@@ -281,7 +281,7 @@ class ModuleLinkDef:
 class StratDef:
     def __init__(self, content, structure, verbose=False):
         if not 'name' in content:
-            print "Error: procstrat element with no name."
+            print "Error: strat element with no name."
             exit(-1)
         self.name = content['name']
         self.structure = structure

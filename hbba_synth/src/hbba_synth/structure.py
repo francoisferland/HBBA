@@ -232,7 +232,6 @@ class Structure:
         pyscript = ""
         for e in self.emoIntensities.values():
             pyscript += e.generatePy()
-        pyscript += "rospy.sleep(1.0)\n"
         for s in self.strategies.values():
             pyscript += s.generatePy()
         pyscript += "\n"
@@ -245,6 +244,8 @@ class Structure:
         if opts.generate_arbitration:
             pyscript += "\n"
             pyscript += self.generateExploitationMatchesPy()
+        pyscript += "\n\nprint \"Stop this script with Ctrl-C when ready.\"\n"
+        pyscript += "rospy.spin()\n"
 
         if verbose:
             print "Generated Python script:\n"

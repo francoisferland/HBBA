@@ -540,6 +540,33 @@ class MotivationDef:
 
         return elems 
         
+class EmoIntensityDef:
+    def __init__(self, content, structure, verbose=False):
+        if type(content) is not dict:
+            print "Error: emo_intensity clause is not a dictionary:"
+            print content
+            exit(-1)
+
+        try:
+            self.name = content['name']
+            self.value = content['value']
+        except KeyError as e:
+            print "Error: missing {0} in {1}".format(e, content)
+            exit(-1)
+
+        if verbose:
+            print "Adding initial emotion intensity {0}: {1}.".format(
+            self.name,
+            self.value)
+        structure.addEmoIntensity(self)
+
+    def generatePy(self):
+        code =  "emo_{0} = EmoIntensity()\n".format(self.name)
+        code += "emo_{0}.name = \"{0}\"\n".format(self.name)
+        code += "emo_{0}.value = {1}\n".format(self.name, self.value)
+        code += "pubEmoIntensity.publish(emo_{0})\n".format(self.name)
+        return code
+
 
 
 typemap = {
@@ -553,6 +580,7 @@ typemap = {
     'desire': DesireDef,
     'behavior_priority': BehaviorPriorityDef,
     'arbitration_type': ArbitrationTypeDef,
-    'motivation': MotivationDef
+    'motivation': MotivationDef,
+    'emo_intensity': EmoIntensityDef
 }
 

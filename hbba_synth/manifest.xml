@@ -11,6 +11,7 @@
   <url>http://ros.org/wiki/hbba_synth</url>
   <depend package="rospy"/>
   <depend package="hbba_msgs"/>
+  <depend package="emotions_msgs"/>
 
 </package>
 

@@ -85,3 +85,7 @@ hbba_conf:
     output:
         - person_pose
 
+# Publishes an initial emotional intensity on emo_intensity (follows root
+# remappings)
+- emo_intensity: {name: 'Joy', value: 1.0}
+

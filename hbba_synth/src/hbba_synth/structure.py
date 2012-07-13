@@ -10,6 +10,7 @@ import roslib; roslib.load_manifest("hbba_synth")
 import rospy;
 from hbba_msgs.msg import *
 from hbba_msgs.srv import *
+from emotions_msgs.msg import EmoIntensity
 
 rospy.init_node("hbba_struct", anonymous=True)
 
@@ -22,6 +23,7 @@ set_resource_max = rospy.ServiceProxy("hbba/set_resource_max", SetResourceMax)
 rospy.wait_for_service("hbba/add_desires", 1.0)
 add_desires = rospy.ServiceProxy("hbba/add_desires", AddDesires)
 
+pubEmoIntensity = rospy.Publisher("{0}", EmoIntensity)
 """
 
 exploitation_match_sp = """
@@ -52,6 +54,7 @@ class Structure:
         self.desires = {}
         self.arbitrationTypes = {}
         self.motivations = {}
+        self.emoIntensities = {}
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -82,6 +85,9 @@ class Structure:
 
     def addMotivation(self, m):
         self.motivations[m.name] = m
+
+    def addEmoIntensity(self, e):
+        self.emoIntensities[e.name] = e
 
     def registerExploitationMatch(self, b, d):
         p = b.priority
@@ -224,6 +230,9 @@ class Structure:
 
         # Python script
         pyscript = ""
+        for e in self.emoIntensities.values():
+            pyscript += e.generatePy()
+        pyscript += "rospy.sleep(1.0)\n"
         for s in self.strategies.values():
             pyscript += s.generatePy()
         pyscript += "\n"
@@ -243,7 +252,8 @@ class Structure:
             print ""
 
         pyfile = file(basepath + ".py", "w")
-        pyfile.write(python_header)
+        pyfile.write(python_header.format(
+            self.getRootTopicFullName("emo_intensity")))
         pyfile.write(pyscript)
 
 

@@ -166,9 +166,9 @@ namespace iw_solver_interface
             // We only keep direct associations.
             hbba_msgs::Intention intent;
             intent.strategies.reserve(result.size());
+            intent.enabled.reserve(result.size());
             intent.desires.resize(result.size());
             intent.desire_types.resize(result.size());
-            intent.enabled.resize(result.size());
 
             typedef typename BaseType::sol_vec_t::const_iterator CI;
             size_t j = 0; // Used to map desires to strategies.

@@ -567,6 +567,16 @@ class EmoIntensityDef:
         code += "pubEmoIntensity.publish(emo_{0})\n".format(self.name)
         return code
 
+class IntegratedArbitrationDef:
+    def __init__(self, content, structure, verbose=False):
+        try:
+            for t in content:
+                structure.addIntegratedArbitration(t)
+                if verbose:
+                    print "Integrated arbitration for {0}.".format(t)
+        except Error as e:
+            print "Error: Problem parsing '{0}' as an array.".format(content)
+            exit(-1)
 
 
 typemap = {
@@ -580,6 +590,7 @@ typemap = {
     'desire': DesireDef,
     'behavior_priority': BehaviorPriorityDef,
     'arbitration_type': ArbitrationTypeDef,
+    'integrated_arbitration': IntegratedArbitrationDef,
     'motivation': MotivationDef,
     'emo_intensity': EmoIntensityDef
 }

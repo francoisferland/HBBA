@@ -53,6 +53,7 @@ class Structure:
         self.rootRemaps = {}
         self.desires = {}
         self.arbitrationTypes = {}
+        self.integratedArbitration = {}
         self.motivations = {}
         self.emoIntensities = {}
 
@@ -82,6 +83,9 @@ class Structure:
 
     def addArbitrationType(self, t):
         self.arbitrationTypes[t.topic] = t
+
+    def addIntegratedArbitration(self, t):
+        self.integratedArbitration[t] = True
 
     def addMotivation(self, m):
         self.motivations[m.name] = m
@@ -211,7 +215,8 @@ class Structure:
             launch_elem.extend(m.generateXML(self))
         if opts.generate_arbitration:
             for t in behavior_topics:
-                launch_elem.extend(self.generateArbitrationXML(t))
+                if t not in self.integratedArbitration:
+                    launch_elem.extend(self.generateArbitrationXML(t))
             for t in self.exploitationMatches.keys():
                 launch_elem.extend(self.generateExploitationMatcherXML(t))
 

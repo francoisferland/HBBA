@@ -72,6 +72,12 @@ hbba_conf:
 # Overrides the default arbitration type for a topic
 - arbitration_type: {topic: 'look_at_pose', pkg: 'abtr_priority', type: 'GenericAsync'}
 
+# Lists topics f or which an arbitration module is already available.
+# This doesn't disable registration and exploitation monitoring
+- integrated_arbitration:
+    - cmd_eta
+    - cmd_vel
+
 # A motivation module is similar to a proc module, except without filters.
 - motivation:
     name: base_motivation

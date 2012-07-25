@@ -120,7 +120,7 @@ class BehaviorDef:
                     uniqueName()),
                 'pkg': 'abtr_priority',
                 'type': 'register',
-                'args': "{0} {1}/{2}".format(root_topic, self.name,
+                'args': "{0} /{1}/{2}".format(root_topic, self.name,
                     self.outputFilterTopic(o))
                 }))
             elems.append(Element("node", attrib={

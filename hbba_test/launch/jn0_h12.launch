@@ -50,9 +50,4 @@
         /ball_tracking/ball_pose
         /manyears/look_at_pose" />
 
-    <!-- Look at pose actuator link -->
-    <include file="$(find jn0_demos)/launch/jn0_lookat.launch"/>
-    <param name="look_at_pose/threshold" value="0.05"/>
-    <param name="look_at_pose/neutral_tilt" value="-0.75"/>
-
 </launch>

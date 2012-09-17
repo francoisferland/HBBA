@@ -7,6 +7,10 @@ hbba_conf:
 # bash ros utils.
 - include: {pkg: "hbba_synth", file: "common.yaml"}
 
+# Root remaps: topics are tested according to these for the actual input/output
+# topic names.
+# If a target ("to") is already registered as a remap, the second registration
+# will map to this value.
 - remap: {from: 'look_at_pose', to: '/face/look_at_pose'}
 
 - resources:

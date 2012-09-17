@@ -76,7 +76,12 @@ class Structure:
         self.resources[r.name] = r
 
     def addRootRemap(self, rm):
-        self.rootRemaps[rm.topic] = rm.to
+        # Look if the remap target is already registered.
+        # If so, map the incoming topic to the original target.
+        if rm.to in self.rootRemaps:
+            self.rootRemaps[rm.topic] = self.rootRemaps[rm.to]
+        else:
+            self.rootRemaps[rm.topic] = rm.to
 
     def addDesire(self, d):
         self.desires[d.desire_id] = d

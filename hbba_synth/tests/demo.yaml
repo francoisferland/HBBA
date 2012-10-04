@@ -34,6 +34,19 @@ hbba_conf:
         - look_at_pose
     priority: 10
 
+- behavior:
+    name: look_at_voice_filtered
+    launch: {pkg: "jn0_bringup", path: "launch/jn0_bhvr_look_at.launch"}
+    # Same as the other behavior, but with filtered input.
+    # Always use a generic filter, for now.
+    filter_input: true
+    input: # Automatically remapped to root.
+        - pose: source_pose 
+        - second_pose
+    output:
+        - look_at_pose
+    priority: 15
+
 - procmodule:
     name: manyears 
     launch: {pkg: "jn0_bringup", path: "launch/jn0_manyears.launch"}

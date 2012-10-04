@@ -76,10 +76,23 @@ class BehaviorDef:
         else:
             self.services = []
 
+        if 'filter_input' in content:
+            fi = content['filter_input']
+            if type(fi) is not bool:
+                print "Error: filter_input clause is not a boolean."
+                exit(-1)
+            self.filter_input = fi 
+        else:
+            self.filter_input = False
+
         structure.addBehavior(self)
         if verbose:
             print "Emitted Behavior '{0}'.".format(self.name)
 
+    def inputFilterName(self, name):
+        return self.name + "/" + name + "_input_filter"
+    def inputFilterNodeName(self, name):
+        return name + "_input_filter"
     def outputFilterName(self, name):
         return self.name + "/" + name + "_output_filter"
     def outputFilterNodeName(self, name):
@@ -87,12 +100,46 @@ class BehaviorDef:
     def outputFilterTopic(self, name):
         return name + "_out"
 
+    def appendFilter(self, grp, elems, node_name, name, topic_in, topic_out):
+        # elems should be a namespace containing grp
+        grp.append(Element("node", attrib={
+            'name': node_name,
+            'pkg': 'nodelet',
+            'type': 'nodelet',
+            'args': 
+            "standalone topic_filters/GenericDivider {0} {1}".format(
+                topic_in, topic_out)
+            }))
+        elems.append(Element("node", attrib={
+            'name': "register_{0}_{1}".format(
+                node_name,
+                uniqueName()), 
+            'pkg': 'topic_filters_manager',
+            'type': 'register',
+            'args': "{0} GenericDivider".format(
+                name)
+            }))
+
     def generateXML(self, structure):
         elems = []
         grp = Element("group", attrib={'ns': self.name})
         # Input remaps, have to go first to affect included nodes:
+        # Note: the actual position is not important if inputs are filtered
         for i in self.input:
-            grp.append(structure.generateRootRemapXML(i))
+            if self.filter_input:
+                if type(i) is dict:
+                    filter_out = i.keys()[0]
+                    filter_in  = structure.getRootTopicFullName(i.values()[0])
+                else:
+                    filter_out = i
+                    filter_in = structure.getRootTopicFullName(i)
+                self.appendFilter(grp, elems, 
+                    self.inputFilterNodeName(filter_out), 
+                    self.inputFilterName(filter_out),
+                    filter_in, filter_out)
+            else:
+                grp.append(structure.generateRootRemapXML(i))
+
         for s in self.services:
             grp.append(structure.generateRootRemapXML(s))
 
@@ -101,14 +148,29 @@ class BehaviorDef:
         for o in self.output:
             root_topic = structure.getRootTopicFullName(o)
             # Add output filter, registration script.
-            grp.append(Element("node", attrib={
-                'name': self.outputFilterNodeName(o),
-                'pkg': 'nodelet',
-                'type': 'nodelet',
-                'args': 
-                    "standalone topic_filters/GenericDivider {0} {1}".format(
-                        o, self.outputFilterTopic(o))
-                }))
+            self.appendFilter(grp, elems,
+                self.outputFilterNodeName(o),
+                self.outputFilterName(o),
+                o,
+                self.outputFilterTopic(o))
+
+            #grp.append(Element("node", attrib={
+            #    'name': self.outputFilterNodeName(o),
+            #    'pkg': 'nodelet',
+            #    'type': 'nodelet',
+            #    'args': 
+            #        "standalone topic_filters/GenericDivider {0} {1}".format(
+            #            o, self.outputFilterTopic(o))
+            #    }))
+            #elems.append(Element("node", attrib={
+            #    'name': "register_{0}_{1}".format(
+            #        self.outputFilterNodeName(o),
+            #        uniqueName()), 
+            #    'pkg': 'topic_filters_manager',
+            #    'type': 'register',
+            #    'args': "{0} GenericDivider".format(
+            #        self.outputFilterName(o))
+            #    }))
             grp.append(Element("param", attrib={
                 'name': self.outputFilterTopic(o) + "/abtr_priority",
                 'value': str(self.priority)
@@ -122,15 +184,6 @@ class BehaviorDef:
                 'type': 'register',
                 'args': "{0} /{1}/{2}".format(root_topic, self.name,
                     self.outputFilterTopic(o))
-                }))
-            elems.append(Element("node", attrib={
-                'name': "register_{0}_{1}".format(
-                    self.outputFilterNodeName(o),
-                    uniqueName()), 
-                'pkg': 'topic_filters_manager',
-                'type': 'register',
-                'args': "{0} GenericDivider".format(
-                    self.outputFilterName(o))
                 }))
 
         return elems

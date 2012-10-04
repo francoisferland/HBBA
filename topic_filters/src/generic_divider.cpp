@@ -64,9 +64,10 @@ namespace topic_filters
                 // there is no subscribers, dropping the first message. Latching
                 // seems not working too (will need a retry).
                 // TODO: Figure out if this works in any threading situation.
-                while (pub_.getNumSubscribers() == 0) {
-                    ros::Duration(0.1).sleep();
-                }
+                // TODO: Disabled! the script engine get stuck if this happens.
+                //while (pub_.getNumSubscribers() == 0) {
+                //    ros::Duration(0.1).sleep();
+                //}
             }
 
             // A rate of 0 will never publish messages, and we need to

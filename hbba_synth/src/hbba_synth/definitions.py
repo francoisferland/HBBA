@@ -90,7 +90,11 @@ class BehaviorDef:
             print "Emitted Behavior '{0}'.".format(self.name)
 
     def inputFilterName(self, name):
-        return self.name + "/" + name + "_input_filter"
+        if type(name) is dict:
+            n = name.keys()[0]
+        else:
+            n = name
+        return self.name + "/" + n + "_input_filter"
     def inputFilterNodeName(self, name):
         return name + "_input_filter"
     def outputFilterName(self, name):
@@ -289,6 +293,9 @@ class ModuleLinkDef:
             self.module_name = content
             bm = structure.behaviors[self.module_name]
             self.filters = []
+            if bm.filter_input:
+                for i in bm.input:
+                    self.filters.append(bm.inputFilterName(i))
             for o in bm.output:
                 self.filters.append(bm.outputFilterName(o))
 

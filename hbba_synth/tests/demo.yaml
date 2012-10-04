@@ -73,6 +73,14 @@ hbba_conf:
     dependencies: {LocateVoice: 100}
     modules:
         - look_at_voice
+- strat:
+    name: LookAtVoiceFiltered
+    class: LookAtVoiceFiltered
+    utility: 1
+    costs: {}
+    dependencies: {LocateVoice: 100}
+    modules:
+        - look_at_voice_filtered
 
 # Defines a desire that is automatically added at startup.
 - desire:

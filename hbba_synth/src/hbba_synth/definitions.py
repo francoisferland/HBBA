@@ -76,15 +76,6 @@ class BehaviorDef:
         else:
             self.services = []
 
-        if 'filter_input' in content:
-            fi = content['filter_input']
-            if type(fi) is not bool:
-                print "Error: filter_input clause is not a boolean."
-                exit(-1)
-            self.filter_input = fi 
-        else:
-            self.filter_input = False
-
         structure.addBehavior(self)
         if verbose:
             print "Emitted Behavior '{0}'.".format(self.name)
@@ -155,23 +146,6 @@ class BehaviorDef:
                 o,
                 self.outputFilterTopic(o))
 
-            #grp.append(Element("node", attrib={
-            #    'name': self.outputFilterNodeName(o),
-            #    'pkg': 'nodelet',
-            #    'type': 'nodelet',
-            #    'args': 
-            #        "standalone topic_filters/GenericDivider {0} {1}".format(
-            #            o, self.outputFilterTopic(o))
-            #    }))
-            #elems.append(Element("node", attrib={
-            #    'name': "register_{0}_{1}".format(
-            #        self.outputFilterNodeName(o),
-            #        uniqueName()), 
-            #    'pkg': 'topic_filters_manager',
-            #    'type': 'register',
-            #    'args': "{0} GenericDivider".format(
-            #        self.outputFilterName(o))
-            #    }))
             grp.append(Element("param", attrib={
                 'name': self.outputFilterTopic(o) + "/abtr_priority",
                 'value': str(self.priority)
@@ -291,9 +265,10 @@ class ModuleLinkDef:
             self.module_name = content
             bm = structure.behaviors[self.module_name]
             self.filters = []
-            if bm.filter_input:
-                for i in bm.input:
-                    self.filters.append(bm.inputFilterName(i))
+            for i in bm.input:
+                t = TopicDef(i, structure)
+                if t.filtered:
+                    self.filters.append(bm.inputFilterName(t.name))
             for o in bm.output:
                 self.filters.append(bm.outputFilterName(o))
 
@@ -668,7 +643,7 @@ class TopicDef:
     def getRootTopicFullName(self):
         return self.structure.getRootTopicFullName(self.src)
     def generateRootRemapXML(self):
-        return self.structure.generateRootRemapXML(self.src)
+        return self.structure.generateRootRemapXML({self.name: self.src})
 
 ####
 

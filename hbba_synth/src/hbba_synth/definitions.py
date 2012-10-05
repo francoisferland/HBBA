@@ -130,19 +130,16 @@ class BehaviorDef:
         # Input remaps, have to go first to affect included nodes:
         # Note: the actual position is not important if inputs are filtered
         for i in self.input:
-            if self.filter_input:
-                if type(i) is dict:
-                    filter_out = i.keys()[0]
-                    filter_in  = structure.getRootTopicFullName(i.values()[0])
-                else:
-                    filter_out = i
-                    filter_in = structure.getRootTopicFullName(i)
+            topic = TopicDef(i, structure)
+            if topic.filtered:
+                filter_in = topic.getRootTopicFullName()
+                filter_out = topic.name
                 self.appendFilter(grp, elems, 
                     self.inputFilterNodeName(filter_out), 
                     self.inputFilterName(filter_out),
                     filter_in, filter_out)
             else:
-                grp.append(structure.generateRootRemapXML(i))
+                grp.append(topic.generateRootRemapXML())
 
         for s in self.services:
             grp.append(structure.generateRootRemapXML(s))
@@ -254,14 +251,15 @@ class ProcModuleDef:
         for o in self.output: 
             grp.append(structure.generateRootRemapXML(o))
 
-        grp.extend(self.launch.generateXML(structure))
         for i in self.input:
-            if type(i) != dict:
-                elems.extend(self.createInputFilter(i))
+            topic = TopicDef(i, structure)
+            # Filter by default
+            if (topic.filtered == True or topic.filtered == None):
+                elems.extend(self.createInputFilter(topic.src))
             else:
-                # TODO: Switch on actual filter type.
-                elems.extend(self.createInputFilter(i.keys()[0]))
+                grp.append(topic.generateRootRemapXML())
 
+        grp.extend(self.launch.generateXML(structure))
 
         return elems 
 
@@ -638,6 +636,41 @@ class IntegratedArbitrationDef:
             print "Error: Problem parsing '{0}' as an array.".format(content)
             exit(-1)
 
+class TopicDef:
+    def __init__(self, content, structure, verbose=False):
+        self.structure = structure
+        if type(content) is dict:
+            self.name = content.keys()[0]
+            if type(content.values()[0]) is dict:
+                c = content.values()[0]
+                print "topicdef c: " + str(c)
+                if ('src' in c):
+                    self.src = c['src']
+                else:
+                    self.src = self.name
+                if 'filtered' in c:
+                    self.filtered = c['filtered']
+                else:
+                    self.filtered = None
+                if 'type' in c:
+                    self.filter_type = c['type']
+                else:
+                    self.filter_type = None
+                
+            else:
+                self.src = content.values()[0]
+                self.filtered = None
+        else:
+            self.name = content
+            self.src = content
+            self.filtered = None
+
+    def getRootTopicFullName(self):
+        return self.structure.getRootTopicFullName(self.src)
+    def generateRootRemapXML(self):
+        return self.structure.generateRootRemapXML(self.src)
+
+####
 
 typemap = {
     'behavior': BehaviorDef,

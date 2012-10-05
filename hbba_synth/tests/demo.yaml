@@ -29,7 +29,8 @@ hbba_conf:
     launch: {pkg: "jn0_bringup", path: "launch/jn0_bhvr_look_at.launch"}
     input: # Automatically remapped to root.
         - pose: source_pose # The first is what the node listens to, the second its actual remap (to root).
-        - second_pose
+        # Other syntax:
+        - second_pose: {src: second_pose, filtered: false}
     output:
         - look_at_pose
     priority: 10
@@ -38,10 +39,9 @@ hbba_conf:
     name: look_at_voice_filtered
     launch: {pkg: "jn0_bringup", path: "launch/jn0_bhvr_look_at.launch"}
     # Same as the other behavior, but with filtered input.
-    # Always use a generic filter, for now.
-    filter_input: true
     input: # Automatically remapped to root.
-        - pose: source_pose 
+        # Other syntax:
+        - pose: {src: source_pose, filtered: true}
         - second_pose
     output:
         - look_at_pose
@@ -53,6 +53,7 @@ hbba_conf:
     input:
         # NOTE: Filter types are ignored for now
         - audio_stream: {type: GenericDivisor}
+        - second_input: {filtered: false}
     output: # Automatically remapped to root.
         - source_pose
 

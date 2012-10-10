@@ -1,6 +1,8 @@
 #include "topic_filters_manager/manager.hpp"
 #include <topic_filters/SetState.h>
 #include <topic_filters/SetDividerRate.h>
+#include <cstdlib>
+#include <sstream>
 
 using namespace topic_filters_manager;
 
@@ -23,7 +25,9 @@ namespace topic_filters_manager
 	template<> void filter::state<topic_filters::SetDividerRate>(
 		const topic_filters::SetDividerRate& req)
 	{
-		state_ = req.request.divider;
+        std::stringstream out;
+		out << req.request.divider;
+        state_ = out.str();
 	}
 
 	struct switch_filter_handler: public filter_handler

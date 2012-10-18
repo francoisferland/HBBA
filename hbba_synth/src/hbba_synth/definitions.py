@@ -618,7 +618,6 @@ class TopicDef:
             self.name = content.keys()[0]
             if type(content.values()[0]) is dict:
                 c = content.values()[0]
-                print "topicdef c: " + str(c)
                 if ('src' in c):
                     self.src = c['src']
                 else:

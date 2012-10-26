@@ -63,6 +63,8 @@ hbba_conf:
     utility: 100
     costs: {CPU: 100}
     dependencies: {} # utility_min
+    # Modules can be omitted to define a strategy with only external
+    # dependencies.
     modules: 
         - manyears:
             - audio_stream: 1 # Filter level for activation

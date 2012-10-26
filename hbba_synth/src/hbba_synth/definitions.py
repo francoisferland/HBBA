@@ -175,7 +175,10 @@ class ProcModuleDef:
 
         try:
             self.launch = LaunchDef(content['launch'], verbose)
-            self.input = content['input']
+            if 'input' in content:
+                self.input = content['input']
+            else:
+                self.input = []
         except KeyError as e:
             print "Error: Missing {0} in {1}".format(e, self.name)
         if 'output' in content:
@@ -331,8 +334,9 @@ class StratDef:
                 for d in content['dependencies']:
                     self.dependencies.append(CostDef(d, verbose))
             self.modules = []
-            for m in content['modules']:
-                self.modules.append(ModuleLinkDef(m, self.structure, verbose))
+            if ('modules' in content):
+                for m in content['modules']:
+                    self.modules.append(ModuleLinkDef(m, self.structure, verbose))
         except KeyError as e:
             print "Error: Missing {0} in {1}".format(e, self.name)
             exit(-1)

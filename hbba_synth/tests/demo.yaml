@@ -76,6 +76,7 @@ hbba_conf:
     dependencies: {LocateVoice: 100}
     modules:
         - look_at_voice
+
 - strat:
     name: LookAtVoiceFiltered
     class: LookAtVoiceFiltered
@@ -83,7 +84,24 @@ hbba_conf:
     costs: {}
     dependencies: {LocateVoice: 100}
     modules:
-        - look_at_voice_filtered
+        - look_at_voice
+
+- strat:
+    name: GoToBehavior
+    class: GoTo
+    utility: 1
+    costs: {}
+    dependencies: {}
+    modules:
+        - goto_pose
+    # A strategy can specify custom bringup code.
+    # This is mostly used to interpret parameters, see the following se_code
+    # element.
+    bringup: "publishGoToGoal(params);"
+
+# We can also specify custom JavaScript code that need to be interpreted by the 
+# script engine at startup.
+- se_code: "function publishGoToGoal(g) {publishPoseStamped('goto_pose', g);}"
 
 # Defines a desire that is automatically added at startup.
 - desire:

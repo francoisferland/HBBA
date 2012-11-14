@@ -1,0 +1,23 @@
+<package>
+  <description brief="quadrics">
+
+     quadrics : package containing class to create PCL filters that 
+     		can remove points inside spheres, cones or cylinders
+
+  </description>
+  <author>Adrien Tronche</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/quadrics</url>
+  <depend package="roscpp"/>
+  <depend package="pcl"/>
+  <depend package="geometry_msgs"/>
+  
+  <!--	Export the quadrics -->
+  <export>
+    <cpp cflags="-I${prefix}/include "/> 
+  </export>
+
+</package>
+
+

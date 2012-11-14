@@ -101,7 +101,7 @@ hbba_conf:
 
 # We can also specify custom JavaScript code that need to be interpreted by the 
 # script engine at startup.
-- custom_script: "function publishGoToGoal(g) {publishNavGoal('goto_pose', g.frame_id, g.x, g.y, g.z);}"
+- custom_script: "function publishGoToGoal(g) {publishNavGoal('goto_pose', g.frame_id, g.x, g.y, g.t);}"
 
 # Defines a desire that is automatically added at startup.
 - desire:

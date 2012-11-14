@@ -10,6 +10,7 @@ import roslib; roslib.load_manifest("hbba_synth")
 import rospy;
 from hbba_msgs.msg import *
 from hbba_msgs.srv import *
+from script_engine.srv import EvalScript
 from emotions_msgs.msg import EmoIntensity
 
 rospy.init_node("hbba_struct", anonymous=True)
@@ -22,6 +23,9 @@ set_resource_max = rospy.ServiceProxy("hbba/set_resource_max", SetResourceMax)
 
 rospy.wait_for_service("hbba/add_desires", 1.0)
 add_desires = rospy.ServiceProxy("hbba/add_desires", AddDesires)
+
+rospy.wait_for_service("hbba/eval_script", 1.0)
+eval_script = rospy.ServiceProxy("hbba/eval_script", EvalScript)
 
 pubEmoIntensity = rospy.Publisher("{0}", EmoIntensity)
 """
@@ -56,6 +60,7 @@ class Structure:
         self.integratedArbitration = {}
         self.motivations = {}
         self.emoIntensities = {}
+        self.customScript = ""
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -98,6 +103,9 @@ class Structure:
     def addEmoIntensity(self, e):
         self.emoIntensities[e.name] = e
 
+    def addCustomScript(self, s):
+        self.customScript += s + "\n"
+
     def registerExploitationMatch(self, b, d):
         p = b.priority
         for o in b.output:
@@ -129,7 +137,6 @@ class Structure:
         else:
             iname = topic
             oname = topic
-
 
         return Element("remap", attrib = {
             'from': iname,
@@ -240,6 +247,11 @@ class Structure:
 
         # Python script
         pyscript = ""
+        if (self.customScript != ""):
+            pyscript += "#Custom script:\n"
+            pyscript += "evalScript(\"\"\" \n"
+            pyscript += self.customScript
+            pyscript += "\n\"\"\"\n\n"
         for e in self.emoIntensities.values():
             pyscript += e.generatePy()
         for s in self.strategies.values():

@@ -92,16 +92,16 @@ hbba_conf:
     utility: 1
     costs: {}
     dependencies: {}
-    modules:
-        - goto_pose
+    modules: []
     # A strategy can specify custom bringup code.
     # This is mostly used to interpret parameters, see the following se_code
     # element.
-    bringup: "publishGoToGoal(params);"
+    # It will be added at the end of filter calls.
+    custom_bringup: "publishGoToGoal(params);"
 
 # We can also specify custom JavaScript code that need to be interpreted by the 
 # script engine at startup.
-- se_code: "function publishGoToGoal(g) {publishNavGoal('goto_pose', g.frame_id, g.x, g.y, g.z);}"
+- custom_script: "function publishGoToGoal(g) {publishNavGoal('goto_pose', g.frame_id, g.x, g.y, g.z);}"
 
 # Defines a desire that is automatically added at startup.
 - desire:

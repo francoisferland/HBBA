@@ -337,6 +337,17 @@ class StratDef:
             if ('modules' in content):
                 for m in content['modules']:
                     self.modules.append(ModuleLinkDef(m, self.structure, verbose))
+            self.custom_bringup = ""
+            if ('custom_bringup' in content):
+                cb = content['custom_bringup']
+                if type(cb) is str:
+                    if verbose:
+                        print "Adding custom bringup script for " + self.name
+                    self.custom_bringup = cb
+                else:
+                    print "Error: custom_bringup element is not a string."
+                    exit(-1)
+                
         except KeyError as e:
             print "Error: Missing {0} in {1}".format(e, self.name)
             exit(-1)
@@ -355,6 +366,8 @@ class StratDef:
         js_source = "function {0}(params) {{\n".format(bup_name)
         for m in self.modules:
             js_source += m.generateActivationJS()
+        if (self.custom_bringup != ""):
+            js_source += self.custom_bringup + "\n"
         js_source += "}\n"
 
         js_source += "function {0}(params) {{\n".format(bdn_name)
@@ -648,6 +661,15 @@ class TopicDef:
     def generateRootRemapXML(self):
         return self.structure.generateRootRemapXML({self.name: self.src})
 
+class CustomScriptDef:
+    def __init__(self, content, structure, verbose=False):
+        if type(content) is str:
+            if verbose:
+                print "Adding custom script: \n" + content
+            structure.addCustomScript(content)
+        else:
+            print "Error: custom_script entry is not a string."
+
 ####
 
 typemap = {
@@ -663,6 +685,7 @@ typemap = {
     'arbitration_type': ArbitrationTypeDef,
     'integrated_arbitration': IntegratedArbitrationDef,
     'motivation': MotivationDef,
-    'emo_intensity': EmoIntensityDef
+    'emo_intensity': EmoIntensityDef,
+    'custom_script': CustomScriptDef
 }
 

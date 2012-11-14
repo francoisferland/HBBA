@@ -41,7 +41,6 @@ namespace quadrics
 	{
 		public :
 			Cone( geometry_msgs::PoseStamped origin, 
-				geometry_msgs::PoseStamped toward, 
 						float aperture ): 
 				Quadric( origin ), aperture_( aperture );
 				a_( 0.0 ), b_( 0.0 ),
@@ -70,6 +69,9 @@ namespace quadrics
 
 				// Scalar value
 				s_ = - p.x * p.x - p.y * p.y + p.z * p.z ;
+
+				// Rotate the cone
+				rotate();
 
 				// Change type to Cone
 				type_ = quadrics::ConeT;

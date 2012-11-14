@@ -45,6 +45,21 @@ namespace quadrics
 				type_ = QuadricT;
 			}
 
+			// Rotate the quadric
+			void rotate()
+			{
+				// Construct rotation matrix from quaternion
+				Eigen::Matrix3f rot( pose_.orientation.x,
+						pose_.orientation.y,
+						pose_.orientation.z,
+						pose_.orientation.q );
+				
+				// Rotate matrix and vector
+				m_ = rot * m_;
+				v_ = rot * v_;
+
+			}
+
 			// Get the stamp
 			ros::Time stamp()
 			{

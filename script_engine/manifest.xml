@@ -10,6 +10,9 @@
   <depend package="pluginlib"/>
   <depend package="std_msgs"/>
   <rosdep name="libv8"/>
+  <!-- TODO: Move these plugin dependencies into a separate module. -->
+  <depend package="geometry_msgs"/>
+  <depend package="tf"/>
 
   <export>
   	<cpp cflags='-I${prefix}/include' lflags='-L${prefix}/lib'/>

@@ -3,6 +3,8 @@
 #include "script_engine/EvalScript.h"
 #include <pluginlib/class_list_macros.h>
 #include <std_msgs/String.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <tf/tf.h>
 #include <stdlib.h>
 #include <string>
 
@@ -79,7 +81,49 @@ namespace common_plugins
             std_msgs::String,
             pub_name,	
             afun> PubStringPlugin;
+    }
+
+    /// \brief A geometry_msgs/PoseStamped publication tool takes as input a 
+    /// planar (x, y, theta) pose usually meant as a navigation goal.
+    ///
+    /// Params:
+    ///  0: The output topic's name, taken care of by the base class.
+    ///  1: The frame id (String)
+    ///  2: x position
+    ///  3: y position
+    ///  4: theta angle, (around Z).
+    namespace pub_nav_goal
+    {
+        extern void afun(const v8::Arguments& args,
+            geometry_msgs::PoseStamped& msg)
+        {
+            if (args.Length() < 5)
+            {
+                ROS_ERROR("Not enough arguments in pubNavGoal call.");
+                return;
+            }
+
+            v8::String::Utf8Value frame_id(args[1]);
+            v8::Number* vx = v8::Number::Cast(*args[2]);
+            v8::Number* vy = v8::Number::Cast(*args[3]);
+            v8::Number* vt = v8::Number::Cast(*args[4]);
+
+            msg.header.frame_id = *frame_id;
+            msg.header.stamp = ros::Time::now();
+            msg.pose.position.x = vx->Value();
+            msg.pose.position.y = vy->Value();
+            msg.pose.position.z = 0.0;
+            msg.pose.orientation = tf::createQuaternionMsgFromYaw(vt->Value());
+
         }
+
+        const extern char pub_name[] = "pubNavGoal";
+
+        typedef script_engine::publisher_topic_arg_base<
+            geometry_msgs::PoseStamped,
+            pub_name,
+            afun> PubNavGoalPlugin;
+    }
 }
 
 PLUGINLIB_DECLARE_CLASS(script_engine, EvalCall, 
@@ -90,5 +134,8 @@ PLUGINLIB_DECLARE_CLASS(script_engine, SysCall,
 	script_engine::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, PubString, 
 	common_plugins::pub_string::PubStringPlugin,
+	script_engine::engine_module);
+PLUGINLIB_DECLARE_CLASS(script_engine, PubNavGoal, 
+	common_plugins::pub_nav_goal::PubNavGoalPlugin,
 	script_engine::engine_module);
 

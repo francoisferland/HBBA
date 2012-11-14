@@ -40,7 +40,7 @@ engine_v8::engine_v8():
 	{
 		try 
 		{
-			engine_module* m = module_loader_->createClassInstance(*i);
+			engine_module* m = module_loader_->createUnmanagedInstance(*i);
 			m->init(global_);
 			modules_list_.push_back(m);
 		}

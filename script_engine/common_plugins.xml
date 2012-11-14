@@ -17,5 +17,11 @@
 		  Publish a string on the specified topic.
 		</description>
 	</class>
+	<class name="script_engine/PubNavGoal" type="common_plugins::pub_nav_goal::PubNavGoalPlugin"
+		base_class_type="script_engine::engine_module">
+		<description>
+		  Publish a navigation goal on a 2D plane on the specified topic and frame_id.
+		</description>
+	</class>
 </library>
 

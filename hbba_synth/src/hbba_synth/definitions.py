@@ -193,8 +193,8 @@ class ProcModuleDef:
 
     def createInputFilter(self, topic):
         elems = []
-        filter_name = "{0}_{1}_filter".format(self.name, topic)
-        node_name = "{0}_{1}_filter".format(self.name, topic)
+        filter_name = "{0}_{1}_filter".format(self.name, topic.src)
+        node_name = "{0}_{1}_filter".format(self.name, topic.src)
         filter_type = "GenericDivider"
         if self.verbose:
             print "Adding filter {0}".format(filter_name)
@@ -206,8 +206,8 @@ class ProcModuleDef:
             'args': 
                 "standalone topic_filters/{0} {1} {2}/{3}".format(
                     filter_type, 
-                    self.structure.getRootTopicFullName(topic), 
-                    self.name, topic)
+                    self.structure.getRootTopicFullName(topic.src), 
+                    self.name, topic.name)
             }))
         elems.append(Element("node", attrib={
             'name': "register_{0}".format(node_name),
@@ -232,7 +232,7 @@ class ProcModuleDef:
             topic = TopicDef(i, structure)
             # Filter by default
             if (topic.filtered == True or topic.filtered == None):
-                elems.extend(self.createInputFilter(topic.src))
+                elems.extend(self.createInputFilter(topic))
             else:
                 grp.append(topic.generateRootRemapXML())
 

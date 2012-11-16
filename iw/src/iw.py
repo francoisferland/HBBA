@@ -18,7 +18,7 @@ class iw_server:
 			SetDesireIntensity, self.set_desire_intensity_srv)
         self.srv_del = rospy.Service('remove_desires', RemoveDesires, \
 			self.remove_desires_srv)
-        self.pub_set = rospy.Publisher('desires_set', DesiresSet)
+        self.pub_set = rospy.Publisher('desires_set', DesiresSet, latch=True)
 
     def add_desires_srv(self, req):
         for d in req.desires:

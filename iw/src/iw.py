@@ -22,7 +22,7 @@ class iw_server:
 
     def add_desires_srv(self, req):
         for d in req.desires:
-            rospy.loginfo('Adding new desire with id ' + d.id)
+            rospy.logdebug('Adding new desire with id ' + d.id)
             self.desires[d.id] = d
         self.publish_set()
         return AddDesiresResponse()
@@ -36,7 +36,7 @@ class iw_server:
 
     def remove_desires_srv(self, req):
         for d in req.ids:
-            rospy.loginfo('Removing desire with id ' + d)
+            rospy.logdebug('Removing desire with id ' + d)
             if d in self.desires:
                 del self.desires[d]
             else:

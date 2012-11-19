@@ -50,7 +50,7 @@ namespace iw_solver_interface
                 n_.advertise<hbba_msgs::Intention>("intention", 10);
             pub_res_max_ =
                 n_.advertise<hbba_msgs::ResourcesSet>("resource_max", 10, true);
-            ROS_INFO("Waiting for script_engine service(s) ...");
+            ROS_DEBUG("Waiting for script_engine service(s) ...");
             ros::service::waitForService("eval_script");
             scl_eval_script_ = 
                n_.serviceClient<script_engine::EvalScript>("eval_script", true);

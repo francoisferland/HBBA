@@ -114,7 +114,7 @@ namespace iw_solver_ortools
 		void solve(std::vector<bool>& res)
 		{
 			std::fill(res.begin(), res.end(), false);
-            ROS_INFO("Solving ...");  
+            ROS_DEBUG("Solving ...");  
             StrategySelection(res);
 		}
 		

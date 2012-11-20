@@ -108,6 +108,12 @@ namespace common_plugins
             v8::Number* vy = v8::Number::Cast(*args[3]);
             v8::Number* vt = v8::Number::Cast(*args[4]);
 
+            ROS_DEBUG("Sending navigation goal: %s, %f, %f, %f.",
+                msg.header.frame_id.c_str(),
+                vx->Value(),
+                vy->Value(),
+                vt->Value());
+
             msg.header.frame_id = *frame_id;
             msg.header.stamp = ros::Time::now();
             msg.pose.position.x = vx->Value();

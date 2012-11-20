@@ -44,6 +44,9 @@ namespace script_engine
 			ros::NodeHandle n;
 			v8::String::Utf8Value v8_topic_name(args[0]);
 			const char* topic_name = *v8_topic_name;
+
+            ROS_DEBUG("Publishing from script_engine on %s", topic_name);
+
 			ros::Publisher pub;
 			pub_map_t::iterator i = pub_map_.find(topic_name);
 			if(i == pub_map_.end())

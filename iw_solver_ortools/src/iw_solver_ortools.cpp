@@ -247,31 +247,36 @@ namespace iw_solver_ortools
 
 			//Searching solutions
 			DecisionBuilder* const db = solver.MakePhase(a, Solver::CHOOSE_RANDOM, Solver::ASSIGN_MAX_VALUE);
-            if (flags_ & DEBUG_PRINT)
-            {
-                SearchMonitor* const log = solver.MakeSearchLog(100000);
-                monitors.push_back(log);
-            }
+
+            //if (flags_ & DEBUG_PRINT)
+            //{
+            //    SearchMonitor* const log = solver.MakeSearchLog(100000);
+            //    monitors.push_back(log);
+            //}
 
 			solver.NewSearch(db, monitors);
 
+            int nbSolutions = 0;
 			while (solver.NextSolution()) 
 			{
-                if (flags_ & DEBUG_PRINT)
-                    printf("Solution found : \n");
+                ++nbSolutions;
 				for(int i = 0; i<nbStrat; i++)
 				{
 					if(a[i]->Value() == 1){res[i] = true; }
 					else{res[i] = false;}
-                    if (flags_ & DEBUG_PRINT)
-                        printf(" %3lld \n", a[i]->Value());
+                    //if (flags_ & DEBUG_PRINT)
+                    //    printf(" %3lld \n", a[i]->Value());
 				}
 			} 
-			if (solver.NextSolution() == false) 
-			{
-                if (flags_ & DEBUG_PRINT)
-                    printf("No more solutions found \n");
-			}		
+
+            if (flags_ & DEBUG_PRINT)
+                printf("Solution(s) found : %i \n", nbSolutions);
+
+			//if (solver.NextSolution() == false) 
+			//{
+                //if (flags_ & DEBUG_PRINT)
+                //    printf("No more solutions found \n");
+			//}		
 	
 			solver.EndSearch();
 		}

@@ -235,6 +235,11 @@ namespace iw_solver_interface
                     impl_->add_strategy(i, cs, uf);
                 }
                 model_updated_ = false;
+
+                // Force update of utility, intensity and resources vectors.
+                umin_updated_ = true;
+                uint_updated_ = true;
+                res_updated_ = true;
             }
 
             if (umin_updated_)

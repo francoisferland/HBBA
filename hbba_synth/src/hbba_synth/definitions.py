@@ -251,7 +251,7 @@ class CostDef:
 def generateCostDefArrayPy(costs):
     cstr = "["
     l = len(costs)
-    for i in range(0,l-2):
+    for i in range(0,l-1):
         cstr += costs[i].generatePy() + ", "
     if (l > 0):
         cstr += costs[l-1].generatePy()

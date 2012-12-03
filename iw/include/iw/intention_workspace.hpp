@@ -42,17 +42,17 @@ class IntentionWorkspaceServer
 
 		// Publish the desires
 		pub_set = nh.advertise<hbba_msgs::DesiresSet>
-					("/desires_set", 1000 );
+					("desires_set", 1000 );
 		
 		// Service Server to manage desires
-		server_add = nh.advertiseService("/add_desires", 
+		server_add = nh.advertiseService("add_desires", 
 				&IntentionWorkspaceServer::add_cb, this);
-		server_rm = nh.advertiseService("/rm_desires", 
+		server_rm = nh.advertiseService("rm_desires", 
 				&IntentionWorkspaceServer::rm_cb, this);
-		server_pub = nh.advertiseService("/pub_desires", 
+		server_pub = nh.advertiseService("pub_desires", 
 				&IntentionWorkspaceServer::pub_cb, this);
 		server_intensity = nh.advertiseService(
-				"/set_desire_intensity",
+				"set_desire_intensity",
 			&IntentionWorkspaceServer::intensity_cb, this);
 
 		desires.clear();

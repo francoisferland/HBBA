@@ -243,7 +243,7 @@ class ProcModuleDef:
 class CostDef:
     def __init__(self, key, val, verbose=False):
         self.name = key
-        self.value = val
+        self.value = float(val)
     
     def generatePy(self):
         return "ResourceUsage(\"{0}\", {1})".format(self.name, self.value)

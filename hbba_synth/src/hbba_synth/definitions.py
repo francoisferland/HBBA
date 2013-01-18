@@ -244,6 +244,8 @@ class CostDef:
     def __init__(self, key, val, verbose=False):
         self.name = key
         self.value = float(val)
+        if (verbose):
+            print "Added new Costdef with {0}, {1} ({2})".format(key, val, float(val))
     
     def generatePy(self):
         return "ResourceUsage(\"{0}\", {1})".format(self.name, self.value)
@@ -324,15 +326,20 @@ class StratDef:
         try:
             self.utility_class = content['class']
             utility = content['utility']
-            self.utility = CostDef(self.utility_class, utility)
+            self.utility = CostDef(self.utility_class, utility, verbose)
             self.costs = []
             if ('costs' in content):
                 for key,val in content['costs'].iteritems():
                     self.costs.append(CostDef(key, val, verbose))
             self.dependencies = []
             if ('dependencies' in content):
-                for d in content['dependencies']:
-                    self.dependencies.append(CostDef(d, verbose))
+                deps = content['dependencies']
+                if (type(deps) is dict):
+                    for key,val in deps.iteritems():
+                        self.dependencies.append(CostDef(key, val, verbose))
+                else:
+                    print "Warning: 'dependencies' in {0} is not a " \
+                          "dictionary.".format(self.name)
             self.modules = []
             if ('modules' in content):
                 for m in content['modules']:

@@ -4,6 +4,8 @@
         <node name="script_engine" pkg="script_engine" type="script_engine"/>
         <node name="iw_solver" pkg="iw_solver_ortools" type="iw_solver_ortools">
             <param name="debug_print" value="false"/>
+            <param name="optimize_intensity" value="true"/>
+            <param name="optimize_utility" value="true"/>
         </node>
     </group>
 

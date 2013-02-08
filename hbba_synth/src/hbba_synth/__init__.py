@@ -13,15 +13,15 @@ def main():
     opt_parser.add_option("-a", "--generate-arbitration", action="store_true",
             dest="generate_arbitration", default=True,
             help="generic arbitration nodes are generated for each behavior output topic (default: %default)")
-    opt_parser.add_option("-b", "--base_nodes", action="store_true",
-            dest="base_nodes", default=True,
-            help="add base HBBA nodes such as iw and script_engine (default: %default)")
     opt_parser.add_option("-d", "--debug", action="store_true",
             dest="debug", default=False,
             help="debug mode for HBBA base nodes (default: %default)")
     opt_parser.add_option("-p", "--pretty", action="store_true",
             dest="pretty", default=False,
             help="more human-readable XML output")
+    opt_parser.add_option("-b", "--behavior-based", action="store_true",
+            dest="behavior_based", default=False,
+            help="generate a purely behavior-based structure (no IW or filters)")
     opt_parser.add_option("-v", "--verbose", action="store_true",
             dest="verbose", default=False,
             help="verbose output")

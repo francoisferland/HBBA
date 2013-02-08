@@ -215,22 +215,24 @@ class Structure:
         
         # XML launch file
         launch_elem = Element("launch")
-        if opts.base_nodes:
+        if not opts.behavior_based:
             if verbose:
                 print "Adding base HBBA nodes"
             launch_elem.append(baseNodesXML(opts.debug))
         for p in self.procmodules.values():
-            launch_elem.extend(p.generateXML(self))
+            launch_elem.extend(p.generateXML(self, opts))
         for b in self.behaviors.values():
-            launch_elem.extend(b.generateXML(self))
-        for m in self.motivations.values():
-            launch_elem.extend(m.generateXML(self))
+            launch_elem.extend(b.generateXML(self, opts))
+        if not opts.behavior_based:
+            for m in self.motivations.values():
+                launch_elem.extend(m.generateXML(self))
         if opts.generate_arbitration:
             for t in behavior_topics:
                 if t not in self.integratedArbitration:
                     launch_elem.extend(self.generateArbitrationXML(t))
-            for t in self.exploitationMatches.keys():
-                launch_elem.extend(self.generateExploitationMatcherXML(t))
+            if not opts.behavior_based:
+                for t in self.exploitationMatches.keys():
+                    launch_elem.extend(self.generateExploitationMatcherXML(t))
 
         launch_tree = ElementTree(launch_elem)
         xml_output = tostring(launch_elem)
@@ -246,38 +248,39 @@ class Structure:
         xmlfile.write(xml_output)
 
         # Python script
-        pyscript = ""
-        if (self.customScript != ""):
-            pyscript += "#Custom script:\n"
-            pyscript += "evalScript(\"\"\" \n"
-            pyscript += self.customScript
-            pyscript += "\n\"\"\"\n\n"
-        for e in self.emoIntensities.values():
-            pyscript += e.generatePy()
-        for s in self.strategies.values():
-            pyscript += s.generatePy()
-        pyscript += "\n"
-        for r in self.resources.values():
-            pyscript += r.generatePy()
-        pyscript += "\n"
-        for d in self.desires.values():
-            pyscript += d.generatePy()
-        pyscript += "\n"
-        if opts.generate_arbitration:
+        if not opts.behavior_based:
+            pyscript = ""
+            if (self.customScript != ""):
+                pyscript += "#Custom script:\n"
+                pyscript += "evalScript(\"\"\" \n"
+                pyscript += self.customScript
+                pyscript += "\n\"\"\"\n\n"
+            for e in self.emoIntensities.values():
+                pyscript += e.generatePy()
+            for s in self.strategies.values():
+                pyscript += s.generatePy()
             pyscript += "\n"
-            pyscript += self.generateExploitationMatchesPy()
-        pyscript += "\n\nprint \"Stop this script with Ctrl-C when ready.\"\n"
-        pyscript += "rospy.spin()\n"
+            for r in self.resources.values():
+                pyscript += r.generatePy()
+            pyscript += "\n"
+            for d in self.desires.values():
+                pyscript += d.generatePy()
+            pyscript += "\n"
+            if opts.generate_arbitration:
+                pyscript += "\n"
+                pyscript += self.generateExploitationMatchesPy()
+            pyscript += "\n\nprint \"Stop this script with Ctrl-C when ready.\"\n"
+            pyscript += "rospy.spin()\n"
 
-        if verbose:
-            print "Generated Python script:\n"
-            print pyscript
-            print ""
+            if verbose:
+                print "Generated Python script:\n"
+                print pyscript
+                print ""
 
-        pyfile = file(basepath + ".py", "w")
-        pyfile.write(python_header.format(
-            self.getRootTopicFullName("emo_intensity")))
-        pyfile.write(pyscript)
-
-
+            pyfile = file(basepath + ".py", "w")
+            pyfile.write(python_header.format(
+                self.getRootTopicFullName("emo_intensity")))
+            pyfile.write(pyscript)
+        elif verbose:
+            print "Behavior-based mode - no Python script generated."
 

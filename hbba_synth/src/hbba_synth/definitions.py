@@ -115,14 +115,14 @@ class BehaviorDef:
                 name)
             }))
 
-    def generateXML(self, structure):
+    def generateXML(self, structure, opts):
         elems = []
         grp = Element("group", attrib={'ns': self.name})
         # Input remaps, have to go first to affect included nodes:
         # Note: the actual position is not important if inputs are filtered
         for i in self.input:
             topic = TopicDef(i, structure)
-            if topic.filtered:
+            if (not opts.behavior_based) and topic.filtered:
                 filter_in = topic.getRootTopicFullName()
                 filter_out = topic.name
                 self.appendFilter(grp, elems, 
@@ -139,26 +139,31 @@ class BehaviorDef:
         elems.append(grp)
         for o in self.output:
             root_topic = structure.getRootTopicFullName(o)
-            # Add output filter, registration script.
-            self.appendFilter(grp, elems,
-                self.outputFilterNodeName(o),
-                self.outputFilterName(o),
-                o,
-                self.outputFilterTopic(o))
+            if opts.behavior_based:
+                abtr_output_topic = o 
+            else:
+                abtr_output_topic = self.outputFilterTopic(o)
+                # Add output filter.
+                self.appendFilter(grp, elems,
+                    self.outputFilterNodeName(o),
+                    self.outputFilterName(o),
+                    o,
+                    self.outputFilterTopic(o))
 
+            # Add registration script.
             grp.append(Element("param", attrib={
-                'name': self.outputFilterTopic(o) + "/abtr_priority",
+                'name': abtr_output_topic + "/abtr_priority",
                 'value': str(self.priority)
                 }))
             elems.append(Element("node", attrib={
                 'name': "register_{0}_{1}_{2}".format(
                     self.name,
-                    self.outputFilterTopic(o),
+                    abtr_output_topic,
                     uniqueName()),
                 'pkg': 'abtr_priority',
                 'type': 'register',
                 'args': "{0} /{1}/{2}".format(root_topic, self.name,
-                    self.outputFilterTopic(o))
+                    abtr_output_topic)
                 }))
 
         return elems
@@ -219,7 +224,7 @@ class ProcModuleDef:
             }))
         return elems
 
-    def generateXML(self, structure):
+    def generateXML(self, structure, opts):
         elems = []
         grp = Element("group", attrib={'ns': self.name})
         elems.append(grp)
@@ -231,7 +236,7 @@ class ProcModuleDef:
         for i in self.input:
             topic = TopicDef(i, structure)
             # Filter by default
-            if (topic.filtered == True or topic.filtered == None):
+            if (not opts.behavior_based) and (topic.filtered == True or topic.filtered == None):
                 elems.extend(self.createInputFilter(topic))
             else:
                 grp.append(topic.generateRootRemapXML())

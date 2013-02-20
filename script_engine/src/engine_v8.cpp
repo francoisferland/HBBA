@@ -64,7 +64,7 @@ engine_v8::~engine_v8()
 
 bool engine_v8::eval(const std::string& src, std::string& result)
 {
-	//ROS_INFO("eval(\"%s\") ...", src.c_str());
+	ROS_DEBUG("eval(\"%s\") ...", src.c_str());
 	using namespace v8;
 	Context::Scope context_scope(context_);
 	Handle<String> str = String::New(src.c_str());
@@ -83,7 +83,14 @@ bool engine_v8::eval(const std::string& src, std::string& result)
     }
 
     if (!script.IsEmpty())
-	    return run_script(script, result);
+    {
+        if (!run_script(script, result))
+        {
+            ROS_ERROR("Exception when evaluating %s", src.c_str());
+            return false;
+        }
+        return true;
+    }
     else
         return false;
 }

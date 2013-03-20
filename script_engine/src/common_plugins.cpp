@@ -1,8 +1,11 @@
 #include "script_engine/service_caller_base.hpp"
 #include "script_engine/publisher_topic_arg_base.hpp"
 #include "script_engine/EvalScript.h"
+#include "script_engine/Boolean.h"
+#include "script_engine/UpdateRate.h"
 #include <pluginlib/class_list_macros.h>
 #include <std_msgs/String.h>
+#include <std_srvs/Empty.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <tf/tf.h>
 #include <stdlib.h>
@@ -13,7 +16,7 @@ namespace common_plugins
 {
     /// \brief Eval function to interpret JS code.
     ///
-    /// Note: This actually calls the eval_script service, mostly meant as a 
+    /// Note: This actually calls the eval_script service, mostly meant as 
     /// test of the service caller template.
     namespace eval
     {
@@ -37,6 +40,84 @@ namespace common_plugins
             call_eval_str,	
             afun,
             rfun> call_eval_plugin;
+    }
+
+    /// \brief Call empty service. Call be used for lots of things
+    namespace empty
+    {
+
+        void afun(const v8::Arguments& args, std_srvs::Empty::Request& req)
+        {
+        }
+
+        v8::Handle<v8::Value> rfun(const std_srvs::Empty::Response& res)
+        {
+            return v8::True();
+        }
+
+        const extern char empty_script_str[] = "empty_script";
+        const extern char call_empty_str[] = "call_empty";
+        typedef script_engine::service_caller_base<
+            std_srvs::Empty,
+            empty_script_str,	
+            call_empty_str,	
+            afun,
+            rfun> call_empty_plugin;
+    }
+
+    /// \brief Call boolean service. Call be used for lots of things
+    namespace boolean
+    {
+
+        void afun(const v8::Arguments& args, 
+			script_engine::Boolean::Request& req)
+        {
+            v8::BooleanObject* b = v8::BooleanObject::Cast( *args[1] );
+            req.boolean = b->BooleanValue();
+        }
+
+        v8::Handle<v8::Value> rfun(
+		const script_engine::Boolean::Response& res)
+        {
+            return v8::True();
+        }
+
+        const extern char boolean_script_str[] = "boolean_script";
+        const extern char call_boolean_str[] = "call_boolean";
+        typedef script_engine::service_caller_base<
+            script_engine::Boolean,
+            boolean_script_str,	
+            call_boolean_str,	
+            afun,
+            rfun> call_boolean_plugin;
+    }
+
+
+    /// \brief Call service to update a timer rate in a node.
+    namespace update_rate
+    {
+
+        void afun(const v8::Arguments& args, 
+            script_engine::UpdateRate::Request& req)
+        {
+            v8::Number* v = v8::Number::Cast(*args[1]);
+            req.rate = v->Value();
+        }
+
+        v8::Handle<v8::Value> rfun(
+            const script_engine::UpdateRate::Response& res)
+        {
+            return v8::True();
+        }
+
+        const extern char update_rate_script_str[] = "update_rate_script";
+        const extern char call_update_rate_str[] = "call_update_rate";
+        typedef script_engine::service_caller_base<
+            script_engine::UpdateRate,
+            update_rate_script_str,	
+            call_update_rate_str,	
+            afun,
+            rfun> call_update_rate_plugin;
     }
 
     /// \brief Run commands on the shell.
@@ -134,6 +215,15 @@ namespace common_plugins
 
 PLUGINLIB_DECLARE_CLASS(script_engine, EvalCall, 
 	common_plugins::eval::call_eval_plugin,
+	script_engine::engine_module);
+PLUGINLIB_DECLARE_CLASS(script_engine, EmptyCall, 
+	common_plugins::empty::call_empty_plugin,
+	script_engine::engine_module);
+PLUGINLIB_DECLARE_CLASS(script_engine, BooleanCall, 
+	common_plugins::boolean::call_boolean_plugin,
+	script_engine::engine_module);
+PLUGINLIB_DECLARE_CLASS(script_engine, UpdateRateCall, 
+	common_plugins::update_rate::call_update_rate_plugin,
 	script_engine::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, SysCall, 
 	common_plugins::SysCall,

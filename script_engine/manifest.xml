@@ -9,6 +9,7 @@
   <depend package="roscpp"/>
   <depend package="pluginlib"/>
   <depend package="std_msgs"/>
+  <depend package="std_srvs"/>
   <rosdep name="libv8"/>
   <!-- TODO: Move these plugin dependencies into a separate module. -->
   <depend package="geometry_msgs"/>

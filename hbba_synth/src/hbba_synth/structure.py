@@ -252,9 +252,9 @@ class Structure:
             pyscript = ""
             if (self.customScript != ""):
                 pyscript += "#Custom script:\n"
-                pyscript += "evalScript(\"\"\" \n"
+                pyscript += "eval_script(\"\"\" \n"
                 pyscript += self.customScript
-                pyscript += "\n\"\"\"\n\n"
+                pyscript += "\n\"\"\")\n\n"
             for e in self.emoIntensities.values():
                 pyscript += e.generatePy()
             for s in self.strategies.values():

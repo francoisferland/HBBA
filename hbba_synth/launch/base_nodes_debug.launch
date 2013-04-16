@@ -6,7 +6,7 @@
             launch-prefix="xterm -e gdb --args">
             <param name="debug_print" value="true"/>
             <param name="optimize_intensity" value="true"/>
-            <param name="optimize_utility" value="true"/>
+            <param name="optimize_utility" value="false"/>
         </node>
     </group>
 

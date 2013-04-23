@@ -122,10 +122,50 @@ namespace iw_solver_interface
                 return;
             }
 
+            // Get a copy of the original vector, might get modified by the
+            // solving process.
+            u_vec_t desires = msg->desires;
+            int passes = 1;
+            while (!desires.empty() && !solvingPass(desires, result))
+            {
+                // Look for the lowest-intensity desire, remove it, solve again.
+                typedef typename u_vec_t::iterator u_vec_it;
+                u_vec_it lowest, i;
+                double lowest_int = std::numeric_limits<double>::max();
+                for (i = desires.begin(); i != desires.end(); ++i)
+                {
+                    if (i->intensity < lowest_int)
+                    {
+                        lowest_int = i->intensity;
+                        lowest = i;
+                    }
+                }
+                ROS_DEBUG("Removing desire %s from set.",
+                    lowest->id.c_str());
+                desires.erase(lowest);
+                passes++;
+            }
+
+            ROS_DEBUG("Solved in %i pass(es).", passes);
+
+            applyStrats(result, desires);
+        }
+
+    private:
+        typedef std::vector<hbba_msgs::Desire> u_vec_t;
+
+        /// \brief Solve for the given desires vector.
+        ///
+        /// \param desires The desires vector to solve for.
+        /// \param The strategies activation vector.
+        /// \return False if no solutions were found.
+        /// 
+        bool solvingPass(const u_vec_t& desires, 
+            typename BaseType::sol_vec_t& result)
+        {
             ros::Time start_time = ros::Time::now();
 
             // Build the utility requests vector.
-            const u_vec_t& desires = msg->desires;
             typedef typename u_vec_t::const_iterator u_vec_it;
             BaseType::clear_reqs();
             for (u_vec_it i = desires.begin(); i != desires.end(); ++i)
@@ -134,20 +174,23 @@ namespace iw_solver_interface
                 BaseType::set_util_int(i->type, i->intensity);
             }
 
-            // Automatically call the solver.
             BaseType::solve(result);
-            ROS_DEBUG("Solving done.");
-
-            applyStrats(result, desires);
 
             std_msgs::Duration solve_time;
             solve_time.data = ros::Time::now() - start_time;
             pub_solve_time_.publish(solve_time);
+
+            // Look for at least one active strategy, return false if it cannot
+            // be found.
+            typename BaseType::sol_vec_t::const_iterator i = result.begin();
+            while (i != result.end())
+            {
+                if (i->second)
+                    return true;
+                ++i;
+            }
+            return false;
         }
-
-
-    private:
-        typedef std::vector<hbba_msgs::Desire> u_vec_t;
 
         /// \brief Apply strategies according to a result set.
         void applyStrats(typename BaseType::sol_vec_t& result, 
@@ -169,6 +212,7 @@ namespace iw_solver_interface
             intent.enabled.reserve(result.size());
             intent.desires.resize(result.size());
             intent.desire_types.resize(result.size());
+            intent.intensity.resize(result.size());
 
             typedef typename BaseType::sol_vec_t::const_iterator CI;
             size_t j = 0; // Used to map desires to strategies.
@@ -199,6 +243,7 @@ namespace iw_solver_interface
                         script += d->params;
                         intent.desires[j] = d->id;
                         intent.desire_types[j] = d->type;
+                        intent.intensity[j] = d->intensity;
                     }
                 }   
                 script += ");";

@@ -47,7 +47,7 @@ namespace iw_solver_interface
                 &ThisType::desiresCB, this);
 
             pub_intention_ = 
-                n_.advertise<hbba_msgs::Intention>("intention", 10);
+                n_.advertise<hbba_msgs::Intention>("intention", 10, true);
             pub_res_max_ =
                 n_.advertise<hbba_msgs::ResourcesSet>("resource_max", 10, true);
             ROS_DEBUG("Waiting for script_engine service(s) ...");

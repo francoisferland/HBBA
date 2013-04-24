@@ -19,7 +19,10 @@ engine_v8::engine_v8():
 	module_loader_(new module_loader_t("script_engine",
 		"script_engine::engine_module"))
 {
-	ros::NodeHandle n;
+	ros::NodeHandle n, np("~");
+
+    np.param("no_eval", no_eval_, false);
+
 	srv_eval_script_ = n.advertiseService("eval_script",
 		&engine_v8::eval_srv, this);
 	srv_compile_script_ = n.advertiseService("compile_script",
@@ -97,7 +100,10 @@ bool engine_v8::eval(const std::string& src, std::string& result)
 
 bool engine_v8::eval_srv(EvalScript::Request& req, EvalScript::Response& res)
 {
-	eval(req.source, res.result);
+    if (no_eval_)
+        ROS_INFO("Eval: %s", req.source.c_str());
+    else
+        eval(req.source, res.result);
 
 	return true;
 }

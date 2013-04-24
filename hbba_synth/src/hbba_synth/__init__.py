@@ -11,8 +11,8 @@ def main():
             help="defines the base name for the produced files (default: %default)", 
             metavar="DIRECTORY")
     opt_parser.add_option("-a", "--generate-arbitration", action="store_true",
-            dest="generate_arbitration", default=True,
-            help="generic arbitration nodes are generated for each behavior output topic (default: %default)")
+            dest="disable_arbitration", default=False,
+            help="arbitration nodes are not generated for behavior output topics.")
     opt_parser.add_option("-d", "--debug", action="store_true",
             dest="debug", default=False,
             help="debug mode for HBBA base nodes (default: %default)")

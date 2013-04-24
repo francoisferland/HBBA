@@ -226,7 +226,7 @@ class Structure:
         if not opts.behavior_based:
             for m in self.motivations.values():
                 launch_elem.extend(m.generateXML(self))
-        if opts.generate_arbitration:
+        if not opts.disable_arbitration:
             for t in behavior_topics:
                 if t not in self.integratedArbitration:
                     launch_elem.extend(self.generateArbitrationXML(t))
@@ -266,7 +266,7 @@ class Structure:
             for d in self.desires.values():
                 pyscript += d.generatePy()
             pyscript += "\n"
-            if opts.generate_arbitration:
+            if not opts.disable_arbitration:
                 pyscript += "\n"
                 pyscript += self.generateExploitationMatchesPy()
             pyscript += "\n\nprint \"Stop this script with Ctrl-C when ready.\"\n"

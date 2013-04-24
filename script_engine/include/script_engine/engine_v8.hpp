@@ -17,6 +17,12 @@ namespace script_engine
 	/// \brief A V8-based JS execution engine.
 	///
 	/// Registers a few ROS services.
+    ///
+    /// Parameters:
+    ///  - no_eval: Disable execution on eval calls, prints given code with 
+    ///    ROS_INFO() (useful for debugging).
+    ///    Default: false.
+    ///
 	class engine_v8
 	{
 	public:
@@ -60,6 +66,8 @@ namespace script_engine
 		typedef v8::Handle<v8::Script> script_t;
 		typedef std::tr1::unordered_map<std::string, script_t> scripts_map_t;
 		scripts_map_t scripts_map_;
+
+        bool no_eval_;
 
 	};
 

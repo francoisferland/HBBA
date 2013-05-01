@@ -24,11 +24,12 @@ rosbuild_gensrv()
 rosbuild_add_library(iw_nodelets src/intention_workspace_nodelet.cpp)
 rosbuild_add_executable(iw_cpp src/intention_workspace.cpp)
 
-rosbuild_add_executable(exploitation_matcher src/exploitation_matcher.cpp)
-
 rosbuild_add_library(iw 
+    src/exploitation_matcher.cpp
     src/events_generator.cpp
 )
 rosbuild_add_executable(events_generator src/events_generator_node.cpp)
 target_link_libraries(events_generator iw)
+rosbuild_add_executable(exploitation_matcher src/exploitation_matcher_node.cpp)
+target_link_libraries(exploitation_matcher iw)
 

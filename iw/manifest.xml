@@ -14,7 +14,7 @@
   <depend package="std_srvs"/>
 
   <export>
-    <cpp cflags="-I${prefix}/msg/cpp"/>
+    <cpp cflags="-I${prefix}/msg/cpp" lflags="-L${prefix} -liw"/>
     <nodelet plugin="${prefix}/nodelet_plugins.xml" />
   </export>
 </package>

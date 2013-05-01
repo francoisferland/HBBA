@@ -15,6 +15,13 @@ EventsGenerator::EventsGenerator(ros::NodeHandle& n, ros::NodeHandle& np)
     pub_events_ = n.advertise<hbba_msgs::Event>("events", 100);
 }
 
+EventsGenerator::~EventsGenerator()
+{
+    std::list<ExploitationMatcher*>::iterator i = matchers_.begin();
+    while (i != matchers_.end())
+        delete *(i++);
+}
+
 void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
 {
     typedef std::vector<std::string> StrVec;
@@ -104,14 +111,18 @@ void EventsGenerator::exploitationCB(const std_msgs::String::ConstPtr& msg)
     }
 
     int& f = d->second;
-    f |= FLAG_EXP;
+    if (!(f & FLAG_EXP))
+    {
+        event(id, hbba_msgs::Event::EXP_ON);
+        f |= FLAG_EXP;
+    }
 
-    // TODO: Figure out a way to remove exploitation flags after a certain time.
     // Removing FLAG_EXP should happen in two cases:
     //  - timeout,
     //  - replaced by another priority.
     // This means the exploitation matcher should be better coupled with the
     // events generator.
+    // TODO: Use exploitation matchers to detect exploitation stops.
 
 }
 

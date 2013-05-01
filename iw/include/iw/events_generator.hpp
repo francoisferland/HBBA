@@ -1,9 +1,11 @@
 #ifndef EVENTS_GENERATOR_HPP
 #define EVENTS_GENERATOR_HPP
 
+#include "exploitation_matcher.hpp"
 #include <hbba_msgs/DesiresSet.h>
 #include <hbba_msgs/Intention.h>
 #include <hbba_msgs/Event.h>
+#include <hbba_msgs/CreateExploitationMatcher.h>
 #include <std_msgs/String.h>
 #include <ros/ros.h>
 #include <map>
@@ -30,6 +32,8 @@ namespace iw
     /// Output topics:
     ///  - events: Messages representing a single event (hbba_msgs/Event).
     ///
+    /// See also ExploitationMatcher for other input/output topics, and
+    /// CreateExploitationMatcher's interface for sub-namespace details.
     class EventsGenerator
     {
     public:
@@ -39,10 +43,16 @@ namespace iw
         /// \param np Node handle to use for parameters.
         EventsGenerator(ros::NodeHandle& n, ros::NodeHandle& np);
 
+        ~EventsGenerator();
+
     private:
         void desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg);
         void intentionCB(const hbba_msgs::Intention::ConstPtr& msg);
         void exploitationCB(const std_msgs::String::ConstPtr& msg);
+        bool cemCB(
+            hbba_msgs::CreateExploitationMatcher::Request& req,
+            hbba_msgs::CreateExploitationMatcher::Response& res);
+
 
         void event(const std::string& id, const unsigned char type);
 
@@ -59,6 +69,8 @@ namespace iw
         };
         typedef std::map<std::string, int> DesMap;
         DesMap map_;
+
+        std::list<ExploitationMatcher*> matchers_;
 
     };
 

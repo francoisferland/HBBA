@@ -26,3 +26,9 @@ rosbuild_add_executable(iw_cpp src/intention_workspace.cpp)
 
 rosbuild_add_executable(exploitation_matcher src/exploitation_matcher.cpp)
 
+rosbuild_add_library(iw 
+    src/events_generator.cpp
+)
+rosbuild_add_executable(events_generator src/events_generator_node.cpp)
+target_link_libraries(events_generator iw)
+

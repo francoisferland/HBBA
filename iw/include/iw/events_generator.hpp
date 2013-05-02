@@ -58,7 +58,8 @@ namespace iw
 
         ros::Subscriber sub_desires_;
         ros::Subscriber sub_intention_;
-        ros::Subscriber sub_exploitation_;
+        //ros::Subscriber sub_exploitation_;
+        ros::ServiceServer srv_cem_;
         ros::Publisher pub_events_;
 
         enum Flags

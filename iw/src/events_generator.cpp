@@ -9,8 +9,10 @@ EventsGenerator::EventsGenerator(ros::NodeHandle& n, ros::NodeHandle& np)
         &EventsGenerator::desiresCB, this);
     sub_intention_ = n.subscribe("intention", 1,
         &EventsGenerator::intentionCB, this);
-    sub_exploitation_ = n.subscribe("exploitation_match", 100,
-        &EventsGenerator::exploitationCB, this);
+    //    sub_exploitation_ = n.subscribe("exploitation_match", 100,
+    //    &EventsGenerator::exploitationCB, this);
+    srv_cem_ = n.advertiseService("create_exploitation_matcher",
+        &EventsGenerator::cemCB, this);
 
     pub_events_ = n.advertise<hbba_msgs::Event>("events", 100);
 }
@@ -132,5 +134,21 @@ void EventsGenerator::event(const std::string& id, const unsigned char type)
     msg.desire = id;
     msg.type = type;
     pub_events_.publish(msg);
+}
+
+bool EventsGenerator::cemCB(
+    hbba_msgs::CreateExploitationMatcher::Request& req,
+    hbba_msgs::CreateExploitationMatcher::Response& res)
+{
+    ros::NodeHandle n, nt(req.abtr_topic);
+    ExploitationMatcher* em = new ExploitationMatcher(n, nt);
+    matchers_.push_back(em);
+
+    std::vector<hbba_msgs::ExploitationMatch>::const_iterator i = 
+        req.matches.begin();
+    while (i != req.matches.end())
+        em->registerMatches(*(i++));
+
+    return true;
 }
 

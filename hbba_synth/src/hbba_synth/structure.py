@@ -31,9 +31,12 @@ pubEmoIntensity = rospy.Publisher("{0}", EmoIntensity)
 """
 
 exploitation_match_sp = """
-register_em=rospy.ServiceProxy("{0}/register_exploitation_match", RegisterExploitationMatch)"""
+rospy.wait_for_service("hbba/create_exploitation_matcher", 1.0)
+create_cem=rospy.ServiceProxy("hbba/create_exploitation_matcher", CreateExploitationMatcher)
+"""
+exploitation_match_elem = """ExploitationMatch({0}, {1})"""
 exploitation_match_call = """
-register_em({0}, {1})"""
+create_cem('{0}', {1})"""
 
 def baseNodesXML(debug):
     if debug:
@@ -117,11 +120,17 @@ class Structure:
             matches[p].append(d)
 
     def generateExploitationMatchesPy(self):
-        out = ""
+        out = exploitation_match_sp
         for t, ms in self.exploitationMatches.iteritems():
-            out += exploitation_match_sp.format(self.getRootTopicFullName(t))
-            for p, ds in ms.iteritems():
-                out += exploitation_match_call.format(p,ds)
+            ems = "["
+            ft = self.getRootTopicFullName(t)
+            p = ms.keys()
+            ds = ms.values()
+            l = len(p)
+            for i in range(0, l-1):
+                ems += exploitation_match_elem.format(p[i], ds[i]) + ", "
+            ems += exploitation_match_elem.format(p[l-1], ds[l-1]) + "]"
+            out += exploitation_match_call.format(ft, ems)
         return out
 
     def getRootTopicFullName(self, topic):
@@ -184,7 +193,7 @@ class Structure:
             'from': 'intention',
             'to': "hbba/intention"}))
         n.append(Element("remap", attrib = {
-            'from': 'register',
+            'from': 'register_em',
             'to': "{0}/register_exploitation_match".format(root_topic)}))
         return [n]
 

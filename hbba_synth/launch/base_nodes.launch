@@ -7,6 +7,7 @@
             <param name="optimize_intensity" value="false"/>
             <param name="optimize_utility" value="false"/>
         </node>
+        <node name="events_generator" pkg="iw" type="events_generator"/>
     </group>
 
 </launch>

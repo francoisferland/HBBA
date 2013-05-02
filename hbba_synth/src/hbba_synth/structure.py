@@ -239,9 +239,6 @@ class Structure:
             for t in behavior_topics:
                 if t not in self.integratedArbitration:
                     launch_elem.extend(self.generateArbitrationXML(t))
-            if not opts.behavior_based:
-                for t in self.exploitationMatches.keys():
-                    launch_elem.extend(self.generateExploitationMatcherXML(t))
 
         launch_tree = ElementTree(launch_elem)
         xml_output = tostring(launch_elem)

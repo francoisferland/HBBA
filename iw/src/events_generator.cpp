@@ -43,7 +43,7 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     for (DesMap::const_iterator i = map_.begin(); i != map_.end(); ++i)
     {
         const std::string& id = i->first;
-        if (std::find(ids.begin(), ids.end(), id) == ids.end())
+        if (std::find(ids.begin(), ids.end(), id) != ids.end())
             del.push_back(id);
     }
     for (StrVec::const_iterator i = del.begin(); i != del.end(); ++i)

@@ -9,7 +9,7 @@ def intentionCB(msg):
     print "Enabled strategies:"
     for i in range(0, len(msg.strategies)):
         if msg.enabled[i]:
-            print " - ", msg.strategies[i]
+            print " - ", msg.strategies[i], ":", msg.desires[i]
     print "---"
 
 if __name__ == "__main__":

@@ -58,6 +58,7 @@ namespace iw
         bool cemCB(
             hbba_msgs::CreateExploitationMatcher::Request& req,
             hbba_msgs::CreateExploitationMatcher::Response& res);
+        void timerCB(const ros::TimerEvent&);
 
         void exploitationCB(const std::string& id);
 
@@ -68,6 +69,7 @@ namespace iw
         ros::Subscriber sub_intention_;
         ros::ServiceServer srv_cem_;
         ros::Publisher pub_events_;
+        ros::Timer timer_;
 
         ros::Duration exp_timeout_;
 

@@ -17,6 +17,8 @@ EventsGenerator::EventsGenerator(ros::NodeHandle& n, ros::NodeHandle& np)
         &EventsGenerator::cemCB, this);
 
     pub_events_ = n.advertise<hbba_msgs::Event>("events", 100);
+
+    timer_ = n.createTimer(ros::Duration(1.0), &EventsGenerator::timerCB, this);
 }
 
 EventsGenerator::~EventsGenerator()
@@ -80,13 +82,20 @@ void EventsGenerator::intentionCB(const hbba_msgs::Intention::ConstPtr& msg)
     for (size_t i = 0; i < ids.size(); ++i)
     {
         const std::string& id = ids[i];
+        if (id == "")
+        {
+            // Skip unmatched strategies.
+            continue;
+        }
+
         const bool& state = states[i];
         DesMap::iterator d = map_.find(id);
         if (d == map_.end())
         {
-            // This shouldn't happen. Skip, only warn in debug:
-            ROS_DEBUG("Unknown desire in intention set: %s", id.c_str());
-            continue;
+            // Add it to the desires' map.
+            // This can happen if we receive the intention message before the
+            // desires set update.
+            map_[id].flags = FLAG_NONE;
         }
 
         int& f = d->second.flags;
@@ -181,6 +190,17 @@ bool EventsGenerator::cemCB(
 
     em->registerMatchCB(&EventsGenerator::exploitationCB, this);
 
+    ROS_DEBUG("ExploitationMatcher created for %s", req.abtr_topic.c_str());
     return true;
+}
+
+void EventsGenerator::timerCB(const ros::TimerEvent&)
+{
+    // Perform routine maintenance on data.
+    
+    // Exploitation timeouts have to be checked periodically.
+    // A problem occurs if we stop receiving exploitation matches: timeouts will
+    // be detected too late.
+    detectExpOff();
 }
 

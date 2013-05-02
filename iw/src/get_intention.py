@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import roslib; roslib.load_manifest('hbba_tools')
+import roslib; roslib.load_manifest('iw')
 import rospy
 from hbba_msgs.msg import Intention
 

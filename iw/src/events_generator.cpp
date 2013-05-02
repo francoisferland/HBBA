@@ -29,6 +29,7 @@ EventsGenerator::~EventsGenerator()
 void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
 {
     typedef std::vector<std::string> StrVec;
+    typedef std::list<std::string> StrList;
     typedef std::vector<hbba_msgs::Desire> DesVec;
     const DesVec& desires = msg->desires;
     StrVec ids;
@@ -39,14 +40,14 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     }
 
     // First, remove desires not in it the current desires set.
-    StrVec del;
+    StrList del;
     for (DesMap::const_iterator i = map_.begin(); i != map_.end(); ++i)
     {
         const std::string& id = i->first;
-        if (std::find(ids.begin(), ids.end(), id) != ids.end())
+        if (std::find(ids.begin(), ids.end(), id) == ids.end())
             del.push_back(id);
     }
-    for (StrVec::const_iterator i = del.begin(); i != del.end(); ++i)
+    for (StrList::const_iterator i = del.begin(); i != del.end(); ++i)
     {
         const std::string& id = *i;
         map_.erase(id);
@@ -95,7 +96,7 @@ void EventsGenerator::intentionCB(const hbba_msgs::Intention::ConstPtr& msg)
             event(id, hbba_msgs::Event::INT_ON);
         } else if (!state && (f & FLAG_INT))
         {
-            f &= (f | ~FLAG_INT);
+            f &= ~FLAG_INT;
             event(id, hbba_msgs::Event::INT_OFF);
         }
     }
@@ -136,7 +137,7 @@ void EventsGenerator::detectExpOff()
     {
         const std::string& id = d->first;
         DesireData& data = (d++)->second;
-        if (data.flags & FLAG_EXP && data.last_exp_ < timeout_limit)
+        if ((data.flags & FLAG_EXP) && (data.last_exp_ < timeout_limit))
         {
             data.flags &= ~FLAG_EXP;
             event(id, hbba_msgs::Event::EXP_OFF);
@@ -150,6 +151,19 @@ void EventsGenerator::event(const std::string& id, const unsigned char type)
     msg.desire = id;
     msg.type = type;
     pub_events_.publish(msg);
+    
+    ROS_DEBUG("Current events state:");
+    DesMap::const_iterator d = map_.begin();
+    while (d != map_.end())
+    {
+        const std::string& id = d->first;
+        const DesireData& data = (d++)->second;
+        ROS_DEBUG(" - %s: %i, last exp: %f", 
+            id.c_str(), 
+            data.flags,
+            (ros::Time::now() - data.last_exp_).toSec());
+
+    }
 }
 
 bool EventsGenerator::cemCB(

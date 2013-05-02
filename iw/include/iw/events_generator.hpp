@@ -22,8 +22,15 @@ namespace iw
     ///  - When they appear or disappear from the selected intention;
     ///  - When their exploitation starts or stops.
     ///
-    /// Input topics:
+    /// Parameters:
+    ///  - exp_timeout: Time used for exploitation deactivation detection.
+    ///    If a desire has not been exploited for this duration, an 
+    ///    EXP_OFF event is generated.
+    ///    EXP_OFF events are generated only if there has been a previous
+    ///    EXP_ON event.
+    ///    Default: 0.5 s.
     ///
+    /// Input topics:
     ///  - desires_set: The current active desires in the IW.
     ///  - intention: The active strategies selected by the solver.
     ///  - exploitation_match: Exploited desires as detected by
@@ -48,19 +55,21 @@ namespace iw
     private:
         void desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg);
         void intentionCB(const hbba_msgs::Intention::ConstPtr& msg);
-        void exploitationCB(const std_msgs::String::ConstPtr& msg);
         bool cemCB(
             hbba_msgs::CreateExploitationMatcher::Request& req,
             hbba_msgs::CreateExploitationMatcher::Response& res);
 
+        void exploitationCB(const std::string& id);
 
+        void detectExpOff();
         void event(const std::string& id, const unsigned char type);
 
         ros::Subscriber sub_desires_;
         ros::Subscriber sub_intention_;
-        //ros::Subscriber sub_exploitation_;
         ros::ServiceServer srv_cem_;
         ros::Publisher pub_events_;
+
+        ros::Duration exp_timeout_;
 
         enum Flags
         {
@@ -68,7 +77,12 @@ namespace iw
             FLAG_INT    = 1,
             FLAG_EXP    = 2
         };
-        typedef std::map<std::string, int> DesMap;
+        struct DesireData
+        {
+            int flags;
+            ros::Time last_exp_;
+        };
+        typedef std::map<std::string, DesireData> DesMap;
         DesMap map_;
 
         std::list<ExploitationMatcher*> matchers_;

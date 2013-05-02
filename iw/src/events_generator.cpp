@@ -5,12 +5,14 @@ using namespace iw;
 
 EventsGenerator::EventsGenerator(ros::NodeHandle& n, ros::NodeHandle& np)
 {
+    double p;
+    np.param("exp_timeout", p, 0.5);
+    exp_timeout_ = ros::Duration(p);
+
     sub_desires_ = n.subscribe("desires_set", 1, 
         &EventsGenerator::desiresCB, this);
     sub_intention_ = n.subscribe("intention", 1,
         &EventsGenerator::intentionCB, this);
-    //    sub_exploitation_ = n.subscribe("exploitation_match", 100,
-    //    &EventsGenerator::exploitationCB, this);
     srv_cem_ = n.advertiseService("create_exploitation_matcher",
         &EventsGenerator::cemCB, this);
 
@@ -57,7 +59,7 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
         const std::string& id = *i;
         if (map_.find(id) == map_.end())
         {
-            map_[id] = FLAG_NONE;
+            map_[id].flags = FLAG_NONE;
             event(id, hbba_msgs::Event::DES_ON);
         }
     }
@@ -86,7 +88,7 @@ void EventsGenerator::intentionCB(const hbba_msgs::Intention::ConstPtr& msg)
             continue;
         }
 
-        int& f = d->second;
+        int& f = d->second.flags;
         if (state && !(f & FLAG_INT))
         {
             f |= FLAG_INT;
@@ -99,10 +101,8 @@ void EventsGenerator::intentionCB(const hbba_msgs::Intention::ConstPtr& msg)
     }
 }
 
-void EventsGenerator::exploitationCB(const std_msgs::String::ConstPtr& msg)
+void EventsGenerator::exploitationCB(const std::string& id)
 {
-    const std::string& id = msg->data;
-
     DesMap::iterator d = map_.find(id);
     if (d == map_.end())
     {
@@ -112,20 +112,36 @@ void EventsGenerator::exploitationCB(const std_msgs::String::ConstPtr& msg)
         return;
     }
 
-    int& f = d->second;
+    DesireData& data = d->second;
+    data.last_exp_ = ros::Time::now();
+    int& f = data.flags;
     if (!(f & FLAG_EXP))
     {
         event(id, hbba_msgs::Event::EXP_ON);
         f |= FLAG_EXP;
     }
 
-    // Removing FLAG_EXP should happen in two cases:
-    //  - timeout,
-    //  - replaced by another priority.
-    // This means the exploitation matcher should be better coupled with the
-    // events generator.
-    // TODO: Use exploitation matchers to detect exploitation stops.
+    detectExpOff();
+}
 
+void EventsGenerator::detectExpOff()
+{
+    ros::Time timeout_limit = ros::Time::now() - exp_timeout_;
+
+    // Go through the list of desires.
+    // If a desire's last exploitation time is over the timeout limit and its
+    // exploitation flag is on, flip the flag and generate the event.
+    DesMap::iterator d = map_.begin();
+    while (d != map_.end())
+    {
+        const std::string& id = d->first;
+        DesireData& data = (d++)->second;
+        if (data.flags & FLAG_EXP && data.last_exp_ < timeout_limit)
+        {
+            data.flags &= ~FLAG_EXP;
+            event(id, hbba_msgs::Event::EXP_OFF);
+        }
+    }
 }
 
 void EventsGenerator::event(const std::string& id, const unsigned char type)
@@ -148,6 +164,8 @@ bool EventsGenerator::cemCB(
         req.matches.begin();
     while (i != req.matches.end())
         em->registerMatches(*(i++));
+
+    em->registerMatchCB(&EventsGenerator::exploitationCB, this);
 
     return true;
 }

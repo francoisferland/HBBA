@@ -22,6 +22,7 @@ namespace iw
     ///
     class EventsFilter
     {
+	public:
         /// \brief Constructor.
         ///
         /// \param n Node handle to use for topic registration.

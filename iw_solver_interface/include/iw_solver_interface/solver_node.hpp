@@ -134,7 +134,7 @@ namespace iw_solver_interface
                 double lowest_int = std::numeric_limits<double>::max();
                 for (i = desires.begin(); i != desires.end(); ++i)
                 {
-                    if (i->intensity < lowest_int)
+                    if ((i->intensity < lowest_int) && !i->security)
                     {
                         lowest_int = i->intensity;
                         lowest = i;

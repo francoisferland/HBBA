@@ -36,7 +36,7 @@ create_em = rospy.ServiceProxy("hbba/create_exploitation_matcher", CreateExploit
 """
 exploitation_match_elem = """ExploitationMatch({0}, {1})"""
 exploitation_match_call = """
-create_cm('{0}', {1})"""
+create_em('{0}', {1})"""
 
 def baseNodesXML(debug):
     if debug:

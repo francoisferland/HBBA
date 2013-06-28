@@ -10,7 +10,7 @@ def main():
             default="./hbba_struct", 
             help="defines the base name for the produced files (default: %default)", 
             metavar="DIRECTORY")
-    opt_parser.add_option("-a", "--generate-arbitration", action="store_true",
+    opt_parser.add_option("-a", "--disable-arbitration", action="store_true",
             dest="disable_arbitration", default=False,
             help="arbitration nodes are not generated for behavior output topics.")
     opt_parser.add_option("-d", "--debug", action="store_true",

@@ -32,11 +32,11 @@ pubEmoIntensity = rospy.Publisher("{0}", EmoIntensity)
 
 exploitation_match_sp = """
 rospy.wait_for_service("hbba/create_exploitation_matcher", 1.0)
-create_cem=rospy.ServiceProxy("hbba/create_exploitation_matcher", CreateExploitationMatcher)
+create_em = rospy.ServiceProxy("hbba/create_exploitation_matcher", CreateExploitationMatcher)
 """
 exploitation_match_elem = """ExploitationMatch({0}, {1})"""
 exploitation_match_call = """
-create_cem('{0}', {1})"""
+create_cm('{0}', {1})"""
 
 def baseNodesXML(debug):
     if debug:

@@ -122,9 +122,38 @@ namespace iw_solver_interface
                 return;
             }
 
-            // Get a copy of the original vector, might get modified by the
-            // solving process.
-            u_vec_t desires = msg->desires;
+            const u_vec_t& desires_org = msg->desires;
+            // Will contain desires kept after the filtering process.
+            u_vec_t desires;
+            desires.reserve(desires_org.size());
+
+            // Look for desires refering to unknown classes.
+            // Delete them and warn to the console.
+            for (size_t i = 0; i < desires_org.size(); ++i)
+            {
+                const hbba_msgs::Desire& desire = desires_org[i];
+                strats_map_t::const_iterator j = strategies_.begin(); 
+                bool found = false;
+                while (j != strategies_.end())
+                {
+                    if (j->second.utility.id == desire.type)
+                    {
+                        found = true;
+                        break;
+                    }
+                    ++j;
+                }
+                if (found)
+                    desires.push_back(desire);
+                else
+                {
+                    ROS_WARN(
+                        "Desire %s has unknown class %s, will be ignored.",
+                        desire.id.c_str(),
+                        desire.type.c_str());
+                }
+            }
+
             int passes = 1;
             while (!desires.empty() && !solvingPass(desires, result))
             {

@@ -79,8 +79,10 @@ bool engine_v8::eval(const std::string& src, std::string& result)
         if (tc.HasCaught())
         {
             result = *String::AsciiValue(tc.Message()->Get());
-            ROS_ERROR("V8 compile error: %s:\n\t %s", result.c_str(),
-                *String::AsciiValue(tc.Message()->GetSourceLine()));
+            ROS_ERROR("V8 compile error: %s: %s \n when running: \n\t%s",
+                result.c_str(),
+                *String::AsciiValue(tc.Message()->GetSourceLine()),
+                src.c_str());
             return false;
         }
     }

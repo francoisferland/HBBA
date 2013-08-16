@@ -61,12 +61,15 @@ class BehaviorDef:
             exit(-1)
         self.name = content['name']
         try:
-            self.launch = LaunchDef(content['launch'], verbose)
             self.output = content['output']
             self.priority = content['priority']
         except KeyError as e:
             print "Error: Missing {0} in {1}".format(e, self.name)
             exit(-1)
+        if 'launch' in content:
+            self.launch = LaunchDef(content['launch'], verbose)
+        else:
+            self.launch = ""
         if 'input' in content:
             self.input = content['input']
         else:
@@ -135,7 +138,8 @@ class BehaviorDef:
         for s in self.services:
             grp.append(structure.generateRootRemapXML(s))
 
-        grp.extend(self.launch.generateXML(structure))
+        if (self.launch != ""):
+            grp.extend(self.launch.generateXML(structure))
         elems.append(grp)
         for o in self.output:
             root_topic = structure.getRootTopicFullName(o)

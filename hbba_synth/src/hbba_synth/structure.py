@@ -50,6 +50,7 @@ def baseNodesXML(debug):
 
 class Structure:
     def __init__(self):
+        self.includes = []
         self.behaviors = {}
         self.procmodules = {}
         self.strategies = {}
@@ -64,6 +65,9 @@ class Structure:
         self.motivations = {}
         self.emoIntensities = {}
         self.customScript = ""
+
+    def addInclude(self, i):
+        self.includes.append(i)
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
@@ -198,6 +202,13 @@ class Structure:
         return [n]
 
     def generate(self, basepath, opts):
+        if (opts.includes):
+            # Just print out includes and quit here - only used for dependency
+            # queries.
+            for i in self.includes:
+                print i
+            exit()
+
         verbose = opts.verbose
         # Analysis pass: Gather every behavior topics.
         behavior_topics = Set([])

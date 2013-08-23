@@ -432,6 +432,7 @@ class IncludeDef:
                 self.fname,
                 self.pkg)
 
+        structure.addInclude(self.getPath())
         p = FileParser(self.getPath(), structure)
         p.parse(verbose)
 
@@ -529,7 +530,7 @@ class BehaviorPriorityDef:
 
         if name in structure.behaviors:
             structure.behaviors[name].priority = p
-        else:
+        elif verbose:
             print "Warning: Behavior priority override ignored for {0}".format(
                 name)
 

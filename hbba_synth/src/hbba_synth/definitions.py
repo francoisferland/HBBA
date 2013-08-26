@@ -195,10 +195,19 @@ class ProcModuleDef:
         else:
             self.output = []
 
+        if 'namespace_exports' in content:
+            self.generateNSExports(content['namespace_exports'])
+        else:
+            self.namespace_exports = []
         structure.addProcModule(self)
 
         if verbose:
             print "Emitted ProcModule '{0}'.".format(self.name)
+
+    def generateNSExports(self, exports):
+        for e in exports:
+            t = TopicDef(e, self.structure)
+            self.structure.addRootRemapEx("/" + self.name + "/" + t.name, t.src)
 
     def createInputFilter(self, topic):
         elems = []

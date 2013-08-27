@@ -47,21 +47,21 @@ namespace script_engine
 
             ROS_DEBUG("Publishing from script_engine on %s", topic_name);
 
-			ros::Publisher pub;
+            ros::Publisher* pub;
 			pub_map_t::iterator i = pub_map_.find(topic_name);
 			if(i == pub_map_.end())
 			{
-				pub = n.advertise<T>(topic_name, 5);
-				pub_map_[std::string(topic_name)] = pub;
+                ros::Publisher npub = n.advertise<T>(topic_name, 5);
+				pub_map_[std::string(topic_name)] = npub;
+                i = pub_map_.find(topic_name);
 				sleep(1);
 			}
-			else
-				pub = i->second;
+            pub = &(i->second);
 
 			T msg;
 			AFun(args, msg);
 
-			pub.publish(msg);				
+			pub->publish(msg);
 			return v8::True();
 		}
 

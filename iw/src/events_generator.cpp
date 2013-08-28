@@ -49,7 +49,7 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
 
     // First, remove desires not in it the current desires set.
     StrList del;
-    for (DesMap::const_iterator i = map_.begin(); i != map_.end(); ++i)
+    for (Model::const_iterator i = model_.begin(); i != model_.end(); ++i)
     {
         const std::string& id = i->first;
         if (std::find(ids.begin(), ids.end(), id) == ids.end())
@@ -58,7 +58,7 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     for (StrList::const_iterator i = del.begin(); i != del.end(); ++i)
     {
         const std::string& id = *i;
-        map_.erase(id);
+        model_.erase(id);
         event(id, hbba_msgs::Event::DES_OFF);
     }
 
@@ -66,9 +66,9 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     for (StrVec::const_iterator i = ids.begin(); i != ids.end(); ++i)
     {
         const std::string& id = *i;
-        if (map_.find(id) == map_.end())
+        if (model_.find(id) == model_.end())
         {
-            map_[id].flags = FLAG_NONE;
+            model_[id].flags = FLAG_NONE;
             event(id, hbba_msgs::Event::DES_ON);
         }
     }
@@ -95,13 +95,13 @@ void EventsGenerator::intentionCB(const hbba_msgs::Intention::ConstPtr& msg)
         }
 
         const bool& state = states[i];
-        DesMap::iterator d = map_.find(id);
-        if (d == map_.end())
+        Model::iterator d = model_.find(id);
+        if (d == model_.end())
         {
             // Add it to the desires' map.
             // This can happen if we receive the intention message before the
             // desires set update.
-            map_[id].flags = FLAG_NONE;
+            model_[id].flags = FLAG_NONE;
         }
 
         int& f = d->second.flags;
@@ -119,8 +119,8 @@ void EventsGenerator::intentionCB(const hbba_msgs::Intention::ConstPtr& msg)
 
 void EventsGenerator::exploitationCB(const std::string& id)
 {
-    DesMap::iterator d = map_.find(id);
-    if (d == map_.end())
+    Model::iterator d = model_.find(id);
+    if (d == model_.end())
     {
         // Shouldn't happen, as in intention callback.
         // Once again, skip and only warn in debug:
@@ -143,6 +143,22 @@ void EventsGenerator::exploitationCB(const std::string& id)
 void EventsGenerator::rosgraphEventsCB(
     const hbba_msgs::RosgraphEvents& msg)
 {
+    typedef std::vector<hbba_msgs::RosgraphEvent>::const_iterator EvIt;
+    for (EvIt i = msg.events.begin(); i != msg.events.end(); ++i) {
+        if (i->activity > 0) {
+            typedef std::vector<std::string>::const_iterator StIt;
+            TEMMap::const_iterator tem = tem_map_.find(i->topic_name);
+            if (tem == tem_map_.end()) {
+                ROS_DEBUG(
+                    "Unknown topic for matcher: %s", 
+                    i->topic_name.c_str());
+                continue;
+            }
+            for (StIt j = tem->second.begin(); j != tem->second.end(); ++j) {
+                exploitationCB(*j);
+            }
+        }
+    }
 }
 
 void EventsGenerator::detectExpOff()
@@ -152,8 +168,8 @@ void EventsGenerator::detectExpOff()
     // Go through the list of desires.
     // If a desire's last exploitation time is over the timeout limit and its
     // exploitation flag is on, flip the flag and generate the event.
-    DesMap::iterator d = map_.begin();
-    while (d != map_.end())
+    Model::iterator d = model_.begin();
+    while (d != model_.end())
     {
         const std::string& id = d->first;
         DesireData& data = (d++)->second;
@@ -173,8 +189,8 @@ void EventsGenerator::event(const std::string& id, const unsigned char type)
     pub_events_.publish(msg);
     
     ROS_DEBUG("Current events state:");
-    DesMap::const_iterator d = map_.begin();
-    while (d != map_.end())
+    Model::const_iterator d = model_.begin();
+    while (d != model_.end())
     {
         const std::string& id = d->first;
         const DesireData& data = (d++)->second;
@@ -206,9 +222,10 @@ bool EventsGenerator::cemCB(
 }
 
 bool EventsGenerator::ctemCB(
-    hbba_msgs::CreateExploitationMatcher::Request& req,
-    hbba_msgs::CreateExploitationMatcher::Response& res)
+    hbba_msgs::RegisterTopicExploitationMatches::Request& req,
+    hbba_msgs::RegisterTopicExploitationMatches::Response& res)
 {
+    tem_map_[req.topic] = req.matches;
     return true;
 }
 

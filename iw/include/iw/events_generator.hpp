@@ -7,6 +7,7 @@
 #include <hbba_msgs/Intention.h>
 #include <hbba_msgs/Event.h>
 #include <hbba_msgs/CreateExploitationMatcher.h>
+#include <hbba_msgs/RegisterTopicExploitationMatches.h>
 #include <std_msgs/String.h>
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
@@ -69,8 +70,8 @@ namespace iw
             hbba_msgs::CreateExploitationMatcher::Request& req,
             hbba_msgs::CreateExploitationMatcher::Response& res);
         bool ctemCB(
-            hbba_msgs::CreateExploitationMatcher::Request& req,
-            hbba_msgs::CreateExploitationMatcher::Response& res);
+            hbba_msgs::RegisterTopicExploitationMatches::Request& req,
+            hbba_msgs::RegisterTopicExploitationMatches::Response& res);
         void timerCB(const ros::TimerEvent&);
 
         void exploitationCB(const std::string& id);
@@ -99,12 +100,14 @@ namespace iw
             int flags;
             ros::Time last_exp_;
         };
-        typedef std::map<std::string, DesireData> DesMap;
-        DesMap map_;
+        typedef std::map<std::string, DesireData> Model;
+        Model model_;
 
         std::list<ExploitationMatcher*> matchers_;
 
         boost::scoped_ptr<RosgraphMonitor> rosgraph_monitor_;
+        typedef std::map< std::string, std::vector<std::string> > TEMMap;
+        TEMMap tem_map_;  // Topic Exploitation matchers map (topic -> classes).
 
     };
 

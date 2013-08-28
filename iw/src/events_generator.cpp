@@ -15,6 +15,8 @@ EventsGenerator::EventsGenerator(ros::NodeHandle& n, ros::NodeHandle& np)
         &EventsGenerator::intentionCB, this);
     srv_cem_ = n.advertiseService("create_exploitation_matcher",
         &EventsGenerator::cemCB, this);
+    srv_ctem_ = n.advertiseService("create_topic_exploitation_matcher",
+        &EventsGenerator::ctemCB, this);
 
     pub_events_ = n.advertise<hbba_msgs::Event>("events", 100);
 
@@ -200,6 +202,13 @@ bool EventsGenerator::cemCB(
     em->registerMatchCB(&EventsGenerator::exploitationCB, this);
 
     ROS_DEBUG("ExploitationMatcher created for %s", req.topic.c_str());
+    return true;
+}
+
+bool EventsGenerator::ctemCB(
+    hbba_msgs::CreateExploitationMatcher::Request& req,
+    hbba_msgs::CreateExploitationMatcher::Response& res)
+{
     return true;
 }
 

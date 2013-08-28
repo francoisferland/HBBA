@@ -34,6 +34,11 @@ namespace iw
     ///  - rosgraph_monitor/topics: A list of topics to monitor for activity and 
     ///    thus perception-related desire exploitation. 
     ///
+    /// Services:
+    ///  - create_exploitation_matcher: Create an exploitation matcher for
+    ///    arbitration output topics.
+    ///  - create_topic_exploitation_matcher: Create an exploitation matcher for
+    ///    standard (usually perception) topics based on activity monitoring.
     /// Input topics:
     ///  - desires_set: The current active desires in the IW.
     ///  - intention: The active strategies selected by the solver.
@@ -63,6 +68,9 @@ namespace iw
         bool cemCB(
             hbba_msgs::CreateExploitationMatcher::Request& req,
             hbba_msgs::CreateExploitationMatcher::Response& res);
+        bool ctemCB(
+            hbba_msgs::CreateExploitationMatcher::Request& req,
+            hbba_msgs::CreateExploitationMatcher::Response& res);
         void timerCB(const ros::TimerEvent&);
 
         void exploitationCB(const std::string& id);
@@ -74,6 +82,7 @@ namespace iw
         ros::Subscriber sub_desires_;
         ros::Subscriber sub_intention_;
         ros::ServiceServer srv_cem_;
+        ros::ServiceServer srv_ctem_;
         ros::Publisher pub_events_;
         ros::Timer timer_;
 

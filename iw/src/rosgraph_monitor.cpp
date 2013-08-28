@@ -50,12 +50,11 @@ RosgraphMonitor::RosgraphMonitor(ros::NodeHandle& n, ros::NodeHandle& np)
                 ROS_ERROR("'topics' element is not a string, skipping.");
                 continue;
             }
-            topic_handlers_.push_back(TopicHandlerPtr(new TopicHandler(
-                n,
-                topic_name)));
+            addTopic(n, topic_name);
         }
     } else {
-        ROS_WARN("No topic names provided ('topics' parameter not found).");
+        ROS_DEBUG("No topic names provided for rosgraph_monitor "
+            "('topics' parameter not found).");
         return;
     }
 
@@ -64,6 +63,15 @@ RosgraphMonitor::RosgraphMonitor(ros::NodeHandle& n, ros::NodeHandle& np)
     double p;
     np.param("period", p, 0.10);
     timer_ = n.createTimer(ros::Duration(p), &RosgraphMonitor::timerCB, this);
+}
+
+void RosgraphMonitor::addTopic(
+    ros::NodeHandle& n, 
+    const std::string& topic_name)
+{
+    topic_handlers_.push_back(TopicHandlerPtr(new TopicHandler(
+        n,
+        topic_name)));
 }
 
 void RosgraphMonitor::timerCB(const ros::TimerEvent&)
@@ -83,6 +91,9 @@ void RosgraphMonitor::timerCB(const ros::TimerEvent&)
 
     if (events.events.size()) {
         pub_events_.publish(events);
+        if (events_cb_) { 
+            events_cb_(events);
+        }
     }
 }
 

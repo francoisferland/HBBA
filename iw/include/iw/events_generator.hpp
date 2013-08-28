@@ -2,12 +2,14 @@
 #define EVENTS_GENERATOR_HPP
 
 #include "exploitation_matcher.hpp"
+#include "rosgraph_monitor.hpp"
 #include <hbba_msgs/DesiresSet.h>
 #include <hbba_msgs/Intention.h>
 #include <hbba_msgs/Event.h>
 #include <hbba_msgs/CreateExploitationMatcher.h>
 #include <std_msgs/String.h>
 #include <ros/ros.h>
+#include <boost/scoped_ptr.hpp>
 #include <map>
 
 namespace iw
@@ -29,12 +31,15 @@ namespace iw
     ///    EXP_OFF events are generated only if there has been a previous
     ///    EXP_ON event.
     ///    Default: 0.5 s.
+    ///  - rosgraph_monitor/topics: A list of topics to monitor for activity and 
+    ///    thus perception-related desire exploitation. 
     ///
     /// Input topics:
     ///  - desires_set: The current active desires in the IW.
     ///  - intention: The active strategies selected by the solver.
     ///  - exploitation_match: Exploited desires as detected by
     ///    exploitation_matcher(s).
+    ///  - all topics defined in rosgraph_monitor/topics.
     ///
     /// Output topics:
     ///  - events: Messages representing a single event (hbba_msgs/Event).
@@ -61,6 +66,7 @@ namespace iw
         void timerCB(const ros::TimerEvent&);
 
         void exploitationCB(const std::string& id);
+        void rosgraphEventsCB(const hbba_msgs::RosgraphEvents& msg);
 
         void detectExpOff();
         void event(const std::string& id, const unsigned char type);
@@ -88,6 +94,8 @@ namespace iw
         DesMap map_;
 
         std::list<ExploitationMatcher*> matchers_;
+
+        boost::scoped_ptr<RosgraphMonitor> rosgraph_monitor_;
 
     };
 

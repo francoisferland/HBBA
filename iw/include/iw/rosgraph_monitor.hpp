@@ -80,6 +80,8 @@ namespace iw
         ros::Timer     timer_;
         TopicHandlers  topic_handlers_;
 
+        boost::function<void (hbba_msgs::RosgraphEvents&)> events_cb_;
+
     public:
         /// \brief Constructor.
         ///
@@ -87,6 +89,18 @@ namespace iw
         /// \param np Node handle for parameters.
         RosgraphMonitor(ros::NodeHandle& n, ros::NodeHandle& np);
 
+        /// \brief Add a new topic handler to the monitored set.
+        ///
+        /// \param n          Reference node handle.
+        /// \param topic_name Topic to monitor.
+        void addTopic(ros::NodeHandle& n, const std::string& topic_name);
+
+        /// \brief Register a class method as an internal events callback.
+        template <class T>
+        void registerCB(void (T::*fun)(const hbba_msgs::RosgraphEvents&), T* obj)
+        {
+            events_cb_ = boost::bind(fun, obj, _1);
+        }
 
     private:
         void timerCB(const ros::TimerEvent&);

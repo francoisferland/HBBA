@@ -18,6 +18,10 @@ EventsGenerator::EventsGenerator(ros::NodeHandle& n, ros::NodeHandle& np)
 
     pub_events_ = n.advertise<hbba_msgs::Event>("events", 100);
 
+    ros::NodeHandle rosgraph_np(np, "rosgraph_monitor");
+    rosgraph_monitor_.reset(new RosgraphMonitor(n, rosgraph_np));
+    rosgraph_monitor_->registerCB(&EventsGenerator::rosgraphEventsCB, this);
+
     timer_ = n.createTimer(ros::Duration(1.0), &EventsGenerator::timerCB, this);
 }
 
@@ -134,6 +138,11 @@ void EventsGenerator::exploitationCB(const std::string& id)
     detectExpOff();
 }
 
+void EventsGenerator::rosgraphEventsCB(
+    const hbba_msgs::RosgraphEvents& msg)
+{
+}
+
 void EventsGenerator::detectExpOff()
 {
     ros::Time timeout_limit = ros::Time::now() - exp_timeout_;
@@ -179,7 +188,7 @@ bool EventsGenerator::cemCB(
     hbba_msgs::CreateExploitationMatcher::Request& req,
     hbba_msgs::CreateExploitationMatcher::Response& res)
 {
-    ros::NodeHandle n, nt(req.abtr_topic);
+    ros::NodeHandle n, nt(req.topic);
     ExploitationMatcher* em = new ExploitationMatcher(n, nt);
     matchers_.push_back(em);
 
@@ -190,7 +199,7 @@ bool EventsGenerator::cemCB(
 
     em->registerMatchCB(&EventsGenerator::exploitationCB, this);
 
-    ROS_DEBUG("ExploitationMatcher created for %s", req.abtr_topic.c_str());
+    ROS_DEBUG("ExploitationMatcher created for %s", req.topic.c_str());
     return true;
 }
 

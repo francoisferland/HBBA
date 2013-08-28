@@ -59,7 +59,7 @@ RosgraphMonitor::RosgraphMonitor(ros::NodeHandle& n, ros::NodeHandle& np)
         return;
     }
 
-    pub_events_ = n.advertise<RosgraphEvents>("rosgraph_events", 10);
+    pub_events_ = n.advertise<hbba_msgs::RosgraphEvents>("rosgraph_events", 10);
 
     double p;
     np.param("period", p, 0.10);
@@ -68,12 +68,12 @@ RosgraphMonitor::RosgraphMonitor(ros::NodeHandle& n, ros::NodeHandle& np)
 
 void RosgraphMonitor::timerCB(const ros::TimerEvent&)
 {
-    RosgraphEvents events;
+    hbba_msgs::RosgraphEvents events;
     typedef TopicHandlers::iterator It;
     for (It i = topic_handlers_.begin(); i != topic_handlers_.end(); ++i) {
         TopicHandlerPtr th = *i;
         if (th->counter()) {
-            RosgraphEvent e;
+            hbba_msgs::RosgraphEvent e;
             e.topic_name = th->topicName();
             e.activity   = th->counter();
             events.events.push_back(e);

@@ -5,7 +5,7 @@
 #ifndef ROSGRAPH_MONITOR_HPP
 #define ROSGRAPH_MONITOR_HPP
 
-#include <iw/RosgraphEvents.h>
+#include <hbba_msgs/RosgraphEvents.h>
 #include <topic_tools/shape_shifter.h>
 #include <ros/ros.h>
 #include <boost/shared_ptr.hpp>

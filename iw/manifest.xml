@@ -12,6 +12,7 @@
   <depend package="rospy"/>
   <depend package="hbba_msgs"/>
   <depend package="std_srvs"/>
+  <depend package="topic_tools"/>
 
   <export>
       <cpp cflags="-I${prefix}/msg/cpp -I${prefix}/include" lflags="-L${prefix}/lib -liw"/>

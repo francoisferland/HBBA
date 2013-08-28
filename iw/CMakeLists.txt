@@ -28,6 +28,7 @@ rosbuild_add_library(iw
     src/exploitation_matcher.cpp
     src/events_generator.cpp
     src/events_filter.cpp
+    src/rosgraph_monitor.cpp
 )
 rosbuild_add_executable(events_generator src/events_generator_node.cpp)
 target_link_libraries(events_generator iw)

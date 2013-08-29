@@ -91,9 +91,10 @@ namespace iw
 
         enum Flags
         {
-            FLAG_NONE   = 0,
-            FLAG_INT    = 1,
-            FLAG_EXP    = 2
+            FLAG_NONE   = 0,    
+            FLAG_INT    = 1,    // Appears in Intention set.
+            FLAG_EXP    = 2,    // Is being exploited.
+            FLAG_ACC    = 4     // As been accomplished as a goal.
         };
         struct DesireData
         {

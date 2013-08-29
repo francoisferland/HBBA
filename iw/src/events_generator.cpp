@@ -84,7 +84,7 @@ void EventsGenerator::intentionCB(const hbba_msgs::Intention::ConstPtr& msg)
     const StrVec&   d_types = msg->desire_types;
     const StateVec& states  = msg->enabled;
 
-    assert(ids.size() == (d_types.size() == states.size()));
+    assert((ids.size() == states.size()) && (d_types.size() == states.size()));
 
     for (size_t i = 0; i < ids.size(); ++i)
     {

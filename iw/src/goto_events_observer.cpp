@@ -117,7 +117,24 @@ namespace iw
         {
             // 1. Look for goals in the model that are no longer in reach,
             // produce ACC_OFF events for them, and remove them from the model.
-            // TODO:
+            typedef Model::iterator ModelIt;
+            ModelIt i = model_.begin();
+            while (i != model_.end()) {
+                const std::string& d_id = i->first;
+                const StampedPose& pose = i->second;
+
+                ModelIt last = i;
+                ++i;
+
+                if (!goalInReach(pose)) {
+                    hbba_msgs::Event evt;
+                    evt.desire = d_id;
+                    evt.type   = hbba_msgs::Event::ACC_OFF;
+                    pub_events_.publish(evt);
+
+                    model_.erase(last);
+                }
+            }
 
             // 2. Look for active GoTo goals in the current desires set.
             //    Skip them if they are already in the model.

@@ -78,7 +78,10 @@ namespace iw
         void rosgraphEventsCB(const hbba_msgs::RosgraphEvents& msg);
 
         void detectExpOff();
-        void event(const std::string& id, const unsigned char type);
+        void event(
+            const std::string& id, 
+            const std::string& d_type,
+            const unsigned char type);
 
         ros::Subscriber sub_desires_;
         ros::Subscriber sub_intention_;
@@ -98,8 +101,9 @@ namespace iw
         };
         struct DesireData
         {
-            int flags;
-            ros::Time last_exp_;
+            int         flags;
+            std::string type;
+            ros::Time   last_exp_;
         };
         typedef std::map<std::string, DesireData> Model;
         Model model_;

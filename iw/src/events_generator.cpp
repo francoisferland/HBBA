@@ -58,8 +58,8 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     for (StrList::const_iterator i = del.begin(); i != del.end(); ++i)
     {
         const std::string& id = *i;
+        event(id, model_[id].type, hbba_msgs::Event::DES_OFF);
         model_.erase(id);
-        event(id, hbba_msgs::Event::DES_OFF);
     }
 
     // Then, generate events for new desires.
@@ -69,7 +69,7 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
         if (model_.find(id) == model_.end())
         {
             model_[id].flags = FLAG_NONE;
-            event(id, hbba_msgs::Event::DES_ON);
+            event(id, model_[id].type, hbba_msgs::Event::DES_ON);
         }
     }
 
@@ -80,14 +80,16 @@ void EventsGenerator::intentionCB(const hbba_msgs::Intention::ConstPtr& msg)
     typedef std::vector<std::string> StrVec;
     // ROS bool vector are actually single bytes:
     typedef std::vector<unsigned char> StateVec; 
-    const StrVec& ids = msg->desires;
-    const StateVec& states = msg->enabled;
+    const StrVec&   ids     = msg->desires;
+    const StrVec&   d_types = msg->desire_types;
+    const StateVec& states  = msg->enabled;
 
-    assert(ids.size() == states.size());
+    assert(ids.size() == (d_types.size() == states.size()));
 
     for (size_t i = 0; i < ids.size(); ++i)
     {
-        const std::string& id = ids[i];
+        const std::string& id     = ids[i];
+        const std::string& d_type = d_types[i];
         if (id == "")
         {
             // Skip unmatched strategies.
@@ -108,11 +110,11 @@ void EventsGenerator::intentionCB(const hbba_msgs::Intention::ConstPtr& msg)
         if (state && !(f & FLAG_INT))
         {
             f |= FLAG_INT;
-            event(id, hbba_msgs::Event::INT_ON);
+            event(id, d_type, hbba_msgs::Event::INT_ON);
         } else if (!state && (f & FLAG_INT))
         {
             f &= ~FLAG_INT;
-            event(id, hbba_msgs::Event::INT_OFF);
+            event(id, d_type, hbba_msgs::Event::INT_OFF);
         }
     }
 }
@@ -133,7 +135,7 @@ void EventsGenerator::exploitationCB(const std::string& id)
     int& f = data.flags;
     if (!(f & FLAG_EXP))
     {
-        event(id, hbba_msgs::Event::EXP_ON);
+        event(id, data.type, hbba_msgs::Event::EXP_ON);
         f |= FLAG_EXP;
     }
 
@@ -176,16 +178,20 @@ void EventsGenerator::detectExpOff()
         if ((data.flags & FLAG_EXP) && (data.last_exp_ < timeout_limit))
         {
             data.flags &= ~FLAG_EXP;
-            event(id, hbba_msgs::Event::EXP_OFF);
+            event(id, data.type, hbba_msgs::Event::EXP_OFF);
         }
     }
 }
 
-void EventsGenerator::event(const std::string& id, const unsigned char type)
+void EventsGenerator::event(
+    const std::string& id, 
+    const std::string& d_type, 
+    const unsigned char type)
 {
     hbba_msgs::Event msg;
-    msg.desire = id;
-    msg.type = type;
+    msg.desire      = id;
+    msg.desire_type = d_type;
+    msg.type        = type;
     pub_events_.publish(msg);
     
     ROS_DEBUG("Current events state:");

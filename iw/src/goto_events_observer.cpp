@@ -35,6 +35,8 @@ namespace iw
     /// Currently, only the position is tracked, orientation has no effect.
     //
     /// Parameters:
+    ///  - goto_class:  Class name of GoTo desire class.
+    ///                 Default: "GoTo".
     ///  - robot_frame: The robot's frame of reference.
     ///                 Used to measure distance between the goal and the
     ///                 robot's current position.
@@ -64,6 +66,7 @@ namespace iw
         ros::Timer                     timer_;
         tf::TransformListener          tf_; 
 
+        std::string                    goto_class_;
         std::string                    robot_frame_;
         double                         goal_eps_;
 
@@ -81,6 +84,7 @@ namespace iw
         ///
         GotoEventsObserver(ros::NodeHandle& n, ros::NodeHandle& np)
         {
+            np.param("goto_class",  goto_class_,  std::string("GoTo"));
             np.param("robot_frame", robot_frame_, std::string("base_link"));
             np.param("goal_eps",    goal_eps_,    2.0);
 
@@ -128,8 +132,9 @@ namespace iw
 
                 if (!goalInReach(pose)) {
                     hbba_msgs::Event evt;
-                    evt.desire = d_id;
-                    evt.type   = hbba_msgs::Event::ACC_OFF;
+                    evt.desire      = d_id;
+                    evt.desire_type = goto_class_;
+                    evt.type        = hbba_msgs::Event::ACC_OFF;
                     pub_events_.publish(evt);
 
                     model_.erase(last);
@@ -143,7 +148,7 @@ namespace iw
             typedef std::vector<hbba_msgs::Desire>::const_iterator DesIt;
             for (DesIt i = desires_.begin(); i != desires_.end(); ++i) {
                 const hbba_msgs::Desire& d = *i;
-                if (d.type != "GoTo") {
+                if (d.type != goto_class_) {
                     continue;
                 }
 
@@ -164,8 +169,9 @@ namespace iw
 
                 if (goalInReach(pose)) {
                     hbba_msgs::Event evt;
-                    evt.desire = d.id; 
-                    evt.type   = hbba_msgs::Event::ACC_ON;
+                    evt.desire      = d.id; 
+                    evt.desire_type = goto_class_;
+                    evt.type        = hbba_msgs::Event::ACC_ON;
                     pub_events_.publish(evt);
 
                     model_[d.id] = pose;

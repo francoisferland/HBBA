@@ -11,4 +11,5 @@ uint8   ACC_ON      = 8 # The desire's goal is or has been accomplished.
 uint8   ACC_OFF     = 9 # The desire's goal has stopped being accomplished.
 
 string  desire      # The desire associated with the event.
+string  desire_type # The desire's class.
 uint8   type        # The event type, see constants for possibilities.

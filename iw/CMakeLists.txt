@@ -35,6 +35,6 @@ target_link_libraries(events_generator iw)
 rosbuild_add_executable(exploitation_matcher src/exploitation_matcher_node.cpp)
 target_link_libraries(exploitation_matcher iw)
 
-rosbuild_add_executable(goto_events_observer src/goto_events_observer)
-target_link_librarieS(goto_events_observer iw)
+rosbuild_add_executable(goto_events_observer src/goto_events_observer.cpp)
+target_link_libraries(goto_events_observer iw yaml-cpp)
 

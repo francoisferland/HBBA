@@ -1,0 +1,17 @@
+<package>
+  <description brief="emotion_generator">
+
+     emotion_generator
+
+  </description>
+  <author>Francis Leconte</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/emotion_generator</url>
+  
+  <depend package="roscpp"/>
+  <depend package="iw"/>
+
+</package>
+
+

@@ -1,6 +1,7 @@
 import roslib; roslib.load_manifest("hbba_synth")
 from structure import *
 from file_parser import FileParser
+from deps_parser import DepsParser
 from optparse import OptionParser
 import os
 
@@ -38,7 +39,11 @@ def main():
     structure = Structure()
 
     for f in args:
-        p = FileParser(f, structure)
+        if (opts.includes):
+            p = DepsParser(f, structure)
+        else:
+            p = FileParser(f, structure)
+
         p.parse(opts.verbose)
 
     structure.generate(opts.basename, opts)

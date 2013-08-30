@@ -425,7 +425,7 @@ class ResourceSetDef:
             structure.addResource(ResourceDef(r_k, r_v))
 
 class IncludeDef:
-    def __init__(self, content, structure, verbose=False):
+    def __init__(self, content, structure, verbose=False, Parser=FileParser):
         if type(content) is not dict:
             print "Error: include clause is not a dictionary."
             exit(-1)
@@ -442,7 +442,7 @@ class IncludeDef:
                 self.pkg)
 
         structure.addInclude(self.getPath())
-        p = FileParser(self.getPath(), structure)
+        p = Parser(self.getPath(), structure)
         p.parse(verbose)
 
 

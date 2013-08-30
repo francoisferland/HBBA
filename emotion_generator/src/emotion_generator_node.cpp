@@ -4,11 +4,12 @@
 int main(int argc, char *argv[])
 {
 
-	ros::init(argc, argv, "EmotionGenerator");
+	std::string nodeName = "EmotionGenerator";
+	ros::init(argc, argv, nodeName);
 
 	ros::NodeHandle n;
 
-	EmotionGenerator emotionGenerator(&n);
+	EmotionGenerator emotionGenerator(&n,nodeName);
 
 	ros::Subscriber subEvent = n.subscribe("events",100,&EmotionGenerator::eventsCallback,&emotionGenerator);
 

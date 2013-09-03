@@ -8,6 +8,9 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 # "irl1_hbba_cfg", such as "irl1_tr".
 
 rosbuild_find_ros_package(irl1_hbba_cfg)
+# Need to find the location of this macro's package for building and
+# dependencies tools:
+rosbuild_find_ros_package(hbba_synth)
 
 set(HBBA_CFG_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/hbba_cfg_out)
 macro(add_hbba_cfg BASENAME ROBOT)
@@ -26,11 +29,14 @@ macro(add_hbba_cfg BASENAME ROBOT)
         ${irl1_hbba_cfg_PACKAGE_PATH}/hbba_cfg/${ROBOT}.yaml
         ${HBBA_CFG_SRC}
     )
+
     message("Gathering HBBA dependencies for ${BASENAME}...")
     execute_process(
-        COMMAND ${PROJECT_SOURCE_DIR}/scripts/hbba_synth_deps.sh ${HBBA_CFG_SRC}
+        COMMAND rosrun hbba_synth hbba_synth_deps.sh ${HBBA_CFG_SRC}
         OUTPUT_VARIABLE HBBA_CFG_SRC_DEPS
     )
+    #message("${BASENAME} dependencies: ${HBBA_CFG_SRC_DEPS}")
+
     add_custom_command(
         OUTPUT ${HBBA_CFG_OUTPUT}
         COMMAND rosrun hbba_synth hbba_synth -po ${HBBA_CFG_OUTPUT_BASENAME} ${HBBA_CFG_SRC_ALL}

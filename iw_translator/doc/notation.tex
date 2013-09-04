@@ -1,6 +1,80 @@
-\class{article, 12pt}
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage[cm]{fullpage}
+
+\parindent 0pt
+\DeclareMathOperator*{\argmax}{arg\,max}
 
 \begin{document}
+
+\author{François Ferland}
+\title{IW Translator - Notation Reference}
+
+\maketitle
+
+\section*{Introduction}
+
+This document is an attempt to clear up some issues about the notation used in the IW Translator.
+The most correct notation could be found in an unpublished paper (for IROS 2012), but still had some readability issues.
+Furthermore, it didn't match the notation used in the old implementation of the IW Solver.
+So, in preparation of a rewrite of the IW Solver into the new iw\_translator package, this document is meant to be used as a reference for both the implementation and future writing on the subject.
+
+\section*{Solving process}
+
+\subsection*{indices}
+
+\begin{itemize}
+	\item A desire $d$,
+	\item A strategy $i$,
+	\item A resource $j$,
+	\item A desire class $k$.
+\end{itemize}
+
+\subsection*{Static vectors and matrices}
+
+These are specified by strategies and the system's configuration:
+
+\begin{itemize}
+	\item $u_{ik}$: Utility produced by strategy $i$ for class $k$,
+	\item $c_{ij}$: Cost of activating strategy $i$ for resource $j$,
+	\item $r_{ik}$: Minimum utility required by activation of strategy $i$ for class $k$,
+	\item $m_{j}$: Maximum cost allowed for resource $j$.
+\end{itemize}
+
+\subsection*{Dynamic vectors and matrices} 
+
+These are specified by the current desires set:
+
+\begin{itemize}
+	\item $b_{dk}$: Minimum utility required by desire $d$ for class $k$,
+	\item $v_{dk}$: Parameters of desire $d$ for class $k$,
+	\item $s_{dk}$: Intensity of desire $d$ for class $k$,
+\end{itemize}
+
+\subsection*{Desire selection process}
+
+Based on $b_{dk}$, $v_{dk}$ and $s_{dk}$, we aim to produce:
+
+\begin{itemize}
+	\item $g_{k}$: Minimum utility required selected for class $k$,
+	\item $p_{k}$: Parameters selected for class $k$.
+\end{itemize}
+
+The technique is simple: for each class $k$, find the the most intense desire $d$:
+
+\begin{itemize}
+	\item $g_{k} = \{ b_{dk} | \argmax_d s_{dk} \} $,
+	\item $p_{k} = \{ v_{dk} | \argmax_d s_{dk} \} $. 
+\end{itemize}
+
+\subsection*{Solving process}
+The goal is to determine $a_{i}$, activation state of strategy $i$, by respecting two sets of constraints:
+
+\begin{itemize}
+	\item $\sum\limits_i a_i (u_{ik} - r_{ik}) \geq g_k$, for each class $k$,
+	\item $\sum\limits_i a_i c_{ij} \leq m_j$, for each resource $j$.
+\end{itemize}
 
 \end{document}
 

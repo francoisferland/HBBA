@@ -1,0 +1,22 @@
+<package>
+  <description brief="iw_translator">
+
+      iw_translator - A new revision of iw_solver combining strategy activation 
+      and filter management.
+
+      Replicates the old iw_solver_interface protocol, with static strategy 
+      sets, a clearer desire -> intention path and correct variable notation.
+
+  </description>
+  <author>fferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/iw_translator</url>
+  <depend package="roscpp"/>
+  <depend package="hbba_msgs"/>
+  <depend package="script_engine"/>
+  <depend package="topic_filters_manager"/>
+
+</package>
+
+

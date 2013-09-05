@@ -1,0 +1,22 @@
+<launch>
+    <!-- Simple launch file to test the strategy parser. -->
+
+    <node name="test_strategy_parser" pkg="iw_translator"
+        type="test_strategy_parser" output="screen"
+    >
+        <rosparam>
+            strategy: 
+                name:           test_strat
+                class:          TestClass
+                utility:        10
+                costs:
+                    CPU:        1
+                dependencies:
+                    SubClass:   1
+                source:         "function t_up() {}; function t_dn() {};"
+                bringup:        "t_up"
+                bringdown:      "t_dn"
+
+        </rosparam>
+    </node>
+</launch>

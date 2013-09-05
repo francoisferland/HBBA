@@ -33,7 +33,7 @@ bool StrategyParser::parseNumber(
     T& out)
 {
     if (!node.hasMember(tag)) {
-        ROS_WARN("Strategy has no member '%s'", tag);
+        ROS_WARN("Strategy has no member '%s'.", tag);
         return false;
     }
     
@@ -46,7 +46,7 @@ bool StrategyParser::parseString(
     std::string& out)
 {
     if (!node.hasMember(tag)) {
-        ROS_WARN("Strategy has no member '%s'", tag);
+        ROS_WARN("Strategy has no member '%s'.", tag);
         return false;
     }
 
@@ -97,7 +97,7 @@ bool StrategyParser::parseSingle(
     // structure:
     
     if (node.getType() != XmlRpc::XmlRpcValue::TypeStruct) {
-        ROS_ERROR("Strategy cannot be parsed: given element is not a struct.");
+        ROS_ERROR("Strategy cannot be parsed: given object is not a struct.");
         return false;
     }
 
@@ -134,6 +134,27 @@ bool StrategyParser::parseSingle(
     parseString(node, TAG_SRC, strat.source);
     parseString(node, TAG_BUP, strat.bringup_function);
     parseString(node, TAG_BDN, strat.bringdown_function);
+
+    return true;
+}
+
+bool StrategyParser::parseArray(
+    XmlRpc::XmlRpcValue& node,
+    std::vector<hbba_msgs::Strategy>& strats)
+{
+    // Just call parseSingle for every member of the array, if it's one:
+    
+    if (node.getType() != XmlRpc::XmlRpcValue::TypeArray) {
+        ROS_ERROR("Strategies cannot be parsed: given object is not an array.");
+        return false;
+    }
+
+    for (int i = 0; i < node.size(); ++i) {
+        hbba_msgs::Strategy strat;
+        if (parseSingle(node[i], strat)) {
+            strats.push_back(strat);
+        }
+    }
 
     return true;
 }

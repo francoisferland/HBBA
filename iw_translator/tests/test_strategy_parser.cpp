@@ -17,9 +17,21 @@ int main(int argc, char** argv)
         XmlRpc::XmlRpcValue node; 
         np.getParam("strategy", node);
         if (iw_translator::StrategyParser::parseSingle(node, strat)) {
-            ROS_INFO("Parsing succeeded.");
+            ROS_INFO("Single strategy parsing succeeded.");
         } else {
-            ROS_ERROR("Parsing failed.");
+            ROS_ERROR("Single strategy parsing failed.");
+        }
+    }
+
+    if (np.hasParam("strategies")) {
+        std::vector<hbba_msgs::Strategy> strats;
+        XmlRpc::XmlRpcValue node; 
+        np.getParam("strategies", node);
+        if (iw_translator::StrategyParser::parseArray(node, strats)) {
+            ROS_INFO("Array parsing finished, %lu element[s] added.",
+                strats.size());
+        } else {
+            ROS_ERROR("Array parsing failed.");
         }
     }
 

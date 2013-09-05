@@ -16,7 +16,13 @@
                 source:         "function t_up() {}; function t_dn() {};"
                 bringup:        "t_up"
                 bringdown:      "t_dn"
-
+            strategies:
+                - name:         test_strat1
+                  class:        TestClass
+                  utility:      5
+                - name:         test_strat2
+                  class:        TestClass
+                  utility:      1
         </rosparam>
     </node>
 </launch>

@@ -60,6 +60,22 @@ SolverModel::SolverModel(
         mapIndex(res_map_, i->id);
     }
 
+    // Build the three strategies-related matrices:
+
+    u_.resize(boost::extents[strat_map_.size()][cls_map_.size()]);
+    c_.resize(boost::extents[strat_map_.size()][res_map_.size()]);
+    r_.resize(boost::extents[strat_map_.size()][cls_map_.size()]);
+    for (SIt i = strats.begin(); i != strats.end(); ++i) {
+        int strat_i = mapIndex(strat_map_, i->id);
+        u_[strat_i][mapIndex(cls_map_, i->utility.id)] = i->utility.value;
+        for (RIt j = i->cost.begin(); j != i->cost.end(); ++j) {
+            c_[strat_i][mapIndex(res_map_, j->id)] = j->value;
+        }
+        for (RIt j = i->utility_min.begin(); j != i->utility_min.end(); ++j) {
+            r_[strat_i][mapIndex(cls_map_, j->id)] = j->value;
+        }
+    }
+
     // Fill the resource caps vector and look for inconsistencies:
     m_ = Vector(res_map_.size(), -1);
     for (RIt i = caps.begin(); i != caps.end(); ++i) {

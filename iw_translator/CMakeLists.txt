@@ -31,6 +31,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_library(iw_translator
     src/strategy_parser.cpp
+    src/solver_model.cpp
 )
 
 rosbuild_add_executable(test_strategy_parser

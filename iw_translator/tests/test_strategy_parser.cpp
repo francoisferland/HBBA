@@ -1,9 +1,10 @@
 #include <iw_translator/strategy_parser.hpp>
+#include <iw_translator/solver_model.hpp>
 #include <ros/ros.h>
 
 int main(int argc, char** argv)
 {
-    // A simple ROS node to test the strategy parser.
+    // A simple ROS node to test the strategy parser and static model builder.
     // Will test two parameters in its private node handle, if their available:
     //  "strategy", to test parseSimple(...).
     //  "strategies", to test parseArray(...).
@@ -28,8 +29,12 @@ int main(int argc, char** argv)
         XmlRpc::XmlRpcValue node; 
         np.getParam("strategies", node);
         if (iw_translator::StrategyParser::parseArray(node, strats)) {
-            ROS_INFO("Array parsing finished, %lu element[s] added.",
+            ROS_INFO(
+                "Array parsing finished, %lu element[s] added, "
+                "will try building model...",
                 strats.size());
+            std::vector<hbba_msgs::ResourceUsage> zero_caps;
+            iw_translator::SolverModel model(strats, zero_caps);
         } else {
             ROS_ERROR("Array parsing failed.");
         }

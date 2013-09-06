@@ -52,6 +52,24 @@ namespace iw_translator
             const std::vector<hbba_msgs::Strategy>&      strats,
             const std::vector<hbba_msgs::ResourceUsage>& caps);
 
+        /// \brief Produce the utility (U) matrix as a CSV table.
+        ///
+        /// \param out The string that will receive the CSV output.
+        std::string uAsCSV() const;
+
+        /// \brief Produce the cost matrix (C) matrix as a CSV table.
+        ///
+        /// \param out The string that will receive the CSV output.
+        std::string cAsCSV() const;
+
+        /// \brief Produce the utility requirements (R) matrix as a CSV table.
+        ///
+        /// \param out The string that will receive the CSV output.
+        std::string rAsCSV() const;
+
+    private:
+        std::string matrixAsCSV(const Matrix& mtx, const IndicesMap& map) const;
+
     };
 
 }

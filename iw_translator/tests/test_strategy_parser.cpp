@@ -35,6 +35,11 @@ int main(int argc, char** argv)
                 strats.size());
             std::vector<hbba_msgs::ResourceUsage> zero_caps;
             iw_translator::SolverModel model(strats, zero_caps);
+
+            ROS_INFO("Cost matrix C:\n%s",         model.cAsCSV().c_str());
+            ROS_INFO("Utility matrix U:\n%s",      model.uAsCSV().c_str());
+            ROS_INFO("Requirements matrix R:\n%s", model.rAsCSV().c_str());
+
         } else {
             ROS_ERROR("Array parsing failed.");
         }

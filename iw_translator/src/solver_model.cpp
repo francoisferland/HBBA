@@ -19,7 +19,7 @@ namespace {
 
     /// \brief Return a string identifier based on an index, or NULL_ID if it's
     /// not valid.
-    const std::string& mapId(IndicesMap& map, const int i) 
+    const std::string& mapId(const IndicesMap& map, const int i) 
     {
         static std::string null_id("NULL_ID");
 
@@ -42,22 +42,19 @@ SolverModel::SolverModel(
 
     // First, build the indices maps, then the matrices can be properly sized.
     
-    ROS_INFO("Strats count: %lu", strats.size());
     for (SIt i = strats.begin(); i != strats.end(); ++i) {
-        ROS_INFO("Strats costs size: %lu", i->cost.size());
         mapIndex(strat_map_, i->id);
         mapIndex(cls_map_,   i->utility.id);
         for (RIt j = i->cost.begin(); j != i->cost.end(); ++j) {
-            ROS_INFO("Resource info: %s", j->id.c_str());
             mapIndex(res_map_, j->id);
         }
-        for (RIt j = i->utility_min.begin(); j != i->utility_min.end(); ++j) {
-            mapIndex(cls_map_, j->id);
+        for (RIt k = i->utility_min.begin(); k != i->utility_min.end(); ++k) {
+            mapIndex(cls_map_, k->id);
         }
     }
 
-    for (RIt i = caps.begin(); i != caps.end(); ++i) {
-        mapIndex(res_map_, i->id);
+    for (RIt j = caps.begin(); j != caps.end(); ++j) {
+        mapIndex(res_map_, j->id);
     }
 
     // Build the three strategies-related matrices:
@@ -71,8 +68,22 @@ SolverModel::SolverModel(
         for (RIt j = i->cost.begin(); j != i->cost.end(); ++j) {
             c_[strat_i][mapIndex(res_map_, j->id)] = j->value;
         }
-        for (RIt j = i->utility_min.begin(); j != i->utility_min.end(); ++j) {
-            r_[strat_i][mapIndex(cls_map_, j->id)] = j->value;
+        for (RIt k = i->utility_min.begin(); k != i->utility_min.end(); ++k) {
+            r_[strat_i][mapIndex(cls_map_, k->id)] = k->value;
+        }
+    }
+
+    // Sanity check: warn if a desire class has no utility producers:
+    for (size_t k = 0; k < cls_map_.size(); ++k) {
+        Scalar u_sum = 0.0;
+        for (size_t i = 0; i < strat_map_.size(); ++i) {
+            u_sum += u_[i][k];
+        }
+
+        if (u_sum == 0.0) {
+            ROS_WARN(
+                "Class '%s' has no producers.", 
+                mapId(cls_map_, k).c_str());
         }
     }
 
@@ -90,4 +101,44 @@ SolverModel::SolverModel(
     }
 
 }
+
+std::string SolverModel::uAsCSV() const
+{
+    return matrixAsCSV(u_, cls_map_);
+}
+
+std::string SolverModel::cAsCSV() const
+{
+    return matrixAsCSV(c_, res_map_);
+}
+
+std::string SolverModel::rAsCSV() const
+{
+    return matrixAsCSV(r_, cls_map_);
+}
+
+std::string SolverModel::matrixAsCSV(
+    const Matrix& mtx, 
+    const IndicesMap& map) const 
+{
+    std::stringstream ss;
+
+    // Header: Strategy | Resource 1 | Resource 2 | ... | Resource J 
+    ss << "Strategy,";
+    for (size_t i = 0; i < (map.size() - 1); ++i) {
+        ss << mapId(map, i) << ",";
+    }
+    ss << mapId(map, map.size() - 1) << std::endl;
+
+    for (size_t i = 0; i < strat_map_.size(); ++i) {
+        ss << mapId(strat_map_, i) << ",";
+        for (size_t j = 0; j < (map.size() - 1); ++j) {
+            ss << mtx[i][j] << ",";
+        }
+        ss << mtx[i][map.size() - 1] << std::endl;
+    }
+
+    return ss.str();
+}
+
 

@@ -1,0 +1,32 @@
+<launch>
+    <!-- Simple launch file to test a standalone IWTranslator. -->
+
+    <rosparam>
+        solver_model:
+            res_caps:
+                CPU:            100
+                Planner:        1
+
+            strategies:
+                - name:         test_strat1
+                  class:        TestClass
+                  utility:      5
+                  costs:
+                      CPU:      5
+                      Planner:  1
+                  dependencies:
+                      SubClass: 1
+                - name:         test_strat2
+                  class:        TestClass
+                  utility:      1
+                  costs:
+                      CPU:      1
+                      Planner:  1
+                  dependencies:
+                      SubClass: 1
+    </rosparam>
+    <node name="test_strategy_parser" pkg="iw_translator"
+        type="iw_translator_node" output="screen"
+        launch-prefix="xterm -e gdb --args"
+    />
+</launch>

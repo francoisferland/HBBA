@@ -38,19 +38,38 @@ namespace iw_translator
         Vector m_; // Resource capacities (m_j).
 
     public:
+        /// \brief Default constructor.
+        ///
+        /// Produces an empty model.
+        ///
+        SolverModel(); 
+
         /// \brief Constructor.
         ///
         /// Takes a set of strategies and resources capacities and build the
         /// model.
+        /// The strategy indices are distributed in the same order that it was
+        /// given in the strats parameter.
+        /// In other words, The first strategy in the strats vector will
+        /// be at row i=0 of the U, C and R matrices.
+        /// The same cannot be guaranteed for the resource indices, as they are
+        /// distributed on a first-seen basis.
+        ///
         /// The given data need to match between both parameters, or the model
         /// might turn unsolvable.
         /// Consistency issues are warned to the user through ROS_WARN.
         /// 
         /// \param strats A vector of strategies.
         /// \param caps   A vector of resource capacities.
+        ///
         SolverModel(
             const std::vector<hbba_msgs::Strategy>&      strats,
             const std::vector<hbba_msgs::ResourceUsage>& caps);
+
+        const Matrix& u() const { return u_; }
+        const Matrix& c() const { return c_; }
+        const Matrix& r() const { return r_; }
+        const Vector& m() const { return m_; }
 
         /// \brief Produce the utility (U) matrix as a CSV table.
         ///
@@ -68,6 +87,14 @@ namespace iw_translator
         std::string rAsCSV() const;
 
     private:
+        /// \brief Disabled copy constructor.
+        ///
+        /// Needs a special definition since Matrix objects cannot be simply
+        /// assigned - sizes need to match, which isn't the case with a
+        /// default-constructed SolverModel.
+        ///
+        SolverModel(const SolverModel& obj);
+
         std::string matrixAsCSV(const Matrix& mtx, const IndicesMap& map) const;
 
     };

@@ -32,6 +32,10 @@ namespace {
     }
 }
 
+SolverModel::SolverModel()
+{
+}
+
 SolverModel::SolverModel(
     const std::vector<hbba_msgs::Strategy>&      strats,
     const std::vector<hbba_msgs::ResourceUsage>& caps)

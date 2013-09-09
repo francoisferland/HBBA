@@ -74,7 +74,6 @@ namespace iw_translator
             XmlRpc::XmlRpcValue& node,
             std::vector<hbba_msgs::Strategy>& strats);
 
-    private:
         /// \brief Parse a numerical value from a TypeInt or TypeDouble.
         template <class T>
         static bool parseNumber(XmlRpc::XmlRpcValue& node, T& v);
@@ -98,6 +97,8 @@ namespace iw_translator
             std::string& out);
 
         /// \brief Parse a TypeStruct into a vector of ResourceUsage.
+        ///
+        /// Can also be used for resource caps definitions.
         ///
         /// Used for costs and dependencies.
         /// Only warn if the given object is not a TypeStruct or a cost value

@@ -30,9 +30,13 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(example ${PROJECT_NAME})
 
 rosbuild_add_library(iw_translator
+    src/iw_translator.cpp
     src/strategy_parser.cpp
     src/solver_model.cpp
 )
+
+rosbuild_add_executable(iw_translator_node src/iw_translator_node.cpp)
+target_link_libraries(iw_translator_node iw_translator)
 
 rosbuild_add_executable(test_strategy_parser
     tests/test_strategy_parser.cpp

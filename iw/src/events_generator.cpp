@@ -39,12 +39,15 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     typedef std::vector<std::string> StrVec;
     typedef std::list<std::string> StrList;
     typedef std::vector<hbba_msgs::Desire> DesVec;
+    typedef std::map<std::string,std::string> TypeMap;
     const DesVec& desires = msg->desires;
+    TypeMap typeMap;
     StrVec ids;
     ids.reserve(desires.size());
     for (DesVec::const_iterator d = desires.begin(); d != desires.end(); ++d)
     {
         ids.push_back(d->id);
+        typeMap[d->id] = d->type;
     }
 
     // First, remove desires not in it the current desires set.
@@ -58,7 +61,7 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     for (StrList::const_iterator i = del.begin(); i != del.end(); ++i)
     {
         const std::string& id = *i;
-        event(id, model_[id].type, hbba_msgs::Event::DES_OFF);
+        event(id, typeMap[id], hbba_msgs::Event::DES_OFF);
         model_.erase(id);
     }
 
@@ -69,6 +72,7 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
         if (model_.find(id) == model_.end())
         {
             model_[id].flags = FLAG_NONE;
+	    model_[id].type = typeMap[id]; //set type in the model
             event(id, model_[id].type, hbba_msgs::Event::DES_ON);
         }
     }

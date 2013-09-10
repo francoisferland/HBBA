@@ -203,6 +203,24 @@ class Structure:
             'to': "{0}/register_exploitation_match".format(root_topic)}))
         return [n]
 
+    def solverModelXML(self, opts):
+        if (opts.verbose):
+            print "Generating static solver model as rosparams..."
+
+        strats = []
+        for strat in self.strategies.values():
+            strats.append(strat.generateDict())
+
+        caps = {}
+        for r in self.resources.values():
+            caps[r.name] = r.value
+
+        s = {'hbba': {'solver_model': {'strategies': strats, 'res_caps': caps}}}
+        n = Element("rosparam")
+        n.text = str(s)
+
+        return n
+
     def generate(self, basepath, opts):
         if (opts.includes):
             # Just print out includes and quit here - only used for dependency
@@ -235,7 +253,7 @@ class Structure:
         if verbose:
             print "Exploitation matches: " + str(self.exploitationMatches)
         
-        # XML launch file
+        # XML launch file, first pass
         launch_elem = Element("launch")
         if not opts.behavior_based:
             if verbose:
@@ -252,19 +270,6 @@ class Structure:
             for t in behavior_topics:
                 if t not in self.integratedArbitration:
                     launch_elem.extend(self.generateArbitrationXML(t))
-
-        launch_tree = ElementTree(launch_elem)
-        xml_output = tostring(launch_elem)
-        if opts.pretty:
-            reparsed = minidom.parseString(xml_output)
-            xml_output = reparsed.toprettyxml(indent="  ")
-
-        if verbose:
-            print "Generated XML:\n"
-            print xml_output
-
-        xmlfile = file(basepath + ".launch", "w")
-        xmlfile.write(xml_output)
 
         # Python script
         if not opts.behavior_based:
@@ -300,6 +305,23 @@ class Structure:
             pyfile.write(python_header.format(
                 self.getRootTopicFullName("emo_intensity")))
             pyfile.write(pyscript)
+
+            # Final addition: the whole solver model as a rosparam:
+            launch_elem.append(self.solverModelXML(opts))
         elif verbose:
             print "Behavior-based mode - no Python script generated."
+
+        # Final XML generation:
+        launch_tree = ElementTree(launch_elem)
+        xml_output = tostring(launch_elem)
+        if opts.pretty:
+            reparsed = minidom.parseString(xml_output)
+            xml_output = reparsed.toprettyxml(indent="  ")
+
+        if verbose:
+            print "Generated XML:\n"
+            print xml_output
+
+        xmlfile = file(basepath + ".launch", "w")
+        xmlfile.write(xml_output)
 

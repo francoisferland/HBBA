@@ -382,10 +382,30 @@ class StratDef:
 
         structure.addStrategy(self)
 
-    def generatePy(self):
-        costs = "["
-        l = len(self.costs)
+    def generateDict(self):
+        bup_name, bdn_name, js_source = self.generateJSSource()
 
+        costs = {}
+        for c in self.costs:
+            costs[c.name] = c.value
+        deps = {}
+        for d in self.dependencies:
+            deps[d.name] = d.value
+
+        d = {
+            'name':         self.name,
+            'class':        self.utility_class,
+            'utility':      self.utility.value,
+            'costs':        costs,
+            'dependencies': deps,
+            'source':       js_source,
+            'bringup':      bup_name,
+            'bringdown':    bdn_name
+        }
+
+        return d
+
+    def generateJSSource(self):
         bup_name = "{0}_bup".format(self.name)
         bdn_name = "{0}_bdn".format(self.name)
         js_source = "function {0}(params) {{\n".format(bup_name)
@@ -399,7 +419,15 @@ class StratDef:
         for m in self.modules:
             js_source += m.generateDeactivationJS()
         js_source += "}\n"
-        
+
+        return bup_name, bdn_name, js_source
+
+    def generatePy(self):
+        costs = "["
+        l = len(self.costs)
+
+        bup_name, bdn_name, js_source = self.generateJSSource()
+
         return StratTemplate.format(
             self.name,
             self.utility.generatePy(),

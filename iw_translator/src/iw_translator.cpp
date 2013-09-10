@@ -36,5 +36,7 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
 
 void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
 {
+    Vector g;
+    solver_model_->convertDesires(*msg, g);
 }
 

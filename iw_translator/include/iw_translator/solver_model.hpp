@@ -2,6 +2,7 @@
 #define SOLVER_MODEL_HPP
 
 #include <hbba_msgs/Strategy.h>
+#include <hbba_msgs/DesiresSet.h>
 #include <boost/multi_array.hpp>
 #include <boost/bimap.hpp>
 
@@ -22,6 +23,7 @@ namespace iw_translator
     ///
     /// Entirely baseed on the available strategies (U, C, and R matrices) and 
     /// resource capacities (M matrix).
+    /// Can convert desires set to a minimum required utility vector (G).
     /// Also provides methods to match string identifiers to indices for 
     /// strategies (i), resources (j), and desire classes (k).
     ///
@@ -70,6 +72,23 @@ namespace iw_translator
         const Matrix& c() const { return c_; }
         const Matrix& r() const { return r_; }
         const Vector& m() const { return m_; }
+
+        /// \brief Convert a desires set into a minimum required utility vector
+        /// (G).
+        ///
+        /// Entirely based on the declared utility classes.
+        /// Indicate through ROS_WARN when unknown classes are encountered.
+        /// The whole desires vector is always verified so that every unknown
+        /// classes can be warned to the user.
+        ///
+        /// The default utility value is 0.0 for unspecified classes.
+        ///
+        /// \param  desires The input desires set.
+        /// \param  out     The output vector.
+        /// \return False when a desire class could not be found in the model.
+        bool convertDesires(
+            const hbba_msgs::DesiresSet& desires, 
+            Vector& out) const;
 
         /// \brief Produce the utility (U) matrix as a CSV table.
         ///

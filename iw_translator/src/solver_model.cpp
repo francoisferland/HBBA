@@ -17,6 +17,18 @@ namespace {
         }
     }
 
+    /// \brief Return the index of an id in an indices map, but return -1 if
+    /// it's unknown.
+    int mapIndex(const IndicesMap& map, const std::string& id) 
+    {
+        IndicesMap::left_map::const_iterator i = map.left.find(id);
+        if (i == map.left.end()) {
+            return -1;
+        } else {
+            return i->second;
+        }
+    }
+
     /// \brief Return a string identifier based on an index, or NULL_ID if it's
     /// not valid.
     const std::string& mapId(const IndicesMap& map, const int i) 
@@ -104,6 +116,33 @@ SolverModel::SolverModel(
         }
     }
 
+}
+
+bool SolverModel::convertDesires(
+    const hbba_msgs::DesiresSet& desires_set, 
+    Vector& out) const
+{
+    typedef const std::vector<hbba_msgs::Desire> DVec;
+    typedef DVec::const_iterator DIt;
+
+    bool ok = true;
+
+    out.resize(cls_map_.size());
+    std::fill(out.begin(), out.end(), 0.0);
+
+    DVec desires = desires_set.desires;
+    for (DIt i = desires.begin(); i != desires.end(); ++i) {
+        const hbba_msgs::Desire& des = *i;
+
+        int k = mapIndex(cls_map_, des.type);
+        if (k < -1) {
+            ROS_WARN("Unknown desire class in model: %s", des.type.c_str());
+            ok = false;
+        }
+            out[k] = des.utility;
+    }
+
+    return ok;
 }
 
 std::string SolverModel::uAsCSV() const

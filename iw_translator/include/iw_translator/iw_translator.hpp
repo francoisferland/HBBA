@@ -4,6 +4,7 @@
 #include <hbba_msgs/Strategy.h>
 #include <hbba_msgs/DesiresSet.h>
 #include <iw_translator/solver_model.hpp>
+#include <iw_translator/solver.hpp>
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
 
@@ -35,6 +36,7 @@ namespace iw_translator
     private:
         std::vector<hbba_msgs::Strategy> strats_;
         boost::scoped_ptr<SolverModel>   solver_model_;
+        boost::scoped_ptr<Solver>        solver_;
 
         ros::Subscriber                  sub_desires_;
 

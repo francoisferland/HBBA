@@ -29,11 +29,39 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
+
+# Note: solver_impl cannot be used by itself, and is only separated for
+# or_tools-related build issues.
+rosbuild_add_library(solver_impl
+    src/solver.cpp
+)
+target_link_libraries(solver_impl
+    constraint_solver
+    linear_solver
+    CoinUtils
+    OsiCbc
+    OsiClp
+    Clp
+    Osi
+    Cbc
+    Cgl
+    CbcSolver
+    util
+    base
+    protobuf
+    gflags
+)
+# Disables warnings on or_tools headers:
+set_target_properties(solver_impl PROPERTIES
+    COMPILE_FLAGS "-Wno-deprecated"
+)
+
 rosbuild_add_library(iw_translator
     src/iw_translator.cpp
-    src/strategy_parser.cpp
     src/solver_model.cpp
+    src/strategy_parser.cpp
 )
+target_link_libraries(iw_translator solver_impl)
 
 rosbuild_add_executable(iw_translator_node src/iw_translator_node.cpp)
 target_link_libraries(iw_translator_node iw_translator)

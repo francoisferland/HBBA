@@ -85,6 +85,7 @@ namespace iw_translator
         ///
         /// \param  desires The input desires set.
         /// \param  out     The output vector.
+        ///                 Will be resized and cleared first.
         /// \return False when a desire class could not be found in the model.
         bool convertDesires(
             const hbba_msgs::DesiresSet& desires, 

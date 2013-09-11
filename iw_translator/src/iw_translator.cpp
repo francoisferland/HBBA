@@ -26,6 +26,7 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
     }
 
     solver_model_.reset(new SolverModel(strats_, res_caps));
+    solver_.reset(new Solver(*solver_model_));
 
     sub_desires_ = n.subscribe(
         "desires_set", 

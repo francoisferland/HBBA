@@ -16,6 +16,7 @@
   <depend package="hbba_msgs"/>
   <depend package="script_engine"/>
   <depend package="topic_filters_manager"/>
+  <depend package="or_tools"/>
 
 </package>
 

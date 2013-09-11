@@ -23,8 +23,6 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
     size_t nb_res    = m.size();
     size_t nb_cls    = ur.shape()[1];
 
-    impl_->fixed_constraints.reserve(nb_strats * nb_res);
-
     // Result vector (strategy activation vector A):
     solver.MakeIntVarArray(nb_strats, 0, 1, &a);
 
@@ -64,7 +62,7 @@ Solver::~Solver()
     delete impl_;
 }
 
-bool Solver::solve(Vector& a_res)
+bool Solver::solve(ActivationVector& a_res)
 {
     namespace or_tools = operations_research;
 

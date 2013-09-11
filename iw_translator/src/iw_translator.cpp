@@ -40,7 +40,15 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     solver_model_->convertDesires(*msg, g);
     Solver solver(*solver_model_, g);
 
-    Vector a;
-    solver.solve(a);
+    ActivationVector a;
+    if (solver.solve(a)) {
+        ROS_DEBUG("Solving succeeded.");
+        for (size_t i = 0; i < a.size(); ++i) {
+            ROS_DEBUG(
+                "Strategy %s activation: %s", 
+                solver_model_->strategyId(i).c_str(), 
+                a[i] ? "true":"false");
+        }
+    };
 }
 

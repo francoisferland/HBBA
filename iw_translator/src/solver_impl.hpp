@@ -24,7 +24,6 @@ namespace iw_translator
         typedef std::vector<operations_research::Constraint*>  ConstraintsVector;
         typedef boost::scoped_ptr<operations_research::Solver> ORSolverPtr;
 
-        ConstraintsVector fixed_constraints;
         IntVarVector      a;
         ORSolverPtr       or_solver;
 

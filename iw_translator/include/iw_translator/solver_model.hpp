@@ -104,6 +104,11 @@ namespace iw_translator
             const hbba_msgs::DesiresSet& desires, 
             Vector& out) const;
 
+        /// \brief Return the name of strategy with the given index.
+        ///
+        /// \return NULL_ID in case of unknown indices.
+        const std::string& strategyId(int i) const;
+
         /// \brief Produce the utility (U) matrix as a CSV table.
         ///
         /// \param out The string that will receive the CSV output.
@@ -118,6 +123,11 @@ namespace iw_translator
         ///
         /// \param out The string that will receive the CSV output.
         std::string rAsCSV() const;
+
+        /// \brief Produce the combined utility matrix (UR) as a CSV table.
+        ///
+        /// \param out The string that will receive the CSV output.
+        std::string urAsCSV() const;
 
     private:
         /// \brief Disabled copy constructor.

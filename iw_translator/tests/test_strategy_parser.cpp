@@ -5,13 +5,13 @@
 int main(int argc, char** argv)
 {
     // A simple ROS node to test the strategy parser and static model builder.
-    // Will test two parameters in its private node handle, if their available:
+    // Will test two parameters in "solver_model" scope, if their available:
     //  "strategy", to test parseSimple(...).
     //  "strategies", to test parseArray(...).
 
     ros::init(argc, argv, "test_strategy_parser");
 
-    ros::NodeHandle np("~");
+    ros::NodeHandle np("solver_model");
 
     if (np.hasParam("strategy")) {
         hbba_msgs::Strategy strat;
@@ -39,6 +39,7 @@ int main(int argc, char** argv)
             ROS_INFO("Cost matrix C:\n%s",         model.cAsCSV().c_str());
             ROS_INFO("Utility matrix U:\n%s",      model.uAsCSV().c_str());
             ROS_INFO("Requirements matrix R:\n%s", model.rAsCSV().c_str());
+            ROS_INFO("Combined matrix UR:\n%s",    model.urAsCSV().c_str());
 
         } else {
             ROS_ERROR("Array parsing failed.");

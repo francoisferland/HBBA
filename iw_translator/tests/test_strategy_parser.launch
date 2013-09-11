@@ -1,34 +1,7 @@
 <launch>
     <!-- Simple launch file to test the strategy parser. -->
 
+    <rosparam command="load" file="$(find iw_translator)/tests/model.yaml"/>
     <node name="test_strategy_parser" pkg="iw_translator"
-        type="test_strategy_parser" output="screen"
-    >
-        <rosparam>
-            strategy: 
-                name:           test_strat
-                class:          TestClass
-                utility:        10
-                source:         "function t_up() {}; function t_dn() {};"
-                bringup:        "t_up"
-                bringdown:      "t_dn"
-            strategies:
-                - name:         test_strat1
-                  class:        TestClass
-                  utility:      5
-                  costs:
-                      CPU:      5
-                      Planner:  1
-                  dependencies:
-                      SubClass: 1
-                - name:         test_strat2
-                  class:        TestClass
-                  utility:      1
-                  costs:
-                      CPU:      1
-                      Planner:  1
-                  dependencies:
-                      SubClass: 1
-        </rosparam>
-    </node>
+        type="test_strategy_parser" output="screen"/>
 </launch>

@@ -78,6 +78,12 @@ SolverModel::SolverModel(
     u_.resize(boost::extents[strat_map_.size()][cls_map_.size()]);
     c_.resize(boost::extents[strat_map_.size()][res_map_.size()]);
     r_.resize(boost::extents[strat_map_.size()][cls_map_.size()]);
+    ur_.resize(boost::extents[strat_map_.size()][cls_map_.size()]);
+    std::fill(u_.origin(),  u_.origin()  + u_.size(),  0.0);
+    std::fill(c_.origin(),  c_.origin()  + c_.size(),  0.0);
+    std::fill(r_.origin(),  r_.origin()  + r_.size(),  0.0);
+    std::fill(ur_.origin(), ur_.origin() + ur_.size(), 0.0);
+
     for (SIt i = strats.begin(); i != strats.end(); ++i) {
         int strat_i = mapIndex(strat_map_, i->id);
         u_[strat_i][mapIndex(cls_map_, i->utility.id)] = i->utility.value;
@@ -86,6 +92,13 @@ SolverModel::SolverModel(
         }
         for (RIt k = i->utility_min.begin(); k != i->utility_min.end(); ++k) {
             r_[strat_i][mapIndex(cls_map_, k->id)] = k->value;
+        }
+    }
+
+    // Combined utility matrix (U - R) generation:
+    for (size_t i = 0; i < ur_.shape()[0]; ++i) {
+        for (size_t k = 0; k < ur_.shape()[1]; ++k) {
+            ur_[i][k] = u_[i][k] - r_[i][k];
         }
     }
 
@@ -145,6 +158,11 @@ bool SolverModel::convertDesires(
     return ok;
 }
 
+const std::string& SolverModel::strategyId(int i) const
+{
+    return mapId(strat_map_, i);
+}
+
 std::string SolverModel::uAsCSV() const
 {
     return matrixAsCSV(u_, cls_map_);
@@ -158,6 +176,11 @@ std::string SolverModel::cAsCSV() const
 std::string SolverModel::rAsCSV() const
 {
     return matrixAsCSV(r_, cls_map_);
+}
+
+std::string SolverModel::urAsCSV() const
+{
+    return matrixAsCSV(ur_, cls_map_);
 }
 
 std::string SolverModel::matrixAsCSV(

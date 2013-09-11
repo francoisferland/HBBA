@@ -10,6 +10,9 @@ namespace iw_translator
     // Forward declartion of isolated implementation class:
     class SolverImpl;
 
+    /// \brief A vector for strategy activation results (bool)
+    typedef std::vector<bool> ActivationVector;
+
     /// \brief A Google OR Tools-based solver for the Intention Workspace.
     ///
     /// Work based on the previous version of the solver (iw_solver_ortools).
@@ -45,7 +48,7 @@ namespace iw_translator
         ///         a solution could be found.
         /// \return False If an error occured while solving or a solution
         ///         could not be found.
-        bool solve(Vector& a);
+        bool solve(ActivationVector& a);
 
     };
 }

@@ -25,4 +25,4 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 rosbuild_add_executable(emotion_generator src/emotion_generator.cpp
                                           src/emotion_generator_node.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+

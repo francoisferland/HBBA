@@ -1,1 +1,2 @@
-Goto : {joy: 1 , anger: -1}
+GoTo : {joy: 1 , anger: -1}
+Wander : {joy: 0.1 , anger: -0.1}

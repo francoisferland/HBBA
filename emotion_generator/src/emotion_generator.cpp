@@ -1,77 +1,104 @@
 #include "emotion_generator.h"
+#include <ros/package.h>
 
 EmotionGenerator::EmotionGenerator(ros::NodeHandle * n, std::string nodeName)
 {
-	timer_ = n->createTimer(ros::Duration(1),
+	timer_ = n->createTimer(ros::Duration(2),
 			&EmotionGenerator::timerCB, this);
 	n_ = n;
 	nodeName_ = nodeName;
 
 	pubEmotion = n_->advertise<hbba_msgs::EmotionIntensities>("emotions",100,true);
+
 }
 
 void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 {
-	ROS_INFO("emotionGenerator event %i %s",msg.type, msg.desire_type.c_str());
+	//ROS_INFO("emotionGenerator event %i %s %s",msg.type, msg.desire.c_str(), msg.desire_type.c_str());
 
 	switch(msg.type)
 	{
 	case hbba_msgs::Event::EXP_ON:
 	{
 		exploitedDesires[msg.desire_type] = true;
+		if(msg.desire_type.compare("GoTo") == 0)
+		{
+			ROS_INFO("exp on goto");
+		}
 		break;
 	}
 	case hbba_msgs::Event::EXP_OFF:
 	{
 		exploitedDesires[msg.desire_type] = false;
+		if(msg.desire_type.compare("GoTo") == 0)
+		{
+			ROS_INFO("exp off goto");
+		}
 		break;
 	}
 	case hbba_msgs::Event::DES_ON:
 	{
 		activeDesires[msg.desire_type] = true;
+		if(msg.desire_type.compare("GoTo") == 0)
+		{
+			ROS_INFO("des on goto");
+		}
 		break;
 	}
 	case hbba_msgs::Event::DES_OFF:
 	{
 		activeDesires[msg.desire_type] = false;
+		if(msg.desire_type.compare("GoTo") == 0)
+		{
+			ROS_INFO("des off goto");
+		}
 		break;
 	}
 	}
 
-	if(emotionMatrix.count(msg.desire_type) == 0)
+	if(!msg.desire_type.empty() && emotionMatrix.count(msg.desire_type) == 0)
 	{
 		std::string paramDesire = n_->getNamespace() + nodeName_ + "/" + msg.desire_type;
 		//ROS_INFO("emotionMatrix %s",paramDesire.c_str());
 
 		XmlRpc::XmlRpcValue emotionParam;
-		n_->getParam(paramDesire,emotionParam);
+		n_->getParam(paramDesire, emotionParam);
 
 		std::map<std::string,double> mapEmotion;
 
 		for (std::map<std::string, XmlRpc::XmlRpcValue>::iterator it = emotionParam.begin(); it != emotionParam.end(); it++)
 		{
-			std::string emotion = paramDesire + "/" + (*it).first;
-			double value = 0;
-			n_->getParam(emotion,value);
-			ROS_INFO("%s, %5.2f",(*it).first.c_str(), value);
+			double emotionFactor = 0;
+			if((*it).second.getType() == XmlRpc::XmlRpcValue::TypeInt)
+			{
+				int value = static_cast<int>((*it).second);
+				ROS_INFO("%s %i",(*it).first.c_str(), value);
+				emotionFactor = (double)value;
 
-			mapEmotion[(*it).first] = value;
+			}
+			else if ((*it).second.getType() == XmlRpc::XmlRpcValue::TypeDouble)
+			{
+				double emotionFactor = static_cast<double>((*it).second);
+				ROS_INFO("%s %5.2f",(*it).first.c_str(), emotionFactor);
+			}
+
+			mapEmotion[(*it).first] = emotionFactor;
 
 			if(emotionIntensities.count((*it).first) == 0)
 			{
 				//initialize this emotion
 				emotionIntensities[(*it).first] = 0;
 			}
-		}
 
-		emotionMatrix[msg.desire_type] = mapEmotion;
+		}
+		if(mapEmotion.size() > 0)
+			emotionMatrix[msg.desire_type] = mapEmotion;
 	}
 
 }
 
 void EmotionGenerator::timerCB(const ros::TimerEvent&)
 {
-
 	generateEmotions();
 
 	hbba_msgs::EmotionIntensities emotions;
@@ -102,6 +129,30 @@ void EmotionGenerator::generateEmotions()
 				double emotionModulation = (*it).second;
 				double emotionIntensity = emotionIntensities[emotion];
 				emotionIntensity += emotionModulation;
+				if(emotionIntensity > 100)
+					emotionIntensity = 100;
+				else if(emotionIntensity < 0)
+					emotionIntensity = 0;
+
+				emotionIntensities[emotion] = emotionIntensity; //update in map
+			}
+		}
+		//if there is a desire but its not exploited, the emotion are influence according to the opposite values in matrix
+		else if( ((*it).second && exploitedDesires.count(desires) == 0) || ((*it).second && exploitedDesires[desires] == false) )
+		{
+			for(std::map<std::string,double>::iterator it = emotionMatrix[desires].begin() ; it!= emotionMatrix[desires].end() ; it++)
+			{
+				std::string emotion = (*it).first;
+				double emotionModulation = (*it).second;
+				double emotionIntensity = emotionIntensities[emotion];
+				emotionIntensity -= emotionModulation;
+				if(emotionIntensity > 100)
+					emotionIntensity = 100;
+				else if(emotionIntensity < 0)
+					emotionIntensity = 0;
+
+				emotionIntensities[emotion] = emotionIntensity; //update in map
+
 			}
 		}
 	}

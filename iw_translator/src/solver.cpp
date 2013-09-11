@@ -66,6 +66,30 @@ Solver::~Solver()
 
 bool Solver::solve(Vector& a_res)
 {
+    namespace or_tools = operations_research;
+
+    or_tools::Solver&               solver = *(impl_->or_solver);
+    const SolverImpl::IntVarVector& a      = impl_->a;
+
+    or_tools::DecisionBuilder* const db = solver.MakePhase(
+       a, 
+       or_tools::Solver::CHOOSE_RANDOM,
+       or_tools::Solver::ASSIGN_MAX_VALUE);
+
+    // TODO: Add monitors for optimizations ?
+    solver.NewSearch(db);
+
+    // Only keep the first solution if available.
+    if (!solver.NextSolution()) {
+        ROS_ERROR("IW Solver could not find solution.");
+        return false;
+    }
+
+    a_res.resize(a.size());
+    for (size_t i = 0; i < a_res.size(); ++i) {
+        a_res[i] = (a[i]->Value() != 0);
+    }
+
     return true;
 }
 

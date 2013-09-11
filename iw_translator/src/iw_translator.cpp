@@ -26,7 +26,6 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
     }
 
     solver_model_.reset(new SolverModel(strats_, res_caps));
-    solver_.reset(new Solver(*solver_model_));
 
     sub_desires_ = n.subscribe(
         "desires_set", 
@@ -39,5 +38,9 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
 {
     Vector g;
     solver_model_->convertDesires(*msg, g);
+    Solver solver(*solver_model_, g);
+
+    Vector a;
+    solver.solve(a);
 }
 

@@ -36,7 +36,6 @@ namespace iw_translator
     private:
         std::vector<hbba_msgs::Strategy> strats_;
         boost::scoped_ptr<SolverModel>   solver_model_;
-        boost::scoped_ptr<Solver>        solver_;
 
         ros::Subscriber                  sub_desires_;
 

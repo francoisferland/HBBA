@@ -4,47 +4,68 @@
 
 using namespace iw_translator;
 
-Solver::Solver(const SolverModel& solver_model): 
+Solver::Solver(const SolverModel& solver_model, const Vector& g): 
     impl_(new SolverImpl())
 {
     namespace or_tools = operations_research;
-
-    typedef Matrix::const_array_view<1>::type     ColView;
-    typedef boost::multi_array_types::index_range Range;
-    typedef std::vector<int64>                    IntVector;
 
     impl_->or_solver.reset(new or_tools::Solver("iw_solver_impl"));
 
     or_tools::Solver& solver = *(impl_->or_solver);
 
-    const Matrix&               u = solver_model.u();
-    const Matrix&               c = solver_model.c();
-    const Matrix&               r = solver_model.r();
-    const Vector&               m = solver_model.m();
-    SolverImpl::IntVarVector&   a = impl_->a;
+    const Matrix&               u  = solver_model.u();
+    const Matrix&               c  = solver_model.c();
+    const Vector&               m  = solver_model.m();
+    const Matrix&               ur = solver_model.u();
+    SolverImpl::IntVarVector&   a  = impl_->a;
 
-    size_t nb_strats = u.size();
+    size_t nb_strats = ur.shape()[0];
     size_t nb_res    = m.size();
-    size_t nb_cls    = u.shape()[1];
+    size_t nb_cls    = ur.shape()[1];
+
+    impl_->fixed_constraints.reserve(nb_strats * nb_res);
 
     // Result vector (strategy activation vector A):
     solver.MakeIntVarArray(nb_strats, 0, 1, &a);
 
     // Convert M vector (maximum cost allowed) to constraints.
     for (size_t j = 0; j < nb_res; ++j) {
-        const ColView col = c[boost::indices[Range()][j]];
-        IntVector c_j(nb_strats); 
+        const MatrixColView   col = c[boost::indices[MatrixRange()][j]];
+        SolverImpl::IntVector c_j(nb_strats); 
+
         std::copy(col.begin(), col.end(), c_j.begin());
 
-        solver.AddConstraint(solver.MakeScalProdLessOrEqual(a, c_j, m[j]));
+        solver.AddConstraint(
+            solver.MakeScalProdLessOrEqual(
+                a, 
+                c_j, 
+                m[j]));
     }
 
+    // Convert both G and UR (utility both required and provided by 
+    // strategies) to constraints:
+    for (size_t k = 0; k < nb_cls; ++k) {
+        const MatrixColView   col = ur[boost::indices[MatrixRange()][k]];
+        SolverImpl::IntVector ur_k(nb_strats);
 
-    
+        std::copy(col.begin(), col.end(), ur_k.begin());
+
+        solver.AddConstraint(
+            solver.MakeScalProdGreaterOrEqual(
+                a, 
+                ur_k, 
+                g[k]));
+    }
+
 }
 
 Solver::~Solver()
 {
     delete impl_;
+}
+
+bool Solver::solve(Vector& a_res)
+{
+    return true;
 }
 

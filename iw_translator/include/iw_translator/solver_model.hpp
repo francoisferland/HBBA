@@ -10,13 +10,17 @@ namespace iw_translator
 {
 
     /// \brief Scalar type for internal data (double).
-    typedef double                         Scalar;
+    typedef double                                Scalar;
     /// \brief Vector type for internal data (Nx1 double).
-    typedef std::vector<Scalar>            Vector;
+    typedef std::vector<Scalar>                   Vector;
     /// \brief Matrix type for internal data (NxM double).
-    typedef boost::multi_array<Scalar, 2>  Matrix;
+    typedef boost::multi_array<Scalar, 2>         Matrix;
     /// \brief Map used to match string identifiers to indices.
-    typedef boost::bimap<std::string, int> IndicesMap;
+    typedef boost::bimap<std::string, int>        IndicesMap;
+    /// \brief Column view of matrices.
+    typedef Matrix::const_array_view<1>::type     MatrixColView;
+    /// \brief Range generator for matrices.
+    typedef boost::multi_array_types::index_range MatrixRange;
 
 
     /// \brief A class that represents the static data part of the IW solver.
@@ -34,10 +38,12 @@ namespace iw_translator
         IndicesMap res_map_;   // Resources  (j)
         IndicesMap cls_map_;   // Classes    (k)
 
-        Matrix u_; // Utility of strategies (u_ik).
-        Matrix c_; // Costs of strategies (c_ij).
-        Matrix r_; // Utility requirements of strategies (r_ik). 
-        Vector m_; // Resource capacities (m_j).
+        Matrix u_;  // Utility of strategies (u_ik).
+        Matrix c_;  // Costs of strategies (c_ij).
+        Matrix r_;  // Utility requirements of strategies (r_ik). 
+        Matrix ur_; // The combined utility of strategies (ur_ik).
+        Vector m_;  // Resource capacities (m_j).
+
 
     public:
         /// \brief Default constructor.
@@ -72,6 +78,13 @@ namespace iw_translator
         const Matrix& c() const { return c_; }
         const Matrix& r() const { return r_; }
         const Vector& m() const { return m_; }
+
+        /// \brief Return the combined matrix of produced and required utility
+        /// of strategies.
+        ///
+        /// Obtained with U - R, used for the internal solver as this part is
+        /// fixed with each pass.
+        const Matrix& ur() const { return ur_; }
 
         /// \brief Convert a desires set into a minimum required utility vector
         /// (G).

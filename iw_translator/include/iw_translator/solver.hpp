@@ -24,29 +24,28 @@ namespace iw_translator
     public:
         /// \brief Constructor.
         ///
-        /// Initialize the static solver structures with the given solver model.
-        /// The solver is then ready to run with desire vectors generated from
-        /// the same solver model.
-        /// 
+        /// Initialize the solver according to both the static model and the
+        /// goal parameters.
+        /// The solver is then ready to run with solve().
+        ///
         /// \param solver_model The static solver model that serves as a basis
         ///                     for the solver.
-        Solver(const SolverModel& solver_model);
+        /// \param g            The required utility vector, or goal (G)
+        Solver(const SolverModel& solver_model, const Vector& g);
 
         /// \brief Destructor.
         ~Solver();
 
-        /// \brief Produce the activation vector (a) from a desire utility
-        /// requirements vector (g).
+        /// \brief Produce the strategy activation vector (a).
         ///
         /// Will return the first (or best, depending on the optimization
         /// options) solution available.
         ///
-        /// \param  g Input vector.
         /// \param  a Output vector, will be resized, cleared and filled only if
         ///         a solution could be found.
         /// \return False If an error occured while solving or a solution
         ///         could not be found.
-        bool solve(const Vector& g, Vector& a);
+        bool solve(Vector& a);
 
     };
 }

@@ -18,12 +18,16 @@ namespace iw_translator
     /// multiple compilation warnings).
     struct SolverImpl
     {
-        boost::scoped_ptr<operations_research::Solver> or_solver;
-        
-        typedef operations_research::IntVar          IntVar;
-        typedef operations_research::vector<IntVar*> IntVarVector;
+        typedef std::vector<int64>                             IntVector;
+        typedef operations_research::IntVar                    IntVar;
+        typedef operations_research::vector<IntVar*>           IntVarVector;
+        typedef std::vector<operations_research::Constraint*>  ConstraintsVector;
+        typedef boost::scoped_ptr<operations_research::Solver> ORSolverPtr;
 
-        IntVarVector a;
+        ConstraintsVector fixed_constraints;
+        IntVarVector      a;
+        ORSolverPtr       or_solver;
+
     };
 }
 

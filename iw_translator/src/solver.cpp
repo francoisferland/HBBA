@@ -70,28 +70,40 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
                 g[k]));
     }
 
+    // Minimize total count of activated strategies so that we don't fulfill
+    // unwanted desires.
+    or_tools::IntVar* sum_a = solver.MakeSum(a)->Var();
+    or_tools::OptimizeVar* const opt_sum_a = solver.MakeMinimize(sum_a, 1);
+
+    // Choose a random unbound variable to start, start with minimum values
+    // (deactivated strategies):
     or_tools::DecisionBuilder* const db = solver.MakePhase(
        a, 
        or_tools::Solver::CHOOSE_RANDOM,
-       or_tools::Solver::ASSIGN_MAX_VALUE);
+       or_tools::Solver::ASSIGN_MIN_VALUE);
 
-    // TODO: Add monitors for optimizations ?
-    solver.NewSearch(db);
+    or_tools::SolutionCollector* coll = 
+        solver.MakeBestValueSolutionCollector(false);
+    coll->Add(a);
+    coll->AddObjective(sum_a);
+    solver.NewSearch(db, coll);
+    solver.Solve(db, coll, opt_sum_a);
 
-    // Only keep the first solution if available.
-    if (!solver.NextSolution()) {
-        ROS_ERROR("IW Solver could not find solution.");
+    int nb_sols = coll->solution_count();
+    ROS_DEBUG("Solutions count: %i", nb_sols);
+
+    if (nb_sols == 0) {
+        ROS_ERROR("IW Solver could not find a solution.");
         a_res_.clear();
-        //return false;
     } else {
         a_res_.resize(a.size());
         for (size_t i = 0; i < a_res_.size(); ++i) {
-            a_res_[i] = (a[i]->Value() > 0);
+            int64 v = coll->Value(0, a[i]);
+            a_res_[i] = (v > 0);
         }
     }
 
     solver.EndSearch();
-
 }
 
 Solver::~Solver()

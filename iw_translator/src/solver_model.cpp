@@ -148,11 +148,12 @@ bool SolverModel::convertDesires(
         const hbba_msgs::Desire& des = *i;
 
         int k = mapIndex(cls_map_, des.type);
-        if (k < -1) {
+        if (k < 0) {
             ROS_WARN("Unknown desire class in model: %s", des.type.c_str());
             ok = false;
-        }
+        } else {
             out[k] = des.utility;
+        }
     }
 
     return ok;

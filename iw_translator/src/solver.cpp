@@ -9,6 +9,14 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
 {
     namespace or_tools = operations_research;
 
+    std::stringstream gstr;
+    gstr << "G: [ ";
+    for (size_t k = 0; k < g.size(); ++k) {
+        gstr << g[k] << " ";
+    }
+    gstr << "]";
+    ROS_DEBUG("%s", gstr.str().c_str());
+
     impl_->or_solver.reset(new or_tools::Solver("iw_solver_impl"));
 
     or_tools::Solver& solver = *(impl_->or_solver);
@@ -16,7 +24,7 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
     const Matrix&               u  = solver_model.u();
     const Matrix&               c  = solver_model.c();
     const Vector&               m  = solver_model.m();
-    const Matrix&               ur = solver_model.u();
+    const Matrix&               ur = solver_model.ur();
     SolverImpl::IntVarVector&   a  = impl_->a;
 
     size_t nb_strats = ur.shape()[0];
@@ -43,6 +51,13 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
     // Convert both G and UR (utility both required and provided by 
     // strategies) to constraints:
     for (size_t k = 0; k < nb_cls; ++k) {
+        // Do not add constraints for zero goals, avoid activating strategies
+        // for undesired classes.
+        // TODO: Check first if it's really needed.
+        // if (!(g[k] > 0.0)) {
+        //     continue;
+        // }
+
         const MatrixColView   col = ur[boost::indices[MatrixRange()][k]];
         SolverImpl::IntVector ur_k(nb_strats);
 
@@ -55,20 +70,6 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
                 g[k]));
     }
 
-}
-
-Solver::~Solver()
-{
-    delete impl_;
-}
-
-bool Solver::solve(ActivationVector& a_res)
-{
-    namespace or_tools = operations_research;
-
-    or_tools::Solver&               solver = *(impl_->or_solver);
-    const SolverImpl::IntVarVector& a      = impl_->a;
-
     or_tools::DecisionBuilder* const db = solver.MakePhase(
        a, 
        or_tools::Solver::CHOOSE_RANDOM,
@@ -80,14 +81,31 @@ bool Solver::solve(ActivationVector& a_res)
     // Only keep the first solution if available.
     if (!solver.NextSolution()) {
         ROS_ERROR("IW Solver could not find solution.");
+        a_res_.clear();
+        //return false;
+    } else {
+        a_res_.resize(a.size());
+        for (size_t i = 0; i < a_res_.size(); ++i) {
+            a_res_[i] = (a[i]->Value() > 0);
+        }
+    }
+
+    solver.EndSearch();
+
+}
+
+Solver::~Solver()
+{
+    delete impl_;
+}
+
+bool Solver::result(ActivationVector& a_res)
+{
+    if (a_res_.empty()) {
         return false;
+    } else {
+        a_res = a_res_;
+        return true;
     }
-
-    a_res.resize(a.size());
-    for (size_t i = 0; i < a_res.size(); ++i) {
-        a_res[i] = (a[i]->Value() != 0);
-    }
-
-    return true;
 }
 

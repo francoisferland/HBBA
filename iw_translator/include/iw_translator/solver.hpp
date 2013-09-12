@@ -22,14 +22,16 @@ namespace iw_translator
     class Solver
     {
     private:
-        SolverImpl* impl_;
+        SolverImpl*      impl_;
+        ActivationVector a_res_;
+
 
     public:
         /// \brief Constructor.
         ///
-        /// Initialize the solver according to both the static model and the
-        /// goal parameters.
-        /// The solver is then ready to run with solve().
+        /// Search a solution according to both the static model and the goal 
+        /// parameters.
+        /// The result, if available, can be obtained with result().
         ///
         /// \param solver_model The static solver model that serves as a basis
         ///                     for the solver.
@@ -39,7 +41,7 @@ namespace iw_translator
         /// \brief Destructor.
         ~Solver();
 
-        /// \brief Produce the strategy activation vector (a).
+        /// \brief Copy the strategy activation vector (a), if available.
         ///
         /// Will return the first (or best, depending on the optimization
         /// options) solution available.
@@ -48,7 +50,7 @@ namespace iw_translator
         ///         a solution could be found.
         /// \return False If an error occured while solving or a solution
         ///         could not be found.
-        bool solve(ActivationVector& a);
+        bool result(ActivationVector& a);
 
     };
 }

@@ -4,6 +4,11 @@ solver_model:
         Planner:        1
 
     strategies:
+        - name:         sub_strat1
+          class:        SubClass
+          utility:      1
+          costs:        
+              CPU:      1
         - name:         test_strat1
           class:        TestClass
           utility:      5
@@ -18,5 +23,3 @@ solver_model:
           costs:
               CPU:      1
               Planner:  1
-          dependencies:
-              SubClass: 1

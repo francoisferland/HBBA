@@ -1,5 +1,6 @@
 #include <iw_translator/iw_translator.hpp>
 #include <iw_translator/strategy_parser.hpp>
+#include <hbba_msgs/Intention.h>
 
 using namespace iw_translator;
 
@@ -32,6 +33,10 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
         10, 
         &IWTranslator::desiresCB, 
         this);
+
+    pub_intention_ = n.advertise<hbba_msgs::Intention>(
+        "intention",
+        10);
 }
 
 void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
@@ -46,12 +51,20 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     ActivationVector a;
     if (solver.result(a)) {
         ROS_DEBUG("Solving succeeded.");
+        hbba_msgs::Intention out;
         for (size_t i = 0; i < a.size(); ++i) {
             ROS_DEBUG(
                 "Strategy %s activation: %s", 
-                solver_model_->strategyId(i).c_str(), 
+                strats_[i].id.c_str(), 
                 a[i] ? "true":"false");
+
+            out.strategies.push_back(strats_[i].id);
+            out.desire_types.push_back(strats_[i].utility.id);
+            out.enabled.push_back(a[i]);
         }
+
+        out.stamp = ros::Time::now();
+        pub_intention_.publish(out);
     };
 }
 

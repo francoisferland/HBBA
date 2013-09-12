@@ -38,6 +38,7 @@ namespace iw_translator
         boost::scoped_ptr<SolverModel>   solver_model_;
 
         ros::Subscriber                  sub_desires_;
+        ros::Publisher                   pub_intention_;
 
     public:
         /// \brief Constructor.

@@ -4,6 +4,31 @@
 
 using namespace iw_translator;
 
+namespace 
+{
+    // Use an empty string for unknown/unmatched desires:
+    static const std::string EMPTY("");
+
+    const std::string& desireIdFromType(
+        const hbba_msgs::DesiresSet& desires_set, 
+        const std::string& type)
+    {
+
+        // Return the first one found, or unknown.
+
+        typedef std::vector<hbba_msgs::Desire> Desires;
+        typedef Desires::const_iterator It;
+        const Desires& desires = desires_set.desires;
+        for (It i = desires.begin(); i != desires.end(); ++i) {
+            if (i->type == type) {
+                return i->id;
+            }
+        }
+
+        return EMPTY;
+    }
+}
+
 IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
 {
     if (!np.hasParam("strategies")) {
@@ -36,7 +61,8 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
 
     pub_intention_ = n.advertise<hbba_msgs::Intention>(
         "intention",
-        10);
+        10,
+        true); // Always latch.
 }
 
 void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
@@ -58,9 +84,16 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
                 strats_[i].id.c_str(), 
                 a[i] ? "true":"false");
 
-            out.strategies.push_back(strats_[i].id);
-            out.desire_types.push_back(strats_[i].utility.id);
-            out.enabled.push_back(a[i]);
+            const std::string& strat_id = strats_[i].id;
+            const std::string& des_type = a[i] ?
+                strats_[i].utility.id            : EMPTY;
+            const std::string& des_id   = a[i] ? 
+                desireIdFromType(*msg, des_type) : EMPTY;
+
+            out.strategies.push_back(   strat_id);
+            out.desires.push_back(      des_id);
+            out.desire_types.push_back( des_type);
+            out.enabled.push_back(      a[i]);
         }
 
         out.stamp = ros::Time::now();

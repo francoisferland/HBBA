@@ -11,6 +11,7 @@ public:
 	void eventsCallback(const hbba_msgs::Event& msg);
 	void timerCB(const ros::TimerEvent&);
 	void generateEmotions();
+	void emotionDecay();
 
 private:
 

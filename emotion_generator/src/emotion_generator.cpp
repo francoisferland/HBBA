@@ -3,7 +3,7 @@
 
 EmotionGenerator::EmotionGenerator(ros::NodeHandle * n, std::string nodeName)
 {
-	timer_ = n->createTimer(ros::Duration(2),
+	timer_ = n->createTimer(ros::Duration(1),
 			&EmotionGenerator::timerCB, this);
 	n_ = n;
 	nodeName_ = nodeName;
@@ -21,36 +21,52 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 	case hbba_msgs::Event::EXP_ON:
 	{
 		exploitedDesires[msg.desire_type] = true;
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Wander") == 0)
 		{
-			ROS_INFO("exp on goto");
+			ROS_INFO("exp on wander");
 		}
 		break;
 	}
 	case hbba_msgs::Event::EXP_OFF:
 	{
 		exploitedDesires[msg.desire_type] = false;
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Wander") == 0)
 		{
-			ROS_INFO("exp off goto");
+			ROS_INFO("exp off wander");
 		}
 		break;
 	}
 	case hbba_msgs::Event::DES_ON:
 	{
 		activeDesires[msg.desire_type] = true;
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Wander") == 0)
 		{
-			ROS_INFO("des on goto");
+			ROS_INFO("des on wander");
 		}
 		break;
 	}
 	case hbba_msgs::Event::DES_OFF:
 	{
 		activeDesires[msg.desire_type] = false;
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Wander") == 0)
 		{
-			ROS_INFO("des off goto");
+			ROS_INFO("des off wander");
+		}
+		break;
+	}
+	case hbba_msgs::Event::INT_ON:
+	{
+		if(msg.desire_type.compare("Wander") == 0)
+		{
+			ROS_INFO("int on wander");
+		}
+		break;
+	}
+	case hbba_msgs::Event::INT_OFF:
+	{
+		if(msg.desire_type.compare("Wander") == 0)
+		{
+			ROS_INFO("int off wander");
 		}
 		break;
 	}
@@ -72,14 +88,14 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 			if((*it).second.getType() == XmlRpc::XmlRpcValue::TypeInt)
 			{
 				int value = static_cast<int>((*it).second);
-				ROS_INFO("%s %i",(*it).first.c_str(), value);
+				//ROS_INFO("factor %s %s %i",msg.desire_type.c_str(),(*it).first.c_str(), value);
 				emotionFactor = (double)value;
 
 			}
 			else if ((*it).second.getType() == XmlRpc::XmlRpcValue::TypeDouble)
 			{
-				double emotionFactor = static_cast<double>((*it).second);
-				ROS_INFO("%s %5.2f",(*it).first.c_str(), emotionFactor);
+				emotionFactor = static_cast<double>((*it).second);
+				//ROS_INFO("factor %s %s %5.2f",msg.desire_type.c_str(),(*it).first.c_str(), emotionFactor);
 			}
 
 			mapEmotion[(*it).first] = emotionFactor;
@@ -156,4 +172,9 @@ void EmotionGenerator::generateEmotions()
 			}
 		}
 	}
+}
+
+void emotionDecay()
+{
+
 }

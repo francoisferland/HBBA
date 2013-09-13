@@ -50,20 +50,21 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
 		typeMap[d->id] = d->type;
 	}
 
-	// First, remove desires not in it the current desires set.
-	StrList del;
-	for (Model::const_iterator i = model_.begin(); i != model_.end(); ++i)
-	{
-		const std::string& id = i->first;
-		if (std::find(ids.begin(), ids.end(), id) == ids.end())
-			del.push_back(id);
-	}
-	for (StrList::const_iterator i = del.begin(); i != del.end(); ++i)
-	{
-		const std::string& id = *i;
-		event(id, model_[id].type, hbba_msgs::Event::DES_OFF);
-		model_.erase(id);
-	}
+    // First, remove desires not in it the current desires set.
+    StrList del;
+    for (Model::const_iterator i = model_.begin(); i != model_.end(); ++i)
+    {
+        const std::string& id = i->first;
+        if (std::find(ids.begin(), ids.end(), id) == ids.end())
+            del.push_back(id);
+    }
+    for (StrList::const_iterator i = del.begin(); i != del.end(); ++i)
+    {
+        const std::string& id = *i;
+	
+        event(id, model_[id].type, hbba_msgs::Event::DES_OFF);
+        model_.erase(id);
+    }
 
 	// Then, generate events for new desires.
 	for (StrVec::const_iterator i = ids.begin(); i != ids.end(); ++i)

@@ -16,7 +16,7 @@
   <depend package="tf"/>
 
   <export>
-  	<cpp cflags='-I${prefix}/include' lflags='-L${prefix}/lib'/>
+  	<cpp cflags='-I${prefix}/include' lflags='-L${prefix}/lib -lengine_v8'/>
 	<script_engine plugin="${prefix}/common_plugins.xml"/>
   </export>
 </package>

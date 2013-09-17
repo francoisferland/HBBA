@@ -9,6 +9,7 @@ solver_model:
           utility:      1
           costs:        
               CPU:      1
+
         - name:         test_strat1
           class:        TestClass
           utility:      5
@@ -17,9 +18,26 @@ solver_model:
               Planner:  1
           dependencies:
               SubClass: 1
+          source:       "function strat1_bup(params) { se_log('strat1_bup'); }; function strat1_bdn() { se_log('strat1_bdn'); } "
+          bringup:      strat1_bup
+          bringdown:    strat1_bdn
+
         - name:         test_strat2
           class:        TestClass
           utility:      1
           costs:
               CPU:      1
               Planner:  1
+          source:       "function strat2_bup(params) { se_log('strat2_bup'); }; function strat2_bdn() { se_log('strat2_bdn'); } "
+          bringup:      strat2_bup
+          bringdown:    strat2_bdn
+
+        - name:         test_strat3
+          class:        ParamClass
+          utility:      1
+          costs:
+              CPU:      1
+              Planner:  1
+          source:       "function strat3_bup(params) { se_log('strat3_bup: ' + params.value); }; function strat3_bdn() { se_log('strat3_bdn'); } "
+          bringup:      strat3_bup
+          bringdown:    strat3_bdn

@@ -41,3 +41,7 @@ solver_model:
           source:       "function strat3_bup(params) { se_log('strat3_bup: ' + params.value); }; function strat3_bdn() { se_log('strat3_bdn'); } "
           bringup:      strat3_bup
           bringdown:    strat3_bdn
+
+topic_filters:
+    "test_filter1": "GenericDivider"
+    "test_filter2": "GenericDivider"

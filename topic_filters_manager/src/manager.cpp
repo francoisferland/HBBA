@@ -98,6 +98,40 @@ manager::manager()
 	handlers_map_["switch_filter"] = new switch_filter_handler();
     handlers_map_["GenericDivider"] = new GenericDividerHandler();
 
+    // Look for a parameter named "topic_filters", a structure of name:type
+    // elements to register.
+    // It is tested on the node's namespace, as it usually resides in "/hbba".
+    parse_topic_filters_param();
+}
+
+void manager::parse_topic_filters_param()
+{
+    if (!n_.hasParam("topic_filters")) {
+        return;
+    }
+
+    XmlRpc::XmlRpcValue node;
+    n_.getParam("topic_filters", node);
+    
+    if (node.getType() != XmlRpc::XmlRpcValue::TypeStruct) {
+        ROS_ERROR("'topic_filters' parameter is not a struct, ignoring.");
+    }
+
+    typedef XmlRpc::XmlRpcValue::iterator It;
+    for (It i = node.begin(); i != node.end(); ++i) {
+        const std::string&   name = i->first;
+        XmlRpc::XmlRpcValue& type = i->second;
+        if (type.getType() != XmlRpc::XmlRpcValue::TypeString) {
+            ROS_ERROR(
+                "Type for '%s' cannot be parsed, skipping.", 
+                name.c_str());
+            continue;
+        }
+
+        register_filter(name, type);
+    }
+
+
 }
 
 manager::~manager()

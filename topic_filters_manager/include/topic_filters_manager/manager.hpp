@@ -108,6 +108,8 @@ namespace topic_filters_manager
 
 
 	private:
+        void parse_topic_filters_param();
+
 		bool register_filter_srv(RegisterFilter::Request& req, 
 			RegisterFilter::Response& res);
 		bool get_filters_srv(GetFilters::Request& req, 
@@ -124,6 +126,7 @@ namespace topic_filters_manager
 
 	struct filter_handler
 	{
+        virtual ~filter_handler() {}
 		virtual bool valid(const std::string& ns) = 0;
 		virtual void add_proxies(ros::NodeHandle&, 
 			const std::string& ns, manager::filter_map_t&) const = 0;

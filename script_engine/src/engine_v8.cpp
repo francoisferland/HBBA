@@ -43,6 +43,7 @@ engine_v8::engine_v8():
 	{
 		try 
 		{
+            ROS_INFO("Loading script engine plugin %s...", i->c_str());
 			engine_module* m = module_loader_->createUnmanagedInstance(*i);
 			m->init(global_);
 			modules_list_.push_back(m);

@@ -33,6 +33,11 @@ hbba_conf:
         - second_pose: {src: second_pose, filtered: false}
     output:
         - look_at_pose
+    services:
+        # Only provide basic remaps for services.
+        # Still follow remap rules.
+         - test_service
+
     priority: 10
 
 - behavior:
@@ -56,6 +61,10 @@ hbba_conf:
         - second_input: {filtered: false}
     output: # Automatically remapped to root.
         - source_pose
+    services:
+        # Only provide basic remaps for services.
+        # Still follow remap rules.
+         - test_service
 
 - strat:
     name: LocateVoiceFull

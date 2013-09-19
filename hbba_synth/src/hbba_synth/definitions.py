@@ -199,6 +199,12 @@ class ProcModuleDef:
             self.generateNSExports(content['namespace_exports'])
         else:
             self.namespace_exports = []
+
+        if 'services' in content:
+            self.services = content['services']
+        else:
+            self.services = []
+
         structure.addProcModule(self)
 
         if verbose:
@@ -253,6 +259,9 @@ class ProcModuleDef:
                 elems.extend(self.createInputFilter(topic))
             else:
                 grp.append(topic.generateRootRemapXML())
+
+        for s in self.services:
+            grp.append(structure.generateRootRemapXML(s))
 
         grp.extend(self.launch.generateXML(structure))
 

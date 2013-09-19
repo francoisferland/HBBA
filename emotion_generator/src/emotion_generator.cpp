@@ -8,11 +8,17 @@ EmotionGenerator::EmotionGenerator(ros::NodeHandle * n, std::string nodeName)
 	nodeName_ = nodeName;
 
 	pubEmotion = n_->advertise<hbba_msgs::EmotionIntensities>("emotions",100,true);
+	pubEmotionFaceExpression = n_->advertise<emotions_msgs::EmoIntensity>("emo_intensity",100,true);
 
-	pubDebugAnger = n_->advertise<emotions_msgs::EmoIntensity>("debug_anger",100,true);
-	pubDebugJoy = n_->advertise<emotions_msgs::EmoIntensity>("debug_joy",100,true);
-	pubDebugGotoExp = n_->advertise<std_msgs::Bool>("debug_goto_exp",100,true);
-	pubDebugGotoDesire = n_->advertise<std_msgs::Bool>("debug_goto_des",100,true);
+	n_->param("debug_emotion_generator",debugEmotionGenerator_,false);
+
+	if(debugEmotionGenerator_)
+	{
+		pubDebugAnger = n_->advertise<emotions_msgs::EmoIntensity>("debug_anger",100,true);
+		pubDebugJoy = n_->advertise<emotions_msgs::EmoIntensity>("debug_joy",100,true);
+		pubDebugGotoExp = n_->advertise<std_msgs::Bool>("debug_goto_exp",100,true);
+		pubDebugGotoDesire = n_->advertise<std_msgs::Bool>("debug_goto_des",100,true);
+	}
 
 }
 
@@ -79,14 +85,14 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 	if(!msg.desire_type.empty() && emotionMatrix.count(msg.desire_type) == 0)
 	{
 		//ROS_INFO("emotionMatrix %s",paramDesire.c_str());
-		getEmotionMotivationRelation(msg.desire_type);
-		getEmotionMotivationRelation("not_"+msg.desire_type);
+		getEmotionDesireRelation(msg.desire_type);
+		getEmotionDesireRelation("not_"+msg.desire_type);
 
 	}
 
 }
 
-void EmotionGenerator::getEmotionMotivationRelation(std::string desireType)
+void EmotionGenerator::getEmotionDesireRelation(std::string desireType)
 {
 	XmlRpc::XmlRpcValue emotionParam;
 	std:: string paramServerDesire = n_->getNamespace() + nodeName_ + "/" + desireType;
@@ -137,14 +143,16 @@ void EmotionGenerator::timerCB(const ros::TimerEvent&)
 		emotions.emotion.push_back(intensity);
 
 		//for debug purposes
-		if(intensity.name.compare("anger") == 0)
+		if(intensity.name.compare("Anger") == 0 && debugEmotionGenerator_)
 		{
 			pubDebugAnger.publish(intensity);
 		}
-		else if(intensity.name.compare("joy") == 0)
+		else if(intensity.name.compare("Joy") == 0 && debugEmotionGenerator_)
 		{
 			pubDebugJoy.publish(intensity);
 		}
+
+		pubEmotionFaceExpression.publish(intensity);
 	}
 
 	//debug desire state vs exploited state

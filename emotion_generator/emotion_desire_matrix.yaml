@@ -1,4 +1,4 @@
-GoTo : {joy: 1 , anger: -1}
-not_GoTo : {joy: -5 , anger: +5}
-Wander : {joy: 0.1 , anger: -0.1}
-not_Wander : {joy: -0.2 , anger: 0.2}
+GoTo : {Joy: 1 , Anger: -1}
+not_GoTo : {Joy: -5 , Anger: +5}
+Wander : {Joy: 0.1 , Anger: -0.1}
+not_Wander : {Joy: -0.2 , Anger: 0.2}

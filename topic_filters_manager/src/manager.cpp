@@ -127,10 +127,12 @@ void manager::parse_topic_filters_param()
             register_filter(name, type);
         } else if (type.getType() == XmlRpc::XmlRpcValue::TypeStruct) {
             // The topic name contains a slash, build it in full and register.
-            const std::string& name_end = type.begin()->first;
-            const std::string& type_end = type.begin()->second;
-            std::string full_name = name + "/" + name_end;
-            register_filter(full_name, type_end);
+            for (It j = type.begin(); j != type.end(); ++j) {
+                const std::string& name_end = j->first;
+                const std::string& type_end = j->second;
+                std::string full_name = name + "/" + name_end;
+                register_filter(full_name, type_end);
+            }
 
         } else {
             ROS_ERROR(

@@ -1,1 +1,1 @@
-emotions_msgs/EmoIntensity[] emotion
+emotions_msgs/Intensity[] emotion

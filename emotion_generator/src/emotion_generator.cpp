@@ -8,14 +8,14 @@ EmotionGenerator::EmotionGenerator(ros::NodeHandle * n, std::string nodeName)
 	nodeName_ = nodeName;
 
 	pubEmotion = n_->advertise<hbba_msgs::EmotionIntensities>("emotions",100,true);
-	pubEmotionFaceExpression = n_->advertise<emotions_msgs::EmoIntensity>("emo_intensity",100,true);
+	pubEmotionFaceExpression = n_->advertise<emotions_msgs::Intensity>("emo_intensity",100,true);
 
 	n_->param("debug_emotion_generator",debugEmotionGenerator_,false);
 
 	if(debugEmotionGenerator_)
 	{
-		pubDebugAnger = n_->advertise<emotions_msgs::EmoIntensity>("debug_anger",100,true);
-		pubDebugJoy = n_->advertise<emotions_msgs::EmoIntensity>("debug_joy",100,true);
+		pubDebugAnger = n_->advertise<emotions_msgs::Intensity>("debug_anger",100,true);
+		pubDebugJoy = n_->advertise<emotions_msgs::Intensity>("debug_joy",100,true);
 		pubDebugGotoExp = n_->advertise<std_msgs::Bool>("debug_goto_exp",100,true);
 		pubDebugGotoDesire = n_->advertise<std_msgs::Bool>("debug_goto_des",100,true);
 	}
@@ -134,7 +134,7 @@ void EmotionGenerator::timerCB(const ros::TimerEvent&)
 	generateEmotions();
 
 	hbba_msgs::EmotionIntensities emotions;
-	emotions_msgs::EmoIntensity intensity;
+	emotions_msgs::Intensity intensity;
 	//publish emotionIntensities
 	for(std::map<std::string,double>::iterator it = emotionIntensities.begin() ; it != emotionIntensities.end() ; it++)
 	{
@@ -152,6 +152,7 @@ void EmotionGenerator::timerCB(const ros::TimerEvent&)
 			pubDebugJoy.publish(intensity);
 		}
 
+		intensity.value /= 100; //face_expresion need intensity between 0 and 1
 		pubEmotionFaceExpression.publish(intensity);
 	}
 

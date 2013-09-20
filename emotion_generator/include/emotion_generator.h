@@ -2,7 +2,7 @@
 #include <ros/package.h>
 #include <hbba_msgs/Event.h>
 #include <hbba_msgs/EmotionIntensities.h>
-#include <emotions_msgs/EmoIntensity.h>
+#include <emotions_msgs/Intensity.h>
 #include <std_msgs/Bool.h>
 
 class EmotionGenerator

@@ -89,6 +89,7 @@ class Structure:
 
     def addRootRemap(self, rm):
         self.addRootRemapEx(rm.to, rm.topic)
+
     def addRootRemapEx(self, to, topic):
         # Look if the remap target is already registered.
         # If so, map the incoming topic to the original target.
@@ -221,6 +222,19 @@ class Structure:
 
         return n
 
+    def topicFiltersXML(self, opts):
+        if (opts.verbose):
+            print "Generating static topic filters list..."
+
+        tfs = {}
+        for tf in self.filters.values():
+            tfs[tf.name] = tf.type 
+        
+        n = Element("rosparam")
+        n.text = str({'hbba': {'topic_filters': tfs}})
+
+        return n
+
     def generate(self, basepath, opts):
         if (opts.includes):
             # Just print out includes and quit here - only used for dependency
@@ -271,7 +285,7 @@ class Structure:
                 if t not in self.integratedArbitration:
                     launch_elem.extend(self.generateArbitrationXML(t))
 
-        # Python script
+        # Python script and second XML generation pass
         if not opts.behavior_based:
             pyscript = ""
             if (self.customScript != ""):
@@ -306,8 +320,11 @@ class Structure:
                 self.getRootTopicFullName("emo_intensity")))
             pyfile.write(pyscript)
 
-            # Final addition: the whole solver model as a rosparam:
+            # XML addition: the whole solver model as a rosparam:
             launch_elem.append(self.solverModelXML(opts))
+            # XML additions: the static list of topic filters:
+            launch_elem.append(self.topicFiltersXML(opts))
+
         elif verbose:
             print "Behavior-based mode - no Python script generated."
 

@@ -54,6 +54,12 @@ class LaunchDef:
             }))
         return elems
 
+class TopicFilterDef:
+    def __init__(self, name, filter_type, verbose=False):
+        self.name        = name
+        self.filter_type = filter_type
+
+
 class BehaviorDef:
     def __init__(self, content, structure, verbose=False):
         if not 'name' in content:
@@ -108,15 +114,15 @@ class BehaviorDef:
             "standalone topic_filters/GenericDivider {0} {1}".format(
                 topic_in, topic_out)
             }))
-        elems.append(Element("node", attrib={
-            'name': "register_{0}_{1}".format(
-                node_name,
-                uniqueName()), 
-            'pkg': 'topic_filters_manager',
-            'type': 'register',
-            'args': "{0} GenericDivider".format(
-                name)
-            }))
+#        elems.append(Element("node", attrib={
+#            'name': "register_{0}_{1}".format(
+#                node_name,
+#                uniqueName()), 
+#            'pkg': 'topic_filters_manager',
+#            'type': 'register',
+#            'args': "{0} GenericDivider".format(
+#                name)
+#            }))
 
     def generateXML(self, structure, opts):
         elems = []
@@ -132,6 +138,9 @@ class BehaviorDef:
                     self.inputFilterNodeName(filter_out), 
                     self.inputFilterName(filter_out),
                     filter_in, filter_out)
+                structure.addFilter(FilterDef(
+                    self.inputFilterName(filter_out),
+                    "GenericDivider"))
             else:
                 grp.append(topic.generateRootRemapXML())
 
@@ -153,6 +162,9 @@ class BehaviorDef:
                     self.outputFilterName(o),
                     o,
                     self.outputFilterTopic(o))
+                structure.addFilter(FilterDef(
+                    self.outputFilterName(o),
+                    "GenericDivider"))
 
             # Add registration script.
             grp.append(Element("param", attrib={
@@ -233,14 +245,14 @@ class ProcModuleDef:
                     self.structure.getRootTopicFullName(topic.src), 
                     self.name, topic.name)
             }))
-        elems.append(Element("node", attrib={
-            'name': "register_{0}".format(node_name),
-            'pkg': 'topic_filters_manager',
-            'type': 'register',
-            'args': "{0} {1}".format(
-                filter_name, 
-                filter_type)
-            }))
+#        elems.append(Element("node", attrib={
+#            'name': "register_{0}".format(node_name),
+#            'pkg': 'topic_filters_manager',
+#            'type': 'register',
+#            'args': "{0} {1}".format(
+#                filter_name, 
+#                filter_type)
+#            }))
         return elems
 
     def generateXML(self, structure, opts):

@@ -42,6 +42,4 @@ solver_model:
           bringup:      strat3_bup
           bringdown:    strat3_bdn
 
-topic_filters:
-    "test_filter1": "GenericDivider"
-    "test_filter2": "GenericDivider"
+topic_filters: {'test_filter1': 'GenericDivider', 'test_filter2': 'GenericDivider'}

@@ -63,7 +63,7 @@ namespace topic_filters_manager
             ros::NodeHandle n("/" + ns);
             ROS_DEBUG("Looking for set_divider_rate in /%s...", ns.c_str());
             std::string service_name = n.resolveName("set_divider_rate");
-            ros::service::waitForService(service_name, ros::Duration(5.0));
+            ros::service::waitForService(service_name, ros::Duration(30.0));
             return ros::service::exists(service_name, true);
         }
 
@@ -121,14 +121,24 @@ void manager::parse_topic_filters_param()
     for (It i = node.begin(); i != node.end(); ++i) {
         const std::string&   name = i->first;
         XmlRpc::XmlRpcValue& type = i->second;
-        if (type.getType() != XmlRpc::XmlRpcValue::TypeString) {
+        
+        if (type.getType() == XmlRpc::XmlRpcValue::TypeString) {
+            // Simple topic name, register it.
+            register_filter(name, type);
+        } else if (type.getType() == XmlRpc::XmlRpcValue::TypeStruct) {
+            // The topic name contains a slash, build it in full and register.
+            const std::string& name_end = type.begin()->first;
+            const std::string& type_end = type.begin()->second;
+            std::string full_name = name + "/" + name_end;
+            register_filter(full_name, type_end);
+
+        } else {
             ROS_ERROR(
                 "Type for '%s' cannot be parsed, skipping.", 
                 name.c_str());
             continue;
         }
 
-        register_filter(name, type);
     }
 
 

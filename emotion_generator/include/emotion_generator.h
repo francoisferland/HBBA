@@ -14,6 +14,7 @@ public:
 	void eventsCallback(const hbba_msgs::Event& msg);
 	void getEmotionDesireRelation(std::string paramServerDesire);
 	void timerCB(const ros::TimerEvent&);
+	void emotionDecayCB(const ros::TimerEvent&);
 	void generateEmotions();
 	void emotionDecay();
 
@@ -27,6 +28,7 @@ private:
 	std::map<std::string,double> emotionIntensities;
 
 	ros::Timer timer_;
+	ros::Timer timerDecay_;
 	ros::Publisher pubEmotion;
 	ros::Publisher pubEmotionFaceExpression;
 	ros::Publisher pubDebugJoy;
@@ -37,6 +39,7 @@ private:
 
 	ros::NodeHandle* n_;
 
+	double emotionDecay_;
 	bool debugEmotionGenerator_;
 	std::string nodeName_;
 

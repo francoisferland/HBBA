@@ -4,14 +4,26 @@ EmotionGenerator::EmotionGenerator(ros::NodeHandle * n, std::string nodeName)
 {
 	timer_ = n->createTimer(ros::Duration(1),
 			&EmotionGenerator::timerCB, this);
+	timerDecay_ = n->createTimer(ros::Duration(2),
+			&EmotionGenerator::emotionDecayCB, this);
+
 	n_ = n;
 	nodeName_ = nodeName;
 
 	pubEmotion = n_->advertise<hbba_msgs::EmotionIntensities>("emotions",100,true);
 	pubEmotionFaceExpression = n_->advertise<emotions_msgs::Intensity>("emo_intensity",100,true);
 
-	n_->param("debug_emotion_generator",debugEmotionGenerator_,false);
+	ros::NodeHandle np("~");
 
+	np.param("debug_emotion_generator",debugEmotionGenerator_,false);
+	np.param("emotion_decay",emotionDecay_,0.01);
+	if(emotionDecay_ > 1 || emotionDecay_ < 0)
+	{
+		emotionDecay_ = 0.01;
+		ROS_WARN("emotion decay must be between 0 and 1");
+	}
+
+	ROS_INFO("debug emotion generator %i",debugEmotionGenerator_);
 	if(debugEmotionGenerator_)
 	{
 		pubDebugAnger = n_->advertise<emotions_msgs::Intensity>("debug_anger",100,true);
@@ -143,16 +155,16 @@ void EmotionGenerator::timerCB(const ros::TimerEvent&)
 		emotions.emotion.push_back(intensity);
 
 		//for debug purposes
-		if(intensity.name.compare("Anger") == 0 && debugEmotionGenerator_)
+		if(intensity.name.compare("Anger") == 0 && debugEmotionGenerator_ > 0)
 		{
 			pubDebugAnger.publish(intensity);
 		}
-		else if(intensity.name.compare("Joy") == 0 && debugEmotionGenerator_)
+		else if(intensity.name.compare("Joy") == 0 && debugEmotionGenerator_ > 0)
 		{
 			pubDebugJoy.publish(intensity);
 		}
 
-		intensity.value /= 100; //face_expresion need intensity between 0 and 1
+		//intensity.value /= 100; //face_expresion need intensity between 0 and 1
 		pubEmotionFaceExpression.publish(intensity);
 	}
 
@@ -194,8 +206,8 @@ void EmotionGenerator::generateEmotions()
 				double emotionModulation = (*it).second;
 				double emotionIntensity = emotionIntensities[emotion];
 				emotionIntensity += emotionModulation;
-				if(emotionIntensity > 100)
-					emotionIntensity = 100;
+				if(emotionIntensity > 1)
+					emotionIntensity = 1;
 				else if(emotionIntensity < 0)
 					emotionIntensity = 0;
 
@@ -212,8 +224,8 @@ void EmotionGenerator::generateEmotions()
 				double emotionModulation = (*it).second;
 				double emotionIntensity = emotionIntensities[emotion];
 				emotionIntensity += emotionModulation;
-				if(emotionIntensity > 100)
-					emotionIntensity = 100;
+				if(emotionIntensity > 1)
+					emotionIntensity = 1;
 				else if(emotionIntensity < 0)
 					emotionIntensity = 0;
 
@@ -224,7 +236,15 @@ void EmotionGenerator::generateEmotions()
 	}
 }
 
-void emotionDecay()
+void EmotionGenerator::emotionDecayCB(const ros::TimerEvent&)
 {
-
+	//reduce every emotion intensity by emotionDecay_
+	for(std::map<std::string,double>::iterator it = emotionIntensities.begin() ; it != emotionIntensities.end() ; it++)
+	{
+		(*it).second -= emotionDecay_;
+		if((*it).second < 0)
+		{
+			(*it).second = 0;
+		}
+	}
 }

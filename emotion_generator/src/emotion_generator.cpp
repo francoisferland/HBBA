@@ -155,11 +155,11 @@ void EmotionGenerator::timerCB(const ros::TimerEvent&)
 		emotions.emotion.push_back(intensity);
 
 		//for debug purposes
-		if(intensity.name.compare("Anger") == 0 && debugEmotionGenerator_ > 0)
+		if(intensity.name.compare("Anger") == 0 && debugEmotionGenerator_ )
 		{
 			pubDebugAnger.publish(intensity);
 		}
-		else if(intensity.name.compare("Joy") == 0 && debugEmotionGenerator_ > 0)
+		else if(intensity.name.compare("Joy") == 0 && debugEmotionGenerator_ )
 		{
 			pubDebugJoy.publish(intensity);
 		}
@@ -169,25 +169,27 @@ void EmotionGenerator::timerCB(const ros::TimerEvent&)
 	}
 
 	//debug desire state vs exploited state
-	for(std::map<std::string,bool>::iterator it = activeDesires.begin() ; it != activeDesires.end() ; it++)
+	if(debugEmotionGenerator_)
 	{
-		if((*it).first.compare("GoTo") == 0)
+		for(std::map<std::string,bool>::iterator it = activeDesires.begin() ; it != activeDesires.end() ; it++)
 		{
-			std_msgs::Bool isGotoDesired;
-			isGotoDesired.data = (*it).second;
-			pubDebugGotoDesire.publish(isGotoDesired);
+			if((*it).first.compare("GoTo") == 0)
+			{
+				std_msgs::Bool isGotoDesired;
+				isGotoDesired.data = (*it).second;
+				pubDebugGotoDesire.publish(isGotoDesired);
+			}
+		}
+		for(std::map<std::string,bool>::iterator it = exploitedDesires.begin() ; it != exploitedDesires.end() ; it++)
+		{
+			if((*it).first.compare("GoTo") == 0)
+			{
+				std_msgs::Bool isGotoExploited;
+				isGotoExploited.data = (*it).second;
+				pubDebugGotoExp.publish(isGotoExploited);
+			}
 		}
 	}
-	for(std::map<std::string,bool>::iterator it = exploitedDesires.begin() ; it != exploitedDesires.end() ; it++)
-	{
-		if((*it).first.compare("GoTo") == 0)
-		{
-			std_msgs::Bool isGotoExploited;
-			isGotoExploited.data = (*it).second;
-			pubDebugGotoExp.publish(isGotoExploited);
-		}
-	}
-
 	pubEmotion.publish(emotions);
 }
 

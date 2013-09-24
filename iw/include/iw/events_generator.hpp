@@ -40,6 +40,7 @@ namespace iw
     ///    arbitration output topics.
     ///  - create_topic_exploitation_matcher: Create an exploitation matcher for
     ///    standard (usually perception) topics based on activity monitoring.
+    ///
     /// Input topics:
     ///  - desires_set: The current active desires in the IW.
     ///  - intention: The active strategies selected by the solver.

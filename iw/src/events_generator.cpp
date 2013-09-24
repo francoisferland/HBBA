@@ -63,6 +63,11 @@ void EventsGenerator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
         const std::string& id = *i;
 	
         event(id, model_[id].type, hbba_msgs::Event::DES_OFF);
+        if (model_[id].flags & FLAG_INT)
+            event(id, model_[id].type, hbba_msgs::Event::INT_OFF);
+        if (model_[id].flags & FLAG_EXP)
+            event(id, model_[id].type, hbba_msgs::Event::EXP_OFF);
+
         model_.erase(id);
     }
 

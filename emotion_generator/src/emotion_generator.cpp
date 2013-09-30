@@ -45,7 +45,7 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 		exploitedDesires[msg.desire_type] = true;
 		if(msg.desire_type.compare("GoTo") == 0)
 		{
-			ROS_INFO("exp on GoTo");
+			ROS_INFO("Emo_gen - exp on GoTo");
 		}
 		break;
 	}
@@ -54,7 +54,7 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 		exploitedDesires[msg.desire_type] = false;
 		if(msg.desire_type.compare("GoTo") == 0)
 		{
-			ROS_INFO("exp off GoTo");
+			ROS_INFO("Emo_gen - exp off GoTo");
 		}
 		break;
 	}
@@ -63,7 +63,7 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 		activeDesires[msg.desire_type] = true;
 		if(msg.desire_type.compare("GoTo") == 0)
 		{
-			ROS_INFO("des on GoTo");
+			ROS_INFO("Emo_gen - des on GoTo");
 		}
 		break;
 	}
@@ -72,7 +72,7 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 		activeDesires[msg.desire_type] = false;
 		if(msg.desire_type.compare("GoTo") == 0)
 		{
-			ROS_INFO("des off GoTo");
+			ROS_INFO("Emo_gen - des off GoTo");
 		}
 		break;
 	}
@@ -80,7 +80,7 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 	{
 		if(msg.desire_type.compare("GoTo") == 0)
 		{
-			ROS_INFO("int on GoTo");
+//			ROS_INFO("int on GoTo");
 		}
 		break;
 	}
@@ -88,7 +88,7 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 	{
 		if(msg.desire_type.compare("GoTo") == 0)
 		{
-			ROS_INFO("int off GoTo");
+//			ROS_INFO("int off GoTo");
 		}
 		break;
 	}
@@ -96,7 +96,7 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 
 	if(!msg.desire_type.empty() && emotionMatrix.count(msg.desire_type) == 0)
 	{
-		//ROS_INFO("emotionMatrix %s",paramDesire.c_str());
+//		ROS_INFO("emotionMatrix %s",msg.desire_type.c_str());
 		getEmotionDesireRelation(msg.desire_type);
 		getEmotionDesireRelation("not_"+msg.desire_type);
 
@@ -107,9 +107,14 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 void EmotionGenerator::getEmotionDesireRelation(std::string desireType)
 {
 	XmlRpc::XmlRpcValue emotionParam;
-	std:: string paramServerDesire = n_->getNamespace() + nodeName_ + "/" + desireType;
+	std::string namespaceNode = n_->getNamespace().substr(1,n_->getNamespace().length()-1);
+	std::string paramServerDesire = namespaceNode + "/" + nodeName_ + "/" + desireType;
 	n_->getParam(paramServerDesire, emotionParam);
 
+	ROS_INFO("Emo gen - param emotion desire relation :%s,%s,%s = %s", n_->getNamespace().c_str() ,
+									   nodeName_.c_str(),
+									   desireType.c_str(),
+									   paramServerDesire.c_str() );
 	std::map<std::string,double> mapEmotion;
 
 	for (std::map<std::string, XmlRpc::XmlRpcValue>::iterator it = emotionParam.begin(); it != emotionParam.end(); it++)
@@ -118,14 +123,14 @@ void EmotionGenerator::getEmotionDesireRelation(std::string desireType)
 		if((*it).second.getType() == XmlRpc::XmlRpcValue::TypeInt)
 		{
 			int value = static_cast<int>((*it).second);
-			//ROS_INFO("factor %s %s %i",msg.desire_type.c_str(),(*it).first.c_str(), value);
+			ROS_INFO("factor %s %i",(*it).first.c_str(), value);
 			emotionFactor = (double)value;
 
 		}
 		else if ((*it).second.getType() == XmlRpc::XmlRpcValue::TypeDouble)
 		{
 			emotionFactor = static_cast<double>((*it).second);
-			//ROS_INFO("factor %s %s %5.2f",msg.desire_type.c_str(),(*it).first.c_str(), emotionFactor);
+			ROS_INFO("factor %s %5.2f",(*it).first.c_str(), emotionFactor);
 		}
 
 		mapEmotion[(*it).first] = emotionFactor;
@@ -202,10 +207,11 @@ void EmotionGenerator::generateEmotions()
 		if((*it).second && exploitedDesires[desires])
 		{
 			//emotion are influence according to a matrix defined in yaml file
-			for(std::map<std::string,double>::iterator it = emotionMatrix[desires].begin() ; it!= emotionMatrix[desires].end() ; it++)
+			for(std::map<std::string,double>::iterator it2 = emotionMatrix[desires].begin() ; it2!= emotionMatrix[desires].end() ; it2++)
 			{
-				std::string emotion = (*it).first;
-				double emotionModulation = (*it).second;
+				ROS_INFO("debug generate emotion %s",(*it2).first.c_str());
+				std::string emotion = (*it2).first;
+				double emotionModulation = (*it2).second;
 				double emotionIntensity = emotionIntensities[emotion];
 				emotionIntensity += emotionModulation;
 				if(emotionIntensity > 1)
@@ -220,10 +226,11 @@ void EmotionGenerator::generateEmotions()
 		else if( ((*it).second && exploitedDesires.count(desires) == 0) || ((*it).second && exploitedDesires[desires] == false) )
 		{
 			desires = "not_"+desires;
-			for(std::map<std::string,double>::iterator it = emotionMatrix[desires].begin() ; it!= emotionMatrix[desires].end() ; it++)
+			for(std::map<std::string,double>::iterator it2 = emotionMatrix[desires].begin() ; it2!= emotionMatrix[desires].end() ; it2++)
 			{
-				std::string emotion = (*it).first;
-				double emotionModulation = (*it).second;
+				ROS_INFO("debug generate emotion %s",(*it2).first.c_str());
+				std::string emotion = (*it2).first;
+				double emotionModulation = (*it2).second;
 				double emotionIntensity = emotionIntensities[emotion];
 				emotionIntensity += emotionModulation;
 				if(emotionIntensity > 1)

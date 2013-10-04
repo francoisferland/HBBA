@@ -166,21 +166,25 @@ class BehaviorDef:
                     self.outputFilterName(o),
                     "GenericDivider"))
 
-            # Add registration script.
+            remapped_output_topic = "/{0}/{1}".format(self.name,
+                    abtr_output_topic)
+
+            structure.addBehaviorOutput(root_topic, remapped_output_topic)
             grp.append(Element("param", attrib={
                 'name': abtr_output_topic + "/abtr_priority",
                 'value': str(self.priority)
                 }))
-            elems.append(Element("node", attrib={
-                'name': "register_{0}_{1}_{2}".format(
-                    self.name,
-                    abtr_output_topic,
-                    uniqueName()),
-                'pkg': 'abtr_priority',
-                'type': 'register',
-                'args': "{0} /{1}/{2}".format(root_topic, self.name,
-                    abtr_output_topic)
-                }))
+            if not opts.new_rev:
+                # Add registration script.
+                elems.append(Element("node", attrib={
+                    'name': "register_{0}_{1}_{2}".format(
+                        self.name,
+                        abtr_output_topic,
+                        uniqueName()),
+                    'pkg': 'abtr_priority',
+                    'type': 'register',
+                    'args': "{0} {1}".format(root_topic, remapped_output_topic)
+                    }))
 
         return elems
 

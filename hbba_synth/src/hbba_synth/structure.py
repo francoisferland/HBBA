@@ -55,6 +55,7 @@ class Structure:
     def __init__(self):
         self.includes = []
         self.behaviors = {}
+        self.behaviorOutputs = {}
         self.procmodules = {}
         self.strategies = {}
         self.filters = {}
@@ -74,6 +75,11 @@ class Structure:
 
     def addBehavior(self, b):
         self.behaviors[b.name] = b
+
+    def addBehaviorOutput(self, tin, tout):
+        if not (tin in self.behaviorOutputs):
+            self.behaviorOutputs[tin] = []
+        self.behaviorOutputs[tin].append(tout)
 
     def addProcModule(self, p):
         self.procmodules[p.name] = p
@@ -161,7 +167,7 @@ class Structure:
             'from': iname,
             'to': self.getRootTopicFullName(oname)})
 
-    def generateArbitrationXML(self, topic):
+    def generateArbitrationXML(self, topic, opts):
         if topic in self.arbitrationTypes:
             abtr_pkg = self.arbitrationTypes[topic].pkg
             abtr_type = self.arbitrationTypes[topic].node
@@ -186,6 +192,13 @@ class Structure:
         n.append(Element("remap", attrib = {
             'from': "cmd/register",
             'to': "{0}/register".format(root_topic)}))
+
+        if (opts.new_rev):
+            # Build behavior output registration model:
+            s = {'registrations': self.behaviorOutputs[root_topic]}
+            param_e = Element("rosparam")
+            param_e.text = str(s)
+            n.append(param_e)
 
         return [n]
 
@@ -286,7 +299,7 @@ class Structure:
         if not opts.disable_arbitration:
             for t in behavior_topics:
                 if t not in self.integratedArbitration:
-                    launch_elem.extend(self.generateArbitrationXML(t))
+                    launch_elem.extend(self.generateArbitrationXML(t, opts))
 
         # Python script and second XML generation pass
         if not opts.behavior_based:

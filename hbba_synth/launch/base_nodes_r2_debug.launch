@@ -1,0 +1,8 @@
+<launch>
+    <group ns="hbba">
+        <node name="iw" pkg="iw" type="iw.py"/>
+        <node name="iw_translator" pkg="iw_translator" type="iw_translator_node"
+            output="screen"/>
+        <node name="events_generator" pkg="iw" type="events_generator"/>
+    </group>
+</launch>

@@ -38,11 +38,14 @@ exploitation_match_elem = """ExploitationMatch({0}, {1})"""
 exploitation_match_call = """
 create_em('{0}', {1})"""
 
-def baseNodesXML(debug):
+def baseNodesXML(new_rev, debug):
+    fname = "base_nodes"
+    if (new_rev):
+        fname = fname + "_r2"
     if debug:
-        fname = "base_nodes_debug.launch"
-    else:
-        fname = "base_nodes.launch"
+        fname = fname + "_debug"
+    fname = fname + ".launch"
+
     e = Element("include", attrib = {
         'file': "$(find hbba_synth)/launch/{0}".format(fname)})
     return e
@@ -272,7 +275,7 @@ class Structure:
         if not opts.behavior_based:
             if verbose:
                 print "Adding base HBBA nodes"
-            launch_elem.append(baseNodesXML(opts.debug))
+            launch_elem.append(baseNodesXML(opts.new_rev, opts.debug))
         for p in self.procmodules.values():
             launch_elem.extend(p.generateXML(self, opts))
         for b in self.behaviors.values():
@@ -295,12 +298,13 @@ class Structure:
                 pyscript += "\n\"\"\")\n\n"
             for e in self.emoIntensities.values():
                 pyscript += e.generatePy()
-            for s in self.strategies.values():
-                pyscript += s.generatePy()
-            pyscript += "\n"
-            for r in self.resources.values():
-                pyscript += r.generatePy()
-            pyscript += "\n"
+            if not opts.new_rev:
+                for s in self.strategies.values():
+                    pyscript += s.generatePy()
+                pyscript += "\n"
+                for r in self.resources.values():
+                    pyscript += r.generatePy()
+                pyscript += "\n"
             for d in self.desires.values():
                 pyscript += d.generatePy()
             pyscript += "\n"

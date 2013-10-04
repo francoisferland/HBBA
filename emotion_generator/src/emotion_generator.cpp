@@ -232,10 +232,6 @@ void EmotionGenerator::generateEmotions()
 			desires = "not_"+desires;
 			for(std::map<std::string,double>::iterator it2 = emotionMatrix[desires].begin() ; it2!= emotionMatrix[desires].end() ; it2++)
 			{
-				if(desires.compare("Teleop") == 0)
-				{
-					ROS_INFO("debug teleop generate inverse emotion %s",(*it2).first.c_str());
-				}
 				std::string emotion = (*it2).first;
 				double emotionModulation = (*it2).second;
 				double emotionIntensity = emotionIntensities[emotion];

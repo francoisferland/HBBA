@@ -35,6 +35,7 @@ namespace abtr_priority
 		/// \brief Complete constructor.
 		///
 		/// \param n The ROS NodeHandle to subscribe from.
+		/// \param np The ROS NodeHandle for parameters.
 		/// \param topic_name The name of the commands topic for the service
 		/// namespace.
 		/// \param fp Callback to call with incoming (valid) commands. First
@@ -42,6 +43,7 @@ namespace abtr_priority
 		/// third the actual message.
 		/// \param fp_obj The instance of T to use the callback on.
 		FrontEnd(ros::NodeHandle& n, 
+            ros::NodeHandle& np,
 			const std::string topic_name,
 			void (T::*fp)(int, ros::Time, const boost::shared_ptr<const M>&),
 			T* fp_obj): 
@@ -51,14 +53,41 @@ namespace abtr_priority
 			//sub_(n_.subscribe(topic_name, 10, &ThisType::cmdCB, this)),
 			fp_(fp), fp_obj_(fp_obj)
 		{
+
+            if (np.hasParam("registrations"))
+            {
+                XmlRpc::XmlRpcValue regs;
+                np.getParam("registrations", regs);
+                if (regs.getType() != XmlRpc::XmlRpcValue::TypeArray)
+                {
+                    ROS_ERROR(
+                        "'registrations' parameter for arbitration "
+                        "frontend is not an array.");
+                }
+                else
+                {
+                    std::vector<std::string> topics;
+                    topics.reserve(regs.size());
+                    for (int i = 0; i < regs.size(); ++i)
+                    {
+                        if (regs[i].getType() == 
+                            XmlRpc::XmlRpcValue::TypeString)
+                        {
+                            topics.push_back(std::string(regs[i]));
+                        }
+                    }
+                    if (topics.size())
+                        registerTopics(topics);
+                }
+            }
+
 		}
 
 	private:
-		bool registerCB(RegisterBehavior::Request& req,
-				RegisterBehavior::Response&)
+		void registerTopics(const std::vector<std::string>& topics)
 		{
 			typedef std::vector<std::string>::const_iterator i_t;
-			for (i_t i = req.topics.begin(); i != req.topics.end(); ++i)
+			for (i_t i = topics.begin(); i != topics.end(); ++i)
 			{
 				int p = getPriority(*i);
 				if (p >= 0)
@@ -70,9 +99,14 @@ namespace abtr_priority
 				else
 					ROS_ERROR("Invalid priority for topic %s", i->c_str());
 			}
-
-			return true;
 		}
+
+		bool registerCB(RegisterBehavior::Request& req,
+				RegisterBehavior::Response&)
+		{
+            registerTopics(req.topics);
+            return true;
+        }
 
 		void command(const typename M::ConstPtr& msg, int p)
 		{

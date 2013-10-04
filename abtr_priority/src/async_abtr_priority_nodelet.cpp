@@ -38,7 +38,7 @@ namespace abtr_priority
             ros::NodeHandle np = getPrivateNodeHandle();
 
 			back_.reset(new BackEndType(n, np, "abtr_cmd"));
-			front_.reset(new FrontEndType(n, "cmd", 
+			front_.reset(new FrontEndType(n, np, "cmd", 
 				&BackEndType::addCommand, back_.get()));
 		}
 

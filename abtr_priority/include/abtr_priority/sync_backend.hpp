@@ -32,14 +32,16 @@ namespace abtr_priority
 		/// \brief Complete constructor.
 		///
 		/// \param n The ROS node handle to register topics with.
+		/// \param np The ROS node handle for parameters.
 		/// \param topic_name The name of the command output topic.
-		SyncBackEnd(ros::NodeHandle& n, const std::string& topic_name = "abtr_cmd"): 
-			n_(n), topic_name_(topic_name), last_cmd_(new M()), last_cmd_p_(-1)
+		SyncBackEnd(ros::NodeHandle& n, ros::NodeHandle& np, 
+            const std::string& topic_name = "abtr_cmd"): 
+                n_(n), topic_name_(topic_name), last_cmd_(new M()), last_cmd_p_(-1)
 		{
 			double p;
-			n_.param("abtr_period", p, 0.1);
+			np.param("abtr_period", p, 0.1);
             period_ = ros::Duration(p);
-			n_.param("abtr_cycle_flush", cycle_flush_, false);
+			np.param("abtr_cycle_flush", cycle_flush_, false);
 			timeout_ = ros::Duration(2.0 * p);
 
 			//timer_ = n_.createTimer(ros::Duration(p), 

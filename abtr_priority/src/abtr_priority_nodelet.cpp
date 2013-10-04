@@ -58,11 +58,12 @@ namespace abtr_priority
 		{
             // NOTE: The root namespace will be the same as the nodelet manager.
 			ros::NodeHandle n = getNodeHandle();
+			ros::NodeHandle np = getPrivateNodeHandle();
 
-			back_.reset(new BackEndType(n, "abtr_cmd"));
+			back_.reset(new BackEndType(n, np, "abtr_cmd"));
 			// WARNING! Can't remap subscription topic names in a nodelet ?
 			// Works for the back end, doesn't for the front end.
-			front_.reset(new FrontEndType(n, "cmd", 
+			front_.reset(new FrontEndType(n, np, "cmd", 
 				&BackEndType::addCommand, back_.get()));
 		}
 

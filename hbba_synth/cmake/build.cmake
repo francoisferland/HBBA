@@ -4,8 +4,9 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 # Automatic build of hbba_cfg with "add_hbba_cfg" macro.
 # The BASENAME parameter should name a configuration file found in your project
 # package's hbba_cfg subfolder.
-# The ROBOT parameter should point to a config file basename found in
-# "irl1_hbba_cfg", such as "irl1_tr".
+# The ROBOT parameter should point to a config file basename found either in 
+# the current project's "hbba_cfg" folder, or in the one found in 
+# irl1_hbba_cfg, such as "irl1_tr".
 
 rosbuild_find_ros_package(irl1_hbba_cfg)
 # Need to find the location of this macro's package for building and
@@ -25,10 +26,23 @@ macro(add_hbba_cfg BASENAME ROBOT)
     set(HBBA_CFG_SRC
         ${PROJECT_SOURCE_DIR}/hbba_cfg/${BASENAME}.yaml
     )
+    
+    find_file(HBBA_ROBOT_SRC 
+        ${ROBOT}.yaml 
+        ${PROJECT_SOURCE_DIR}/hbba_cfg 
+        ${irl1_hbba_cfg_PACKAGE_PATH}/hbba_cfg
+    )
     set(HBBA_CFG_SRC_ALL
-        ${irl1_hbba_cfg_PACKAGE_PATH}/hbba_cfg/${ROBOT}.yaml
+        ${HBBA_ROBOT_SRC}
         ${HBBA_CFG_SRC}
     )
+
+    set(HBBA_CFG_OPTS "-p")
+    if(${ARGN} MATCHES "BHVR")
+        message("Building ${BASENAME} in behavior mode.")
+        set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}b")
+    endif()
+    set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}o")
 
     message("Gathering HBBA dependencies for ${BASENAME}...")
     execute_process(
@@ -39,7 +53,7 @@ macro(add_hbba_cfg BASENAME ROBOT)
 
     add_custom_command(
         OUTPUT ${HBBA_CFG_OUTPUT}
-        COMMAND rosrun hbba_synth hbba_synth -po ${HBBA_CFG_OUTPUT_BASENAME} ${HBBA_CFG_SRC_ALL}
+        COMMAND rosrun hbba_synth hbba_synth ${HBBA_CFG_OPTS} ${HBBA_CFG_OUTPUT_BASENAME} ${HBBA_CFG_SRC_ALL}
         DEPENDS ${HBBA_CFG_SRC_ALL} ${HBBA_CFG_SRC_DEPS}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )

@@ -115,7 +115,12 @@ namespace abtr_priority
                         clearOldCommands(ros::Time::now());
 
                     if (cmd_map_.empty())
+                    {
+                        ROS_DEBUG(
+                            "Arbitration command map empty, "
+                            "skipping publication.");
                         continue;
+                    }
 
                     // Return whatever is left at the top of the list.
                     std_msgs::Int32 p;

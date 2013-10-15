@@ -3,4 +3,4 @@ not_GoTo :   {Joy: -0.05,  Anger:  0.05 }
 Wander :     {Joy:  0.005, Anger: -0.005}
 not_Wander : {Joy: -0.002, Anger:  0.002}
 Teleop :     {Joy:  0.04,  Anger: -0.04 }
-not_Teleop : {Joy: -0.05,  Anger:  0.05 }
+not_Teleop : {Joy: 0,  Anger:  0 }

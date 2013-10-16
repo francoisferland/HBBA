@@ -54,6 +54,9 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
         // Do not add constraints for zero goals, avoid activating strategies
         // for undesired classes.
         // TODO: Check first if it's really needed.
+        // NOTE: Adding zero goals should permit desires that really don't want
+        // utility in specific classes.
+        // Instead of using a ">=" constraint, it should be "=0".
         // if (!(g[k] > 0.0)) {
         //     continue;
         // }

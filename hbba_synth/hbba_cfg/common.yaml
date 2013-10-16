@@ -13,4 +13,5 @@ hbba_conf:
 - remap: {from: 'remove_desires', to: '/hbba/remove_desires'}
 - remap: {from: 'eval_script', to: '/hbba/eval_script'}
 - remap: {from: 'events', to: '/hbba/events'}
+- remap: {from: 'desires_set', to: '/hbba/desires_set'}
 

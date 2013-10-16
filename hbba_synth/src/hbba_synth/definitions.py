@@ -646,6 +646,9 @@ class MotivationDef:
             self.auto_hbba_remap = True
 
         if self.auto_hbba_remap:
+            self.input.extend([
+                'desires_set',
+                'events'])
             self.output.extend([
                 'add_desires', 
                 'remove_desires', 

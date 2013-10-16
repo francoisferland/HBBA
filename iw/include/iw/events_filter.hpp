@@ -29,7 +29,8 @@ namespace iw
         /// \param id Desire id to filter with.
         EventsFilter(ros::NodeHandle& n, const std::string& id);
 
-        /// \brief Register a callback for all events related to this event.
+        /// \brief Register a callback for all events related to a specific 
+        /// desire.
         ///
         /// \brief fun A class member function pointer.
         /// \brief obj The class instance to use for this callback.

@@ -16,7 +16,7 @@ EmotionGenerator::EmotionGenerator(ros::NodeHandle * n, std::string nodeName)
 	ros::NodeHandle np("~");
 
 	np.param("debug_emotion_generator",debugEmotionGenerator_,false);
-	np.param("emotion_decay",emotionDecay_,0.01);
+	np.param("emotion_decay",emotionDecay_,0.002);
 	if(emotionDecay_ > 1 || emotionDecay_ < 0)
 	{
 		emotionDecay_ = 0.01;
@@ -118,20 +118,21 @@ void EmotionGenerator::getEmotionDesireRelation(std::string desireType)
 
 	std::map<std::string,double> mapEmotion;
 
+	ROS_INFO_COND(emotionParam.begin() != emotionParam.end() , "new desire %s :",desireType.c_str());
 	for (std::map<std::string, XmlRpc::XmlRpcValue>::iterator it = emotionParam.begin(); it != emotionParam.end(); it++)
 	{
 		double emotionFactor = 0;
 		if((*it).second.getType() == XmlRpc::XmlRpcValue::TypeInt)
 		{
 			int value = static_cast<int>((*it).second);
-			ROS_INFO("factor %s %i",(*it).first.c_str(), value);
+			ROS_INFO(" %s %i",(*it).first.c_str(), value);
 			emotionFactor = (double)value;
 
 		}
 		else if ((*it).second.getType() == XmlRpc::XmlRpcValue::TypeDouble)
 		{
 			emotionFactor = static_cast<double>((*it).second);
-			ROS_INFO("factor %s %5.2f",(*it).first.c_str(), emotionFactor);
+			ROS_INFO(" %s %5.2f",(*it).first.c_str(), emotionFactor);
 		}
 
 		mapEmotion[(*it).first] = emotionFactor;

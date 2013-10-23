@@ -38,10 +38,21 @@ macro(add_hbba_cfg BASENAME ROBOT)
     )
 
     set(HBBA_CFG_OPTS "-p")
-    if(${ARGN} MATCHES "BHVR")
+    # ARGN requires to be put in a variable before list(...) works:
+    set(_vargs ${ARGN})
+
+    list(FIND _vargs "BHVR" _opt_bhvr)
+    if(NOT _opt_bhvr EQUAL -1)
         message("Building ${BASENAME} in behavior mode.")
         set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}b")
     endif()
+
+    list(FIND _vargs "NEWREV" _opt_newrev)
+    if (NOT _opt_newrev EQUAL -1)
+        message("Building ${BASENAME} with the new IW revision.")
+        set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}n")
+    endif()
+
     set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}o")
 
     message("Gathering HBBA dependencies for ${BASENAME}...")

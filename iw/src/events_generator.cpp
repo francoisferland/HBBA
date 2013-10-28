@@ -25,6 +25,8 @@ EventsGenerator::EventsGenerator(ros::NodeHandle& n, ros::NodeHandle& np)
 	rosgraph_monitor_->registerCB(&EventsGenerator::rosgraphEventsCB, this);
 
 	timer_ = n.createTimer(ros::Duration(1.0), &EventsGenerator::timerCB, this);
+
+    parseExploitationMatches(n);
 }
 
 EventsGenerator::~EventsGenerator()
@@ -218,22 +220,31 @@ void EventsGenerator::event(
 	}
 }
 
-bool EventsGenerator::cemCB(
-		hbba_msgs::CreateExploitationMatcher::Request& req,
-		hbba_msgs::CreateExploitationMatcher::Response& res)
+void EventsGenerator::cem(
+    const std::string& topic_name, 
+    const std::vector<hbba_msgs::ExploitationMatch>& matches)
 {
-	ros::NodeHandle n, nt(req.topic);
+	ros::NodeHandle n, nt(topic_name);
+
 	ExploitationMatcher* em = new ExploitationMatcher(n, nt);
 	matchers_.push_back(em);
 
 	std::vector<hbba_msgs::ExploitationMatch>::const_iterator i =
-			req.matches.begin();
-	while (i != req.matches.end())
+			matches.begin();
+	while (i != matches.end())
 		em->registerMatches(*(i++));
 
 	em->registerMatchCB(&EventsGenerator::exploitationCB, this);
 
-	ROS_DEBUG("ExploitationMatcher created for %s", req.topic.c_str());
+	ROS_INFO("ExploitationMatcher created for %s", topic_name.c_str());
+
+}
+
+bool EventsGenerator::cemCB(
+		hbba_msgs::CreateExploitationMatcher::Request& req,
+		hbba_msgs::CreateExploitationMatcher::Response& res)
+{
+    cem(req.topic, req.matches);
 	return true;
 }
 
@@ -243,6 +254,103 @@ bool EventsGenerator::ctemCB(
 {
 	tem_map_[req.topic] = req.matches;
 	return true;
+}
+
+void EventsGenerator::parseExploitationMatches(const ros::NodeHandle& n)
+{
+    if (!n.hasParam("exploitation_matches")) {
+        return;
+    }
+
+    ROS_INFO("Parsing parameters for exploitation matches ...");
+
+    XmlRpc::XmlRpcValue node;
+    n.getParam("exploitation_matches", node);
+
+    if (node.getType() != XmlRpc::XmlRpcValue::TypeArray) {
+        ROS_ERROR("'exploitation_matches' is not an array, ignoring.");
+        return;
+    }
+
+    for (int i = 0; i != node.size(); ++i) {
+        XmlRpc::XmlRpcValue& topic_node  = node[i];
+
+        if (!topic_node.hasMember("topic_name")) {
+            ROS_ERROR("Topic node has no topic_name, skipping.");
+            continue;
+        }
+
+        if (!topic_node.hasMember("matches")) {
+            ROS_ERROR("Topic node has no matches, skipping.");
+            continue;
+        }
+
+        const std::string&   topic_name   = topic_node["topic_name"];
+        XmlRpc::XmlRpcValue& matches_node = topic_node["matches"];
+
+        if (matches_node.getType() != XmlRpc::XmlRpcValue::TypeArray) {
+            ROS_ERROR("Matches for '%s' is not an array, skipping.",
+                      topic_name.c_str());
+            continue;
+        }
+
+        std::vector<hbba_msgs::ExploitationMatch> matches;
+        matches.reserve(matches_node.size());
+        for (int j = 0; j < matches_node.size(); ++j) {
+            XmlRpc::XmlRpcValue& elem = matches_node[j];
+            if (elem.getType() != XmlRpc::XmlRpcValue::TypeStruct) {
+                ROS_ERROR("Element for '%s' is not a proper struct, skipping.",
+                          topic_name.c_str());
+                continue;
+            }
+
+            if (!elem.hasMember("priority")) {
+                ROS_ERROR("Element for '%s' does not contain a priority, "
+                          "skipping.",
+                          topic_name.c_str());
+                continue;
+            }
+
+            int priority = static_cast<int>(elem["priority"]);
+
+            if (!elem.hasMember("desire_type")) {
+                ROS_ERROR("Element for priority %i of '%s' does not contain a "
+                          "desire type, skipping.",
+                          priority,
+                          topic_name.c_str());
+                continue;
+            }
+
+            XmlRpc::XmlRpcValue& desire_types = elem["desire_type"];
+            if (desire_types.getType() != XmlRpc::XmlRpcValue::TypeArray) {
+                ROS_ERROR("Desire type for priority %i of '%s' is not an "
+                          "array, skipping.",
+                          priority,
+                          topic_name.c_str());
+                continue;
+            }
+
+            hbba_msgs::ExploitationMatch match;
+            match.priority = priority;
+            match.classes.reserve(desire_types.size());
+            for (int k = 0; k < desire_types.size(); ++k) {
+                XmlRpc::XmlRpcValue& dtype = desire_types[k];
+                if (dtype.getType() != XmlRpc::XmlRpcValue::TypeString) {
+                    ROS_ERROR("Desire type in '%s' is not a string, skipping.",
+                              topic_name.c_str());
+                    continue;
+                }
+
+                match.classes.push_back(dtype);
+            }
+
+            matches.push_back(match);
+        }
+
+        if (matches.size()) {
+            cem(topic_name, matches);
+        }
+    }
 }
 
 void EventsGenerator::timerCB(const ros::TimerEvent&)

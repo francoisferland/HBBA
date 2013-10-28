@@ -149,6 +149,23 @@ class Structure:
             out += exploitation_match_call.format(ft, ems)
         return out
 
+    def generateExploitationMatchesXML(self, opts):
+        if (opts.verbose):
+            print "Generating static set of exploitation matches..."
+
+        matches = []
+        for t, ms in self.exploitationMatches.iteritems():
+            topic_name = self.getRootTopicFullName(t)
+            p_dt = []
+            for p, dt in ms.iteritems():
+                p_dt.append({'priority': p, 'desire_type': dt})
+            match = {'topic_name':  topic_name, 'matches': p_dt}
+            matches.append(match)
+        out = {'hbba': {'exploitation_matches': matches}}
+        out_e = Element("rosparam")
+        out_e.text = str(out)
+        return out_e
+
     def getRootTopicFullName(self, topic):
         if topic in self.rootRemaps:
             return self.rootRemaps[topic]
@@ -200,24 +217,6 @@ class Structure:
             param_e.text = str(s)
             n.append(param_e)
 
-        return [n]
-
-    def generateExploitationMatcherXML(self, topic):
-        root_topic = self.getRootTopicFullName(topic)
-        node_name = "exploitation_matcher_{0}".format(topic)
-        n = Element("node", attrib = {
-            'name': node_name,
-            'pkg': 'iw',
-            'type': 'exploitation_matcher'})
-        n.append(Element("remap", attrib = {
-            'from': 'priority',
-            'to': "{0}/priority".format(root_topic)}))
-        n.append(Element("remap", attrib = {
-            'from': 'intention',
-            'to': "hbba/intention"}))
-        n.append(Element("remap", attrib = {
-            'from': 'register_em',
-            'to': "{0}/register_exploitation_match".format(root_topic)}))
         return [n]
 
     def solverModelXML(self, opts):
@@ -321,9 +320,10 @@ class Structure:
             for d in self.desires.values():
                 pyscript += d.generatePy()
             pyscript += "\n"
-            if not opts.disable_arbitration:
-                pyscript += "\n"
-                pyscript += self.generateExploitationMatchesPy()
+            #if not opts.disable_arbitration:
+            #    pyscript += "\n"
+            #    pyscript += self.generateExploitationMatchesPy()
+
             pyscript += "\n\nprint \"Stop this script with Ctrl-C when ready.\"\n"
             pyscript += "rospy.spin()\n"
 
@@ -337,10 +337,13 @@ class Structure:
                 self.getRootTopicFullName("emo_intensity")))
             pyfile.write(pyscript)
 
-            # XML addition: the whole solver model as a rosparam:
+            # XML additions: 
+            # The whole solver model as a rosparam:
             launch_elem.append(self.solverModelXML(opts))
-            # XML additions: the static list of topic filters:
+            # The static list of topic filters:
             launch_elem.append(self.topicFiltersXML(opts))
+            # The static list of exploitation matches:
+            launch_elem.append(self.generateExploitationMatchesXML(opts))
 
         elif verbose:
             print "Behavior-based mode - no Python script generated."

@@ -34,6 +34,22 @@ namespace iw
     ///    Default: 0.5 s.
     ///  - rosgraph_monitor/topics: A list of topics to monitor for activity and 
     ///    thus perception-related desire exploitation. 
+    ///  - exploitation_matches: A dictionary of exploitation matches.
+    ///    This parameter is expected in the same namespace as this node, so
+    ///    '/hbba', usually.
+    ///    The format is as such:
+    ///
+    ///       exploitation_matches:
+    ///           - topic_name: 'full_topic_name_1'
+    ///             matches: 
+    ///              - priority: priority_value_1
+    ///                desire_type: ['desire_type_1', 'desire_type_2', ...]
+    ///              - priority: priority_value_2
+    ///                desire_type: ['desire_type_3', ...]   
+    ///           - topic_name: 'full_topic_name_2'
+    ///             matches: ...    
+    ///
+    ///    See 'hbba_synth' for automatic generation of this parameter.
     ///
     /// Services:
     ///  - create_exploitation_matcher: Create an exploitation matcher for
@@ -83,6 +99,13 @@ namespace iw
             const std::string& id, 
             const std::string& d_type,
             const unsigned char type);
+
+        /// \brief Create Exploitation match(es).
+        void cem(
+                const std::string& topic_name, 
+                const std::vector<hbba_msgs::ExploitationMatch>& matches);
+
+        void parseExploitationMatches(const ros::NodeHandle& n);
 
         ros::Subscriber sub_desires_;
         ros::Subscriber sub_intention_;

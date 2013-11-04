@@ -72,7 +72,10 @@ The technique is simple: for each class $k$, find the the most intense desire $d
 The goal is to determine $a_{i}$, activation state of strategy $i$, by respecting two sets of constraints:
 
 \begin{itemize}
-	\item $\sum\limits_i a_i (u_{ik} - r_{ik}) \geq g_k$, for each class $k$,
+	\item $\sum\limits_i a_i (u_{ik} - r_{ik}) \geq g_k$, for each class $k$
+        where $g_k > 0$, 
+	\item $\sum\limits_i a_i (u_{ik} - r_{ik}) \leq 0$, for each class $k$
+        where $g_k \leq 0$, 
 	\item $\sum\limits_i a_i c_{ij} \leq m_j$, for each resource $j$.
 \end{itemize}
 

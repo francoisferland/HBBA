@@ -51,30 +51,31 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
     // Convert both G and UR (utility both required and provided by 
     // strategies) to constraints:
     for (size_t k = 0; k < nb_cls; ++k) {
-        // Do not add constraints for zero goals, avoid activating strategies
-        // for undesired classes.
-        // TODO: Check first if it's really needed.
-        // NOTE: Adding zero goals should permit desires that really don't want
-        // utility in specific classes.
-        // Instead of using a ">=" constraint, it should be "=0".
-        // if (!(g[k] > 0.0)) {
-        //     continue;
-        // }
-
         const MatrixColView   col = ur[boost::indices[MatrixRange()][k]];
         SolverImpl::IntVector ur_k(nb_strats);
 
         std::copy(col.begin(), col.end(), ur_k.begin());
 
-        solver.AddConstraint(
-            solver.MakeScalProdGreaterOrEqual(
-                a, 
-                ur_k, 
-                g[k]));
+        // Add ">=" constraints for positive goals, as we don't mind if we
+        // get higher utility than required.
+        // However, add "<=" constraints for null (or negative) goals, as we
+        // don't want to produce utility for unwanted desires.
+        if (g[k] > 0.0) {
+            solver.AddConstraint(
+                solver.MakeScalProdGreaterOrEqual(
+                    a, 
+                    ur_k, 
+                    g[k]));
+        } else {
+            solver.AddConstraint(
+                solver.MakeScalProdLessOrEqual(
+                    a,
+                    ur_k,
+                    g[k]));
+        }
     }
 
-    // Minimize total count of activated strategies so that we don't fulfill
-    // unwanted desires.
+    // Finally, minimize total count of activated strategies.
     or_tools::IntVar* sum_a = solver.MakeSum(a)->Var();
     or_tools::OptimizeVar* const opt_sum_a = solver.MakeMinimize(sum_a, 1);
 

@@ -73,11 +73,12 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
                     ur_k, 
                     g[k]));
         } else {
-            solver.AddConstraint(
-                solver.MakeScalProdLessOrEqual(
-                    a,
-                    ur_k,
-                    g[k]));
+            // TODO: CURRENTLY DISABLED, BREAKS DEPENDENCIES GATHERING:
+            // solver.AddConstraint(
+            //    solver.MakeScalProdLessOrEqual(
+            //        a,
+            //        ur_k,
+            //        g[k]));
         }
     }
 

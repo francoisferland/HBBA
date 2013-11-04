@@ -5,7 +5,7 @@ from sets import Set
 
 # Some constant expressions that are formatted later:
 
-python_header = """
+python_header_common = """
 import roslib; roslib.load_manifest("hbba_synth")
 import rospy;
 from hbba_msgs.msg import *
@@ -15,19 +15,23 @@ from emotions_msgs.msg import EmoIntensity
 
 rospy.init_node("hbba_struct", anonymous=True)
 
+rospy.wait_for_service("hbba/add_desires", 1.0)
+add_desires = rospy.ServiceProxy("hbba/add_desires", AddDesires)
+
+pubEmoIntensity = rospy.Publisher("{0}", EmoIntensity)
+
+"""
+
+python_header_model = """
 rospy.wait_for_service("hbba/add_strategy", 1.0)
 add_strat = rospy.ServiceProxy("hbba/add_strategy", AddStrategy)
 
 rospy.wait_for_service("hbba/set_resource_max", 1.0)
 set_resource_max = rospy.ServiceProxy("hbba/set_resource_max", SetResourceMax)
 
-rospy.wait_for_service("hbba/add_desires", 1.0)
-add_desires = rospy.ServiceProxy("hbba/add_desires", AddDesires)
-
 rospy.wait_for_service("hbba/eval_script", 1.0)
 eval_script = rospy.ServiceProxy("hbba/eval_script", EvalScript)
 
-pubEmoIntensity = rospy.Publisher("{0}", EmoIntensity)
 """
 
 exploitation_match_sp = """
@@ -333,8 +337,11 @@ class Structure:
                 print ""
 
             pyfile = file(basepath + ".py", "w")
-            pyfile.write(python_header.format(
+            pyfile.write(python_header_common.format(
                 self.getRootTopicFullName("emo_intensity")))
+            if not opts.new_rev:
+                pyfile.write(python_header_model)
+
             pyfile.write(pyscript)
 
             # XML additions: 

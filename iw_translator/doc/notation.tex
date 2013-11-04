@@ -69,7 +69,7 @@ The technique is simple: for each class $k$, find the the most intense desire $d
 \end{itemize}
 
 \subsection*{Solving process}
-The goal is to determine $a_{i}$, activation state of strategy $i$, by respecting two sets of constraints:
+The goal is to determine $a_{i}$, the activation state of strategy $i$, by respecting these constraints:
 
 \begin{itemize}
 	\item $\sum\limits_i a_i (u_{ik} - r_{ik}) \geq g_k$, for each class $k$
@@ -77,6 +77,15 @@ The goal is to determine $a_{i}$, activation state of strategy $i$, by respectin
 	\item $\sum\limits_i a_i (u_{ik} - r_{ik}) \leq 0$, for each class $k$
         where $g_k \leq 0$, 
 	\item $\sum\limits_i a_i c_{ij} \leq m_j$, for each resource $j$.
+\end{itemize}
+
+And observe the following optimizations:
+
+\begin{itemize}
+    \item Minimize $\sum\limits_i a_i$ to avoid activating extra strategies for
+        unwanted desires (usefulness currently being evaluated),
+    \item Maximize $\sum\limits_k \sum\limits_i a_{i} (u_{ik} - r_{ik})$, the
+        total utility produced.
 \end{itemize}
 
 \end{document}

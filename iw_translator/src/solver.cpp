@@ -21,11 +21,14 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
 
     or_tools::Solver& solver = *(impl_->or_solver);
 
-    const Matrix&               u  = solver_model.u();
-    const Matrix&               c  = solver_model.c();
-    const Vector&               m  = solver_model.m();
-    const Matrix&               ur = solver_model.ur();
-    SolverImpl::IntVarVector&   a  = impl_->a;
+    const Matrix&               u   = solver_model.u();
+    const Matrix&               c   = solver_model.c();
+    const Vector&               m   = solver_model.m();
+    const Matrix&               ur  = solver_model.ur();
+    SolverImpl::IntVarVector&   a   = impl_->a;
+
+    // Total utility produced per class (a_ik * (u_ik - r_ik)):
+    SolverImpl::IntVarVector aur;
 
     size_t nb_strats = ur.shape()[0];
     size_t nb_res    = m.size();
@@ -56,6 +59,9 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
 
         std::copy(col.begin(), col.end(), ur_k.begin());
 
+        // Keep a copy of the scalar product for optimization.
+        aur.push_back(solver.MakeScalProd(a, ur_k)->Var());
+
         // Add ">=" constraints for positive goals, as we don't mind if we
         // get higher utility than required.
         // However, add "<=" constraints for null (or negative) goals, as we
@@ -75,9 +81,18 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
         }
     }
 
+    // Search monitors used for optimization (see Solve(...) call).
+    std::vector<or_tools::SearchMonitor*> monitors;
+
+    // Optimize for maximum utility production (non-optional).
+    or_tools::IntVar* sum_aur = solver.MakeSum(aur)->Var();
+    monitors.push_back(solver.MakeMaximize(sum_aur, 1));
+
     // Finally, minimize total count of activated strategies.
+    // TODO: Remove this, probably no longer necessary with the '<='
+    // constraints, and doesn't really mean anything.
     or_tools::IntVar* sum_a = solver.MakeSum(a)->Var();
-    or_tools::OptimizeVar* const opt_sum_a = solver.MakeMinimize(sum_a, 1);
+    monitors.push_back(solver.MakeMinimize(sum_a, 1));
 
     // Choose a random unbound variable to start, start with minimum values
     // (deactivated strategies):
@@ -90,8 +105,11 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
         solver.MakeBestValueSolutionCollector(false);
     coll->Add(a);
     coll->AddObjective(sum_a);
+    coll->AddObjective(sum_aur);
+    monitors.push_back(coll);
+
     solver.NewSearch(db, coll);
-    solver.Solve(db, coll, opt_sum_a);
+    solver.Solve(db, monitors);
 
     int nb_sols = coll->solution_count();
     ROS_DEBUG("Solutions count: %i", nb_sols);

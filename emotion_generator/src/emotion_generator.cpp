@@ -36,49 +36,49 @@ EmotionGenerator::EmotionGenerator(ros::NodeHandle * n, std::string nodeName)
 
 void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 {
-	//ROS_INFO("emotionGenerator event %i %s %s",msg.type, msg.desire.c_str(), msg.desire_type.c_str());
+//	ROS_INFO("emotionGenerator event %i %s %s",msg.type, msg.desire.c_str(), msg.desire_type.c_str());
 
 	switch(msg.type)
 	{
 	case hbba_msgs::Event::EXP_ON:
 	{
 		exploitedDesires[msg.desire_type] = true;
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Teleop") == 0)
 		{
-			ROS_INFO("Emo_gen - exp on GoTo");
+			ROS_INFO("Emo_gen - exp on Teleop");
 		}
 		break;
 	}
 	case hbba_msgs::Event::EXP_OFF:
 	{
 		exploitedDesires[msg.desire_type] = false;
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Teleop") == 0)
 		{
-			ROS_INFO("Emo_gen - exp off GoTo");
+			ROS_INFO("Emo_gen - exp off Teleop");
 		}
 		break;
 	}
 	case hbba_msgs::Event::DES_ON:
 	{
 		activeDesires[msg.desire_type] = true;
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Teleop") == 0)
 		{
-			ROS_INFO("Emo_gen - des on GoTo");
+			ROS_INFO("Emo_gen - des on Teleop");
 		}
 		break;
 	}
 	case hbba_msgs::Event::DES_OFF:
 	{
 		activeDesires[msg.desire_type] = false;
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Teleop") == 0)
 		{
-			ROS_INFO("Emo_gen - des off GoTo");
+			ROS_INFO("Emo_gen - des off Teleop");
 		}
 		break;
 	}
 	case hbba_msgs::Event::INT_ON:
 	{
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Teleop") == 0)
 		{
 			//			ROS_INFO("int on GoTo");
 		}
@@ -86,7 +86,7 @@ void EmotionGenerator::eventsCallback(const hbba_msgs::Event& msg)
 	}
 	case hbba_msgs::Event::INT_OFF:
 	{
-		if(msg.desire_type.compare("GoTo") == 0)
+		if(msg.desire_type.compare("Teleop") == 0)
 		{
 			//			ROS_INFO("int off GoTo");
 		}

@@ -9,11 +9,11 @@
 namespace iw_translator
 {
 
-    /// \brief Scalar type for internal data (double).
-    typedef double                                Scalar;
-    /// \brief Vector type for internal data (Nx1 double).
+    /// \brief Scalar type for internal data (int).
+    typedef int                                   Scalar;
+    /// \brief Vector type for internal data (Nx1).
     typedef std::vector<Scalar>                   Vector;
-    /// \brief Matrix type for internal data (NxM double).
+    /// \brief Matrix type for internal data (NxM).
     typedef boost::multi_array<Scalar, 2>         Matrix;
     /// \brief Map used to match string identifiers to indices.
     typedef boost::bimap<std::string, int>        IndicesMap;
@@ -21,7 +21,6 @@ namespace iw_translator
     typedef Matrix::const_array_view<1>::type     MatrixColView;
     /// \brief Range generator for matrices.
     typedef boost::multi_array_types::index_range MatrixRange;
-
 
     /// \brief A class that represents the static data part of the IW solver.
     ///
@@ -94,7 +93,10 @@ namespace iw_translator
         /// The whole desires vector is always verified so that every unknown
         /// classes can be warned to the user.
         ///
-        /// The default utility value is 0.0 for unspecified classes.
+        /// The default utility value is a negative integer for unspecified 
+        /// classes.
+        /// A value of 0 is allowed, and is used by desires to prevent utility
+        /// production in specific classes.
         ///
         /// \param  desires The input desires set.
         /// \param  out     The output vector.

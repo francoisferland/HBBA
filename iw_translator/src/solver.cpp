@@ -54,31 +54,41 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
     // Convert both G and UR (utility both required and provided by 
     // strategies) to constraints:
     for (size_t k = 0; k < nb_cls; ++k) {
-        const MatrixColView   col = ur[boost::indices[MatrixRange()][k]];
+        const MatrixColView   u_col  = u[boost::indices[MatrixRange()][k]];
+        const MatrixColView   ur_col = ur[boost::indices[MatrixRange()][k]];
+        SolverImpl::IntVector u_k(nb_strats);
         SolverImpl::IntVector ur_k(nb_strats);
-
-        std::copy(col.begin(), col.end(), ur_k.begin());
+        std::copy(u_col.begin(),  u_col.end(),  u_k.begin());
+        std::copy(ur_col.begin(), ur_col.end(), ur_k.begin());
 
         // Keep a copy of the scalar product for optimization.
         aur.push_back(solver.MakeScalProd(a, ur_k)->Var());
 
         // Add ">=" constraints for positive goals, as we don't mind if we
         // get higher utility than required.
-        // However, add "<=" constraints for null (or negative) goals, as we
-        // don't want to produce utility for unwanted desires.
-        if (g[k] > 0.0) {
+        // Negative (unspecified) goal values follow the same rule, as they
+        // might get produced if they're part of a strategy's dependencies
+        // (R matrix).
+        // However, add "=" constraints for zero goals with u_ik in the sum, as 
+        // we don't want to produce utility for specifically unwanted desires, 
+        // even if it's only through a dependency.
+        if (g[k] != 0) {
+            // NOTE: We need to saturate g_k at zero.
+            // Otherwise, some requirements might get ignored when (u_ik - r_ik)
+            // ends with a negative value.
+            Scalar g_k = (g[k] < 0) ? 0 : g[k];
             solver.AddConstraint(
                 solver.MakeScalProdGreaterOrEqual(
                     a, 
                     ur_k, 
-                    g[k]));
+                    g_k));
         } else {
-            // TODO: CURRENTLY DISABLED, BREAKS DEPENDENCIES GATHERING:
-            // solver.AddConstraint(
-            //    solver.MakeScalProdLessOrEqual(
-            //        a,
-            //        ur_k,
-            //        g[k]));
+            Scalar g_k = 0;
+            solver.AddConstraint(
+               solver.MakeScalProdEquality(
+                   a,
+                   u_k,
+                   g_k));
         }
     }
 

@@ -141,7 +141,7 @@ bool SolverModel::convertDesires(
     bool ok = true;
 
     out.resize(cls_map_.size());
-    std::fill(out.begin(), out.end(), 0.0);
+    std::fill(out.begin(), out.end(), -1);
 
     DVec desires = desires_set.desires;
     for (DIt i = desires.begin(); i != desires.end(); ++i) {

@@ -11,6 +11,11 @@ from hbba_msgs.srv import *
 # Anything passed [utility] is packed into the params string.
 # Syntax: del id1 [id2] ...
 
+def gatherClasses():
+    strats = rospy.get_param("hbba/solver_model/strategies")
+    dtypes = [s['class'] for s in strats if 'class' in s]
+    return dtypes
+
 class Completer:
     def __init__(self, shell):
         self.matches = []
@@ -34,8 +39,11 @@ class Shell:
         readline.set_completer(self.comp.completer)
         readline.parse_and_bind("tab: complete")
 
-        self.commands = ['add', 'del']
-        self.desire_classes = ['LocateLegs', 'LocateFaces']
+        self.scl_add = rospy.ServiceProxy("hbba/add_desires",    AddDesires)
+        self.scl_del = rospy.ServiceProxy("hbba/remove_desires", RemoveDesires)
+
+        self.commands = ['add', 'del', 'help', 'quit']
+        self.desire_classes = gatherClasses()
 
         self.current_id = 0
         self.ids = []
@@ -62,21 +70,28 @@ class Shell:
                     cmd = "del"
                     opts = self.ids
                     continue
-                opts = self.commands
-                continue
+                elif (t.lower() == "help"):
+                    state = 6
+                    cmd = "help"
+                    opts = []
+                    continue
+                else:
+                    opts = self.commands
+                    continue
+
             elif (state == 1):    # Add
                 if (t in self.desire_classes):
                     state = 2   # AddType
                     opts  = []
-                    desire.type = t
+                    desire.type = str(t)
                     continue
             elif (state == 2):
                 state = 3 # AddTypeInt
-                desire.intensity = t
+                desire.intensity = float(t)
                 continue
             elif (state == 3):
                 state = 4 # AddTypeIntParams 
-                desire.utility = t
+                desire.utility = float(t)
                 continue
             elif (state == 4):
                 desire.params += t
@@ -90,11 +105,13 @@ class Shell:
                     self.addDesire(desire)
                 else:
                     print "Missing critical desire type info."
-            if (cmd == "del"):
+            elif (cmd == "del"):
                 if (len(del_ids) > 0):
                     self.delDesires(del_ids)
                 else:
                     print "Missing desire id(s) to delete."
+            elif (cmd == "help"):
+                self.printSyntax()
 
         return opts
 
@@ -103,14 +120,25 @@ class Shell:
         self.ids.append(desire.id)
         self.current_id += 1
         print desire
+        self.scl_add.call([desire])
 
     def delDesires(self, del_ids):
         print "Deleting ", del_ids, "..."
         for d in del_ids:
             if (d in self.ids):
                 self.ids.remove(d)
+        self.scl_del.call(del_ids)
+
+    def printSyntax(self):
+        print "Syntax :"
+        print "  add Class [intensity] [utility] [params]"
+        print "  del id1 [id2] ..."
+        print ""
+        print "For the add command, anything passed the [utility] arg is"
+        print "appended in a single params string."
 
     def loop(self):
+        print "Type 'help' for syntax."
         line = ""
         ok = True
         while ok:
@@ -118,14 +146,15 @@ class Shell:
             ok = self.analyse(line)
 
     def analyse(self, line):
-        print line
         self.parseLine(line, final=True)
 
-        if line == "quit":
+        if line.split()[0] == "quit":
+            print "Quitting..."
             return False
 
         return True
 
+rospy.init_node("iw_console", anonymous=True)
 
 shell = Shell()
 shell.loop()

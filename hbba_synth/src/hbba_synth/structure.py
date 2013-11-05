@@ -355,10 +355,11 @@ class Structure:
             # XML additions: 
             # The whole solver model as a rosparam:
             launch_elem.append(self.solverModelXML(opts))
-            # The static list of topic filters:
-            launch_elem.append(self.topicFiltersXML(opts))
-            # The static list of exploitation matches:
-            launch_elem.append(self.generateExploitationMatchesXML(opts))
+            if not opts.model_only:
+                # The static list of topic filters:
+                launch_elem.append(self.topicFiltersXML(opts))
+                # The static list of exploitation matches:
+                launch_elem.append(self.generateExploitationMatchesXML(opts))
 
         elif verbose:
             print "Behavior-based mode - no Python script generated."

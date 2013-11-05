@@ -92,18 +92,22 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
         }
     }
 
+    // TODO: Clean up multiple optimizations setup.
     // Search monitors used for optimization (see Solve(...) call).
-    std::vector<or_tools::SearchMonitor*> monitors;
+    // std::vector<or_tools::SearchMonitor*> monitors;
 
     // Optimize for maximum utility production (non-optional).
-    or_tools::IntVar* sum_aur = solver.MakeSum(aur)->Var();
-    monitors.push_back(solver.MakeMaximize(sum_aur, 1));
+    
+    // TODO: Re-enable this:
+    // or_tools::IntVar* sum_aur = solver.MakeSum(aur)->Var();
+    // monitors.push_back(solver.MakeMaximize(sum_aur, 1));
 
     // Finally, minimize total count of activated strategies.
     // TODO: Remove this, probably no longer necessary with the '<='
     // constraints, and doesn't really mean anything.
     or_tools::IntVar* sum_a = solver.MakeSum(a)->Var();
-    monitors.push_back(solver.MakeMinimize(sum_a, 1));
+    // monitors.push_back(solver.MakeMinimize(sum_a, 1));
+    or_tools::OptimizeVar* opt_sum_a = solver.MakeMinimize(sum_a, 1);
 
     // Choose a random unbound variable to start, start with minimum values
     // (deactivated strategies):
@@ -116,11 +120,12 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
         solver.MakeBestValueSolutionCollector(false);
     coll->Add(a);
     coll->AddObjective(sum_a);
-    coll->AddObjective(sum_aur);
-    monitors.push_back(coll);
+    // coll->AddObjective(sum_aur);
+    // monitors.push_back(coll);
 
     solver.NewSearch(db, coll);
-    solver.Solve(db, monitors);
+    // solver.Solve(db, monitors);
+    solver.Solve(db, coll, opt_sum_a);
 
     int nb_sols = coll->solution_count();
     ROS_DEBUG("Solutions count: %i", nb_sols);

@@ -292,17 +292,24 @@ class Structure:
             if verbose:
                 print "Adding base HBBA nodes"
             launch_elem.append(baseNodesXML(opts.new_rev, opts.debug))
+
+        main_elems = []
         for p in self.procmodules.values():
-            launch_elem.extend(p.generateXML(self, opts))
+            main_elems.extend(p.generateXML(self, opts))
         for b in self.behaviors.values():
-            launch_elem.extend(b.generateXML(self, opts))
+            main_elems.extend(b.generateXML(self, opts))
         if not opts.behavior_based:
             for m in self.motivations.values():
-                launch_elem.extend(m.generateXML(self))
+                main_elems.extend(m.generateXML(self))
         if not opts.disable_arbitration:
             for t in behavior_topics:
                 if t not in self.integratedArbitration:
-                    launch_elem.extend(self.generateArbitrationXML(t, opts))
+                    main_elems.extend(self.generateArbitrationXML(t, opts))
+
+        if not opts.model_only:
+            launch_elem.append(main_elems)
+        else:
+            print "Generating output in model-only mode."
 
         # Python script and second XML generation pass
         if not opts.behavior_based:
@@ -336,13 +343,14 @@ class Structure:
                 print pyscript
                 print ""
 
-            pyfile = file(basepath + ".py", "w")
-            pyfile.write(python_header_common.format(
-                self.getRootTopicFullName("emo_intensity")))
-            if not opts.new_rev:
-                pyfile.write(python_header_model)
+            if not opts.model_only:
+                pyfile = file(basepath + ".py", "w")
+                pyfile.write(python_header_common.format(
+                    self.getRootTopicFullName("emo_intensity")))
+                if not opts.new_rev:
+                    pyfile.write(python_header_model)
 
-            pyfile.write(pyscript)
+                pyfile.write(pyscript)
 
             # XML additions: 
             # The whole solver model as a rosparam:

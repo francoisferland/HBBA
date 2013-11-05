@@ -14,6 +14,9 @@ def main():
     opt_parser.add_option("-n", "--new-rev", action="store_true",
             dest="new_rev", default=False,
             help="Use the revision of the IW Solver.")
+    opt_parser.add_option("-m", "--model-only", action="store_true",
+            dest="model_only", default=False,
+            help="Only output the IW model (new revision only).")
     opt_parser.add_option("-a", "--disable-arbitration", action="store_true",
             dest="disable_arbitration", default=False,
             help="arbitration nodes are not generated for behavior output topics.")

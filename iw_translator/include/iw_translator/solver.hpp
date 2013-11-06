@@ -36,7 +36,10 @@ namespace iw_translator
         /// \param solver_model The static solver model that serves as a basis
         ///                     for the solver.
         /// \param g            The required utility vector, or goal (G)
-        Solver(const SolverModel& solver_model, const Vector& g);
+        /// \param s            The intensity vector (S)
+        Solver(const SolverModel& solver_model, 
+               const Vector& g,
+               const Vector& s);
 
         /// \brief Destructor.
         ~Solver();

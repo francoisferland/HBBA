@@ -131,17 +131,19 @@ SolverModel::SolverModel(
 
 }
 
-bool SolverModel::convertDesires(
-    const hbba_msgs::DesiresSet& desires_set, 
-    Vector& out) const
+bool SolverModel::convertDesires(const hbba_msgs::DesiresSet& desires_set, 
+                                 Vector& g,
+                                 Vector& s) const
 {
     typedef const std::vector<hbba_msgs::Desire> DVec;
     typedef DVec::const_iterator DIt;
 
     bool ok = true;
 
-    out.resize(cls_map_.size());
-    std::fill(out.begin(), out.end(), -1);
+    g.resize(cls_map_.size());
+    s.resize(cls_map_.size());
+    std::fill(g.begin(), g.end(), -1);
+    std::fill(s.begin(), s.end(),  0);
 
     DVec desires = desires_set.desires;
     for (DIt i = desires.begin(); i != desires.end(); ++i) {
@@ -152,7 +154,8 @@ bool SolverModel::convertDesires(
             ROS_WARN("Unknown desire class in model: %s", des.type.c_str());
             ok = false;
         } else {
-            out[k] = des.utility;
+            g[k] = des.utility;
+            s[k] = des.intensity;
         }
     }
 

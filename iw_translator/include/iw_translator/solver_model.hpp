@@ -26,7 +26,8 @@ namespace iw_translator
     ///
     /// Entirely baseed on the available strategies (U, C, and R matrices) and 
     /// resource capacities (M matrix).
-    /// Can convert desires set to a minimum required utility vector (G).
+    /// Can convert desires set to a minimum required utility and intensity 
+    /// vectors (G and S).
     /// Also provides methods to match string identifiers to indices for 
     /// strategies (i), resources (j), and desire classes (k).
     ///
@@ -98,13 +99,18 @@ namespace iw_translator
         /// A value of 0 is allowed, and is used by desires to prevent utility
         /// production in specific classes.
         ///
+        /// The default intensity value is 0.
+        ///
         /// \param  desires The input desires set.
-        /// \param  out     The output vector.
+        /// \param  g       The output vector for utility requirements.
+        ///                 Will be resized and cleared first.
+        /// \param  s       The output vector for intensity.
         ///                 Will be resized and cleared first.
         /// \return False when a desire class could not be found in the model.
         bool convertDesires(
             const hbba_msgs::DesiresSet& desires, 
-            Vector& out) const;
+            Vector& g,
+            Vector& s) const;
 
         /// \brief Return the name of strategy with the given index.
         ///

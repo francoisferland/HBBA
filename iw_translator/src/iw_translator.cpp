@@ -69,12 +69,13 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
 
 void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
 {
-    Vector g;
-    if (!solver_model_->convertDesires(*msg, g)) {
+    Vector g, s;
+
+    if (!solver_model_->convertDesires(*msg, g, s)) {
         ROS_WARN("Class with unknown desires will be ignored.");
     }
 
-    Solver solver(*solver_model_, g);
+    Solver solver(*solver_model_, g, s);
 
     ActivationVector a;
     if (solver.result(a)) {

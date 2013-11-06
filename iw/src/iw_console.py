@@ -148,7 +148,8 @@ class Shell:
     def analyse(self, line):
         self.parseLine(line, final=True)
 
-        if line.split()[0] == "quit":
+        line_tokens = line.split()
+        if (len(line_tokens) > 0) and (line_tokens[0].lower() == "quit"):
             print "Quitting..."
             return False
 

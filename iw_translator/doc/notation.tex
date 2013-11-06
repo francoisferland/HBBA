@@ -69,24 +69,22 @@ The technique is simple: for each class $k$, find the the most intense desire $d
 \end{itemize}
 
 \subsection*{Solving process}
-The goal is to determine $a_{i}$, the activation state of strategy $i$, by respecting these constraints:
+The goal is to determine $a_{i}$, the activation state of strategy $i$, and
+$f_{k}$, the consideration of desire class $k$, by respecting these constraints:
 
 \begin{itemize}
-	\item $\sum\limits_i a_i (u_{ik} - r_{ik}) \geq g_k$, for each class $k$
+	\item $\sum\limits_i a_i (u_{ik} - r_{ik}) \geq f_k g_k$, for each class $k$
         where $g_k > 0$, 
 	\item $\sum\limits_i a_i (u_{ik} - r_{ik}) \leq 0$, for each class $k$
         where $g_k \leq 0$, 
 	\item $\sum\limits_i a_i c_{ij} \leq m_j$, for each resource $j$.
 \end{itemize}
 
-And observe the following optimizations:
+Where $a_i, f_k \in [0,1]$.
 
-\begin{itemize}
-    \item Minimize $\sum\limits_i a_i$ to avoid activating extra strategies for
-        unwanted desires (usefulness currently being evaluated),
-    \item Maximize $\sum\limits_k \sum\limits_i a_{i} (u_{ik} - r_{ik})$, the
-        total utility produced.
-\end{itemize}
+To find the best solution, the solving process maximizes $f \cdot s$, which 
+favors consideration of the most intense desires in case the resource 
+constraints cannot be met for all desire classes.
 
 \end{document}
 

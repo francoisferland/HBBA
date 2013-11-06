@@ -4,8 +4,11 @@
 
 using namespace iw_translator;
 
-Solver::Solver(const SolverModel& solver_model, const Vector& g): 
-    impl_(new SolverImpl())
+Solver::Solver(
+    const SolverModel& solver_model, 
+    const Vector& g, 
+    const Vector& s): 
+        impl_(new SolverImpl())
 {
     namespace or_tools = operations_research;
 
@@ -30,6 +33,7 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
     // Total utility produced per class (a_ik * (u_ik - r_ik)):
     SolverImpl::IntVarVector aur;
 
+
     size_t nb_strats = ur.shape()[0];
     size_t nb_res    = m.size();
     size_t nb_cls    = ur.shape()[1];
@@ -37,6 +41,10 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
     // Result vector (strategy activation vector A):
     solver.MakeIntVarArray(nb_strats, 0, 1, &a);
 
+    // F vector for desire activation (in f_k * g_k)
+    SolverImpl::IntVarVector f;
+    solver.MakeIntVarArray(nb_cls, 0, 1, &f);
+    
     // Convert M vector (maximum cost allowed) to constraints.
     for (size_t j = 0; j < nb_res; ++j) {
         const MatrixColView   col = c[boost::indices[MatrixRange()][j]];
@@ -77,11 +85,13 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
             // Otherwise, some requirements might get ignored when (u_ik - r_ik)
             // ends with a negative value.
             Scalar g_k = (g[k] < 0) ? 0 : g[k];
-            solver.AddConstraint(
-                solver.MakeScalProdGreaterOrEqual(
-                    a, 
-                    ur_k, 
-                    g_k));
+
+            or_tools::IntExpr* scal_prod = solver.MakeScalProd(a, ur_k);
+            or_tools::IntExpr* fk_gk     = solver.MakeProd(f[k], g_k);
+            solver.AddConstraint(solver.MakeGreaterOrEqual(
+                scal_prod->Var(), 
+                fk_gk->Var()));
+
         } else {
             Scalar g_k = 0;
             solver.AddConstraint(
@@ -92,40 +102,32 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
         }
     }
 
-    // TODO: Clean up multiple optimizations setup.
-    // Search monitors used for optimization (see Solve(...) call).
-    // std::vector<or_tools::SearchMonitor*> monitors;
+    // Maximize the number of activated desire classes based on intensity 
+    // (f * s).
+    or_tools::IntVar*      f_s       = solver.MakeScalProd(f, s)->Var();
+    or_tools::OptimizeVar* opt_f_s   = solver.MakeMaximize(f_s, 1);
 
-    // Optimize for maximum utility production (non-optional).
-    
-    // TODO: Re-enable this:
-    // or_tools::IntVar* sum_aur = solver.MakeSum(aur)->Var();
-    // monitors.push_back(solver.MakeMaximize(sum_aur, 1));
+    // Build a single vector for all variables to solve (a and f vectors):
+    SolverImpl::IntVarVector full_sol(nb_strats + nb_cls);
+    std::copy(a.begin(), a.end(), full_sol.begin());
+    std::copy(f.begin(), f.end(), &full_sol[nb_strats]);
 
-    // Finally, minimize total count of activated strategies.
-    // TODO: Remove this, probably no longer necessary with the '<='
-    // constraints, and doesn't really mean anything.
-    or_tools::IntVar* sum_a = solver.MakeSum(a)->Var();
-    // monitors.push_back(solver.MakeMinimize(sum_a, 1));
-    or_tools::OptimizeVar* opt_sum_a = solver.MakeMinimize(sum_a, 1);
-
-    // Choose a random unbound variable to start, start with minimum values
-    // (deactivated strategies):
+    // Choose a random unbound variable to start, start with minimum values for
+    // all (everything deactivated).
     or_tools::DecisionBuilder* const db = solver.MakePhase(
-       a, 
+       full_sol, 
        or_tools::Solver::CHOOSE_RANDOM,
        or_tools::Solver::ASSIGN_MIN_VALUE);
 
     or_tools::SolutionCollector* coll = 
-        solver.MakeBestValueSolutionCollector(false);
-    coll->Add(a);
-    coll->AddObjective(sum_a);
-    // coll->AddObjective(sum_aur);
-    // monitors.push_back(coll);
+        solver.MakeBestValueSolutionCollector(true);
+
+
+    coll->Add(full_sol);
+    coll->AddObjective(f_s);
 
     solver.NewSearch(db, coll);
-    // solver.Solve(db, monitors);
-    solver.Solve(db, coll, opt_sum_a);
+    solver.Solve(db, coll, opt_f_s);
 
     int nb_sols = coll->solution_count();
     ROS_DEBUG("Solutions count: %i", nb_sols);
@@ -136,10 +138,19 @@ Solver::Solver(const SolverModel& solver_model, const Vector& g):
     } else {
         a_res_.resize(a.size());
         for (size_t i = 0; i < a_res_.size(); ++i) {
-            int64 v = coll->Value(0, a[i]);
-            a_res_[i] = (v > 0);
+            int64 a_i = coll->Value(0, a[i]);
+            a_res_[i] = (a_i > 0);
         }
     }
+
+    std::stringstream ss;
+    ss << "[";
+    for (size_t k = 0; k < nb_cls; ++k) {
+        int64 f_k = coll->Value(0, f[k]);
+        ss << f_k << " ";
+    }
+    ss << "]";
+    ROS_DEBUG("F vector: %s", ss.str().c_str());
 
     solver.EndSearch();
 }

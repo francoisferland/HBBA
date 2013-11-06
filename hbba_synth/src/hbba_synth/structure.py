@@ -307,7 +307,7 @@ class Structure:
                     main_elems.extend(self.generateArbitrationXML(t, opts))
 
         if not opts.model_only:
-            launch_elem.append(main_elems)
+            launch_elem.extend(main_elems)
         else:
             print "Generating output in model-only mode."
 

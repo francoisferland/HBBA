@@ -1,3 +1,4 @@
+#include <iw_observer/rules_ast.hpp>
 #include "rules_parser.hpp"
 
 #include <ros/ros.h>

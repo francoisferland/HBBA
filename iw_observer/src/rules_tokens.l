@@ -1,8 +1,11 @@
 %{
 
+#include <iw_observer/rules_ast.hpp>
 #include "rules_parser.hpp"
 
 extern "C" int yywrap() { return 0; }
+
+#define SAVE_TOKEN yylval.string = new std::string(yytext)
 
 %}
 
@@ -10,7 +13,7 @@ extern "C" int yywrap() { return 0; }
 
 %%
 [ \t\n]                 ;
-[a-zA-Z_][a-zA-Z0-9_]*  return TIDENTIFIER;
+[a-zA-Z_][a-zA-Z0-9_]*  SAVE_TOKEN; return TIDENTIFIER;
 [0-9]+                  return TINTEGER;
 \".\"                   return TSTRING;
 ","                     return TCOMMA;

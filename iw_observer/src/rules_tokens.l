@@ -12,12 +12,13 @@ extern "C" int yywrap() { return 0; }
 [ \t\n]                 ;
 [a-zA-Z_][a-zA-Z0-9_]*  return TIDENTIFIER;
 [0-9]+                  return TINTEGER;
+\".\"                   return TSTRING;
 ","                     return TCOMMA;
 ":"                     return TCOLON;
 ";"                     return TSEMICOLON;
 "->"                    return TARROW;
-"("                     return TLP;
-")"                     return TRP;
+"{"                     return TLB;
+"}"                     return TRB;
 
 %%
 

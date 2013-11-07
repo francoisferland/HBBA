@@ -14,12 +14,14 @@ void yyerror(const char* err)
 %token TWSPACE;
 %token TIDENTIFIER;
 %token TINTEGER;
+%token TSTRING;
 %token TARROW;
 %token TCOLON;
 %token TCOMMA;
 %token TSEMICOLON;
-%token TLP;
-%token TRP;
+%token TLB;
+%token TRB;
+
 
 %start rules
 
@@ -29,13 +31,14 @@ rules : rule
       | rules rule
       ;
 
-rule : filter TARROW cmds
+rule : filter TARROW cmd
+     | filter TARROW TLB cmds TRB
      ;
 
-filter : ident idents
+filter : ident TCOLON idents
 
 cmds : cmd
-     | cmds cmd 
+     | cmds cmd
      ;
 
 cmd : ident ident TSEMICOLON
@@ -56,6 +59,7 @@ arg : ident TCOLON arg_value
 
 arg_value : TIDENTIFIER
           | TINTEGER
+          | TSTRING
           ;
 
 %%

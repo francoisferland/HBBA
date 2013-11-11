@@ -24,6 +24,7 @@ AddCommand::AddCommand(const Ident& des_cls, const Args& args)
     for (It i = args.begin(); i != args.end(); ++i) {
         const Arg* arg = *i;
         arg->apply(desire_);
+        delete arg;
     }
 }
 

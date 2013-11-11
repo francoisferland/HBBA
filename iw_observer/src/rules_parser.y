@@ -21,6 +21,7 @@ using namespace iw_observer;
     iw_observer::Args*     args;
     iw_observer::Arg*      arg;
     iw_observer::Ident*    ident;
+    iw_observer::Filter*   filter;
     std::string*           string;
     int                    token;
     int                    value;
@@ -43,13 +44,14 @@ using namespace iw_observer;
 %token <token>  TIDENT_INT;
 %token <token>  TIDENT_PARAMS;
 
-%type <rules> rules;
-%type <rule>  rule;
-%type <cmds>  cmds;
-%type <cmd>   cmd;
-%type <args>  args;
-%type <arg>   arg;
-%type <ident> ident;
+%type <rules>  rules;
+%type <rule>   rule;
+%type <cmds>   cmds cmd_block;
+%type <cmd>    cmd;
+%type <args>   args;
+%type <arg>    arg;
+%type <ident>  ident;
+%type <filter> filter;
 
 %start rules
 
@@ -59,13 +61,13 @@ rules : rule       { $$ = &ruleset(); $$->push_back($<rule>1); }
       | rules rule { $1->push_back($<rule>2); }
       ;
 
-rule : filter TARROW cmd_block { $$ = new Rule(); }
+rule : filter TARROW cmd_block { $$ = new Rule($<filter>1, $<cmds>3); }
      ;
 
 filter : ident TCOLON idents
 
-cmd_block : cmd
-          | TLB cmds TRB
+cmd_block : cmd          { $$ = new Commands(); $$->push_back($<cmd>1); }
+          | TLB cmds TRB { $$ = $<cmds>2; }
           ;
 
 cmds : cmd      { $$ = new Commands(); $$->push_back($<cmd>1); } 

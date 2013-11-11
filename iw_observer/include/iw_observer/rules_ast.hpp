@@ -82,20 +82,6 @@ namespace iw_observer
 
     typedef std::vector<Arg*> Args;
 
-    /// \brief Generic class for rules.
-    struct Rule
-    {
-        Rule() { std::cerr << "New rule added" << std::endl; }
-    };
-
-    typedef std::vector<Rule*> Rules;
-
-    /// \brief Return a reference to the current ruleset.
-    ///
-    /// Used by the parser and will contain its output after yyparse().
-    /// Not thread-safe.
-    Rules& ruleset();
-
     /// \brief Base class for commands.
     ///
     /// Commands are usually applied to a desire, but the exact type of the 
@@ -163,6 +149,45 @@ namespace iw_observer
     };
 
     typedef std::vector<Command*> Commands;
+
+    /// \brief Generic class for filters.
+    struct Filter
+    {
+    };
+
+    /// \brief Generic class for rules.
+    class Rule
+    {
+    private:
+        Filter*   filter_;
+        Commands* cmds_;
+
+    public:
+        Rule(Filter* filter, Commands* cmds): 
+            filter_(filter), 
+            cmds_(cmds)
+        {
+            std::cerr << "New rule added" << std::endl;
+        }
+
+        ~Rule()
+        {
+            delete filter_;
+            typedef Commands::const_iterator It;
+            for (It i = cmds_->begin(); i != cmds_->end(); ++i) {
+                delete *i;
+            }
+            delete cmds_;
+        }
+    };
+
+    typedef std::vector<Rule*> Rules;
+
+    /// \brief Return a reference to the current ruleset.
+    ///
+    /// Used by the parser and will contain its output after yyparse().
+    /// Not thread-safe.
+    Rules& ruleset();
 
 }
 

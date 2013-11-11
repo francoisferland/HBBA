@@ -1,11 +1,12 @@
 #ifndef RUNTIME_HPP
 #define RUNTIME_HPP
 
+#include "rules_ast.hpp"
 #include <hbba_msgs/Event.h>
 #include <hbba_msgs/AddDesires.h>
 #include <hbba_msgs/RemoveDesires.h>
 #include <ros/ros.h>
-#include "rules_ast.hpp"
+#include <map>
 
 namespace iw_observer
 {
@@ -29,6 +30,12 @@ namespace iw_observer
 
         Rules rules_;
 
+        typedef std::map<std::string, uint8_t> EventTypeMap; 
+        /// \brief Maps an event string (e.g. "exp_on") to an enum value in
+        /// hbba_msgs::Event.
+        /// The map is filled at the first construction of a Runtime instance.
+        static EventTypeMap event_type_map_; 
+
     public:
         /// \brief Constructor.
         ///
@@ -45,6 +52,7 @@ namespace iw_observer
 
     private:
         void eventsCB(const hbba_msgs::Event::ConstPtr& msg);
+        void parseRules(const Rules& rules);
 
     };
 }

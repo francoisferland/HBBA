@@ -37,10 +37,17 @@ bison_target(rules_parser src/rules_parser.y ${CMAKE_CURRENT_BINARY_DIR}/rules_p
 add_flex_bison_dependency(rules_lexer rules_parser)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-# NOTE: Simple executable compiler for now, no external API.
-rosbuild_add_executable(rules_compiler 
+
+rosbuild_add_library(${PROJECT_NAME}
     ${FLEX_rules_lexer_OUTPUTS}
     ${BISON_rules_parser_OUTPUTS}
+    src/rules_ast.cpp
+    src/runtime.cpp
+)
+
+# NOTE: Simple executable compiler for testing purposes.
+rosbuild_add_executable(rules_compiler 
     src/rules_compiler.cpp
 )
+target_link_libraries(rules_compiler ${PROJECT_NAME})
 

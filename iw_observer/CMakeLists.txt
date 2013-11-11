@@ -45,6 +45,9 @@ rosbuild_add_library(${PROJECT_NAME}
     src/runtime.cpp
 )
 
+rosbuild_add_executable(iw_observer_node src/iw_observer_node.cpp)
+target_link_libraries(iw_observer_node ${PROJECT_NAME})
+
 # NOTE: Simple executable compiler for testing purposes.
 rosbuild_add_executable(rules_compiler 
     src/rules_compiler.cpp

@@ -22,7 +22,7 @@ utility                 return TIDENT_UTIL;
 intensity               return TIDENT_INT;
 params                  return TIDENT_PARAMS;
 [a-zA-Z_][a-zA-Z0-9_]*  SAVE_TOKEN; return TIDENTIFIER;
-[0-9]+                  return TINTEGER;
+[0-9]+                  yylval.value = atoi(yytext); return TINTEGER;
 \".\"                   return TSTRING;
 ","                     return TCOMMA;
 ":"                     return TCOLON;

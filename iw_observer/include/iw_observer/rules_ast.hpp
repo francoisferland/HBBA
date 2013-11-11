@@ -22,7 +22,7 @@ namespace iw_observer
     /// command refers to.
     struct Arg
     {
-        Arg() {}
+        Arg() { }
         virtual ~Arg() {}
 
         /// \brief Applies the value of the argument to the given desire.
@@ -41,7 +41,7 @@ namespace iw_observer
         Ident value_;
 
     public:
-        IdArg(const Ident& v): value_(v) {}
+        IdArg(const Ident& v): value_(v) { std::cerr << "New id arg, v: " << v << std::endl; }
         void apply(hbba_msgs::Desire& d) const { d.id = value_; }
     };
     /// \brief Desire utility argument.
@@ -51,7 +51,7 @@ namespace iw_observer
         int value_;
 
     public:
-        UtilArg(int v): value_(v) {}
+        UtilArg(int v): value_(v) { std::cerr << "New util arg, v: " << v << std::endl; }
         void apply(hbba_msgs::Desire& d) const { d.utility = value_; }
     };
 
@@ -89,6 +89,12 @@ namespace iw_observer
     };
 
     typedef std::vector<Rule*> Rules;
+
+    /// \brief Return a reference to the current ruleset.
+    ///
+    /// Used by the parser and will contain its output after yyparse().
+    /// Not thread-safe.
+    Rules& ruleset();
 
     /// \brief Base class for commands.
     ///

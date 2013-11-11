@@ -24,12 +24,13 @@ using namespace iw_observer;
     iw_observer::Ident*    ident;
     std::string*           string;
     int                    token;
+    int                    value;
 
 }
 
 %token <string> TSTRING;
 %token <ident>  TIDENTIFIER;
-%token <token>  TINTEGER;
+%token <value>  TINTEGER;
 %token <token>  TARROW;
 %token <token>  TCOLON;
 %token <token>  TCOMMA;
@@ -55,7 +56,7 @@ using namespace iw_observer;
 
 %% 
 
-rules : rule       { $$ = new Rules(); $$->push_back($<rule>1); }
+rules : rule       { $$ = &ruleset(); $$->push_back($<rule>1); }
       | rules rule { $1->push_back($<rule>2); }
       ;
 
@@ -72,11 +73,11 @@ cmds : cmd      { $$ = new Commands(); $$->push_back($<cmd>1); }
      ;
 
 cmd : TIDENT_ADD ident TSEMICOLON
-        { $$ = new AddCommand(*$<ident>1, Args()); }
+        { $$ = new AddCommand(*$<ident>2, Args()); }
     | TIDENT_ADD ident args TSEMICOLON
-        { $$ = new AddCommand(*$<ident>1, *$<args>2); }
+        { $$ = new AddCommand(*$<ident>2, *$<args>3); }
     | TIDENT_DEL ident TSEMICOLON
-        { $$ = new DelCommand(*$<ident>1); }
+        { $$ = new DelCommand(*$<ident>2); }
 
 
 idents : ident

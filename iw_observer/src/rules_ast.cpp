@@ -3,6 +3,13 @@
 
 using namespace iw_observer;
 
+Rules& iw_observer::ruleset()
+{
+    static Rules ruleset;
+    
+    return ruleset;
+}
+
 AddCommand::AddCommand(const Ident& des_cls, const Args& args)
 {
     static int unique_id = 0;

@@ -2,9 +2,11 @@
 
 using namespace iw_observer;
 
-Runtime::Runtime()
+Runtime::Runtime(const Rules& rules): rules_(rules)
 {
     ros::NodeHandle n;
+
+    sub_events_ = n.subscribe("events", 100, &Runtime::eventsCB, this);
 
     scl_add_ = n.serviceClient<hbba_msgs::AddDesires>(   "add_desires",
                                                          true);
@@ -26,5 +28,9 @@ void Runtime::removeDesire(const std::string& id)
     c.request.ids.push_back(id);
 
     scl_del_.call(c);
+}
+
+void Runtime::eventsCB(const hbba_msgs::Event::ConstPtr& msg)
+{
 }
 

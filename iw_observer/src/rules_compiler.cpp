@@ -7,8 +7,6 @@ extern int yyparse();
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "rules_compiler");
-
     yyparse();
 
     return 0;

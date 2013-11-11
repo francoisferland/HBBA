@@ -3,7 +3,10 @@
 #include <iw_observer/rules_ast.hpp>
 #include "rules_parser.hpp"
 
-extern "C" int yywrap() { return 0; }
+extern "C" int yywrap() 
+{ 
+    return 1; // Stop at EOF. 
+}
 
 #define SAVE_TOKEN yylval.string = new std::string(yytext)
 

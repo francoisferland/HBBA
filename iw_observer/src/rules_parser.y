@@ -1,13 +1,12 @@
 %{
 
 #include <iw_observer/rules_ast.hpp>
-#include <ros/ros.h>
 
 extern int yylex();
 
 void yyerror(const char* err) 
 {
-    ROS_ERROR("Rules parser error: %s", err);
+    std::cerr <<  "Rules parser: " << err << std::endl;
 }
 
 using namespace iw_observer;
@@ -67,6 +66,7 @@ filter : ident TCOLON idents
 
 cmd_block : cmd
           | TLB cmds TRB
+          ;
 
 cmds : cmd      { $$ = new Commands(); $$->push_back($<cmd>1); } 
      | cmds cmd { $1->push_back($<cmd>2); }
@@ -78,10 +78,13 @@ cmd : TIDENT_ADD ident TSEMICOLON
         { $$ = new AddCommand(*$<ident>2, *$<args>3); }
     | TIDENT_DEL ident TSEMICOLON
         { $$ = new DelCommand(*$<ident>2); }
+    | error { yyerror("Unrecognized command"); }
+    ;
 
 
 idents : ident
        | idents ident
+       ;
 
 ident : TIDENTIFIER
       ;

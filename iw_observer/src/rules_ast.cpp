@@ -24,11 +24,10 @@ AddCommand::AddCommand(const Ident& des_cls, const Args& args)
     for (It i = args.begin(); i != args.end(); ++i) {
         const Arg* arg = *i;
         arg->apply(desire_);
-        delete arg;
     }
 }
 
-void AddCommand::exec(Runtime& rt)
+void AddCommand::exec(Runtime& rt) const
 {
     rt.addDesire(desire_);
 }
@@ -37,7 +36,7 @@ DelCommand::DelCommand(const Ident& des_id): id_(des_id)
 {
 }
 
-void DelCommand::exec(Runtime& rt)
+void DelCommand::exec(Runtime& rt) const
 {
     rt.removeDesire(id_);
 }

@@ -13,7 +13,8 @@ namespace iw_observer
     class Runtime;
 
     /// \brief Underlying type for identifiers (a basic string).
-    typedef std::string Ident;
+    typedef std::string        Ident;
+    typedef std::vector<Ident> Idents;
 
     /// \brief Base class for arguments.
     ///
@@ -41,7 +42,7 @@ namespace iw_observer
         Ident value_;
 
     public:
-        IdArg(const Ident& v): value_(v) { std::cerr << "New id arg, v: " << v << std::endl; }
+        IdArg(const Ident& v): value_(v) { }
         void apply(hbba_msgs::Desire& d) const { d.id = value_; }
     };
     /// \brief Desire utility argument.
@@ -51,7 +52,7 @@ namespace iw_observer
         int value_;
 
     public:
-        UtilArg(int v): value_(v) { std::cerr << "New util arg, v: " << v << std::endl; }
+        UtilArg(int v): value_(v) { }
         void apply(hbba_msgs::Desire& d) const { d.utility = value_; }
     };
 
@@ -102,7 +103,7 @@ namespace iw_observer
         /// Must be implemented in derived classes.
         ///
         /// \param rt A mutable reference to the IWObserver runtime.
-        virtual void exec(Runtime& rt) = 0;
+        virtual void exec(Runtime& rt) const = 0;
     };
 
     /// \brief Command class to create and add a new desire to the Intention
@@ -126,7 +127,7 @@ namespace iw_observer
         /// \param args    Arguments to apply to the new desire (see Arg class).
         AddCommand(const Ident& des_cls, const Args& args);
 
-        void exec(Runtime& rt);
+        void exec(Runtime& rt) const;
     };
 
     /// \brief Command class to delete an already existing desire from the
@@ -145,14 +146,38 @@ namespace iw_observer
         /// \param des_id Identifier of the desire to delete.
         DelCommand(const Ident& des_id);
 
-        void exec(Runtime& rt);
+        void exec(Runtime& rt) const;
     };
 
     typedef std::vector<Command*> Commands;
 
     /// \brief Generic class for filters.
-    struct Filter
+    class Filter
     {
+    private:
+        Ident  event_type_;
+        Idents des_types_;
+
+        /// \brief Private copy constructor, not currently copy-safe.
+        Filter(const Filter&);
+
+    public:
+        /// \brief Constructor.
+        ///
+        /// Does not perform any checks on event types, this is the runtime's
+        /// responsability.
+        ///
+        /// \param type      Event type identifier ("exp_on", "int_off", ...).
+        /// \param des_types Desire classes it applies to.
+        Filter(const Ident& type, const Idents& des_types):
+            event_type_(type),
+            des_types_(des_types)
+        {
+        }
+
+        const Ident&  eventType() const { return event_type_; }
+        const Idents& desTypes()  const { return des_types_;  }
+
     };
 
     /// \brief Generic class for rules.
@@ -162,12 +187,14 @@ namespace iw_observer
         Filter*   filter_;
         Commands* cmds_;
 
+        /// \brief Private copy constructor, not currently copy-safe.
+        Rule(const Rule&);
+
     public:
         Rule(Filter* filter, Commands* cmds): 
             filter_(filter), 
             cmds_(cmds)
         {
-            std::cerr << "New rule added" << std::endl;
         }
 
         ~Rule()
@@ -179,6 +206,9 @@ namespace iw_observer
             }
             delete cmds_;
         }
+
+        const Filter&   filter()   const { return *filter_; }
+        const Commands& commands() const { return *cmds_;   }
     };
 
     typedef std::vector<Rule*> Rules;

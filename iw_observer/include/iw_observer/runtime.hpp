@@ -28,7 +28,7 @@ namespace iw_observer
         ros::ServiceClient scl_add_;
         ros::ServiceClient scl_del_;
 
-        Rules rules_;
+        const Rules& rules_;
 
         typedef std::map<std::string, uint8_t> EventTypeMap; 
         /// \brief Maps an event string (e.g. "exp_on") to an enum value in
@@ -36,12 +36,25 @@ namespace iw_observer
         /// The map is filled at the first construction of a Runtime instance.
         static EventTypeMap event_type_map_; 
 
+        typedef std::map<std::string, Commands> CmdsMap;
+        /// \brief Maps a desire type to a set of commands to execute.
+        ///
+        /// Used by FiltersMap.
+        CmdsMap cmds_map_;
+
+        typedef std::map<int, CmdsMap> FiltersMap;
+        /// \brief Maps an event type id (int) to a map of rules to evaluate.
+        FiltersMap filters_map_;
+
     public:
         /// \brief Constructor.
         ///
         /// Create service proxies and assumes they are in the node's namespace.
         ///
         /// \param rules The parsed ruleset to observe.
+        ///              NOTE: Keeps pointers to members owned by the ruleset,
+        ///              and thus needs to be kept in memory for the lifetime of
+        ///              the runtime. 
         Runtime(const Rules& rules);
 
         /// \brief Add a desire to the Intention Workspace.

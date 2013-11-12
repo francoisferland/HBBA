@@ -46,6 +46,14 @@ namespace iw_observer
         /// \brief Maps an event type id (int) to a map of rules to evaluate.
         FiltersMap filters_map_;
 
+        // The following vectors contain desires to add and remove when commands
+        // are executed.
+        // Since a single event can produce more than one call to the IW, we
+        // cache these when rules are evaluated, and then we used to service
+        // proxies.
+        // The vectors are flushed after being used in eventsCB.
+        std::vector<hbba_msgs::Desire> add_desires_set_;
+        std::vector<std::string>       del_ids_;
     public:
         /// \brief Constructor.
         ///

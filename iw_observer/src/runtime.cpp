@@ -27,20 +27,16 @@ void Runtime::addDesire(const hbba_msgs::Desire& d)
 {
     ROS_DEBUG("IWObserver rt: add desire of type '%s'",
               d.type.c_str());
-    hbba_msgs::AddDesires c;
-    c.request.desires.push_back(d);
+    add_desires_set_.push_back(d);
 
-    scl_add_.call(c);
 }
 
 void Runtime::removeDesire(const std::string& id)
 {
     ROS_DEBUG("IWObserver rt: del desire with id '%s'",
               id.c_str());
-    hbba_msgs::RemoveDesires c;
-    c.request.ids.push_back(id);
+    del_ids_.push_back(id);
 
-    scl_del_.call(c);
 }
 
 void Runtime::eventsCB(const hbba_msgs::Event::ConstPtr& msg)
@@ -70,6 +66,22 @@ void Runtime::eventsCB(const hbba_msgs::Event::ConstPtr& msg)
         cmd.exec(*this);
     }
 
+    // Look for changes in both add and delete vectors, call the proper
+    // services.
+    if (!add_desires_set_.empty()) {
+        // This sequence probably result in multiple copies of the desire
+        // descriptions, but it's not a major issue for the moment:
+        hbba_msgs::AddDesires c;
+        c.request.desires = add_desires_set_;
+        scl_add_.call(c);
+        add_desires_set_.clear();
+    }
+    if (!del_ids_.empty()) {
+        hbba_msgs::RemoveDesires c;
+        c.request.ids = del_ids_;
+        scl_del_.call(c);
+        del_ids_.clear();
+    }
 }
 
 void Runtime::parseRules(const Rules& rules)

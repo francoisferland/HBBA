@@ -3,8 +3,7 @@
 
 #include "rules_ast.hpp"
 #include <hbba_msgs/Event.h>
-#include <hbba_msgs/AddDesires.h>
-#include <hbba_msgs/RemoveDesires.h>
+#include <hbba_msgs/UpdateDesires.h>
 #include <ros/ros.h>
 #include <map>
 
@@ -18,15 +17,13 @@ namespace iw_observer
     ///  - events         (hbba_msgs/Event).
     ///
     /// Services (as a client):
-    ///  - add_desires    (hbba_msgs/AddDesires).
-    ///  - remove_desires (hbba_msgs/RemoveDesires).
+    ///  - update_desires (hbba_msgs/UpdateDesires).
     /// 
     class Runtime
     {
     private:
         ros::Subscriber    sub_events_;
-        ros::ServiceClient scl_add_;
-        ros::ServiceClient scl_del_;
+        ros::ServiceClient scl_update_;
 
         const Rules& rules_;
 
@@ -46,14 +43,14 @@ namespace iw_observer
         /// \brief Maps an event type id (int) to a map of rules to evaluate.
         FiltersMap filters_map_;
 
-        // The following vectors contain desires to add and remove when commands
-        // are executed.
+        // The following request object contain desires to add and remove when 
+        // commands are executed.
         // Since a single event can produce more than one call to the IW, we
         // cache these when rules are evaluated, and then we used to service
         // proxies.
         // The vectors are flushed after being used in eventsCB.
-        std::vector<hbba_msgs::Desire> add_desires_set_;
-        std::vector<std::string>       del_ids_;
+        hbba_msgs::UpdateDesires update_des_; 
+
     public:
         /// \brief Constructor.
         ///

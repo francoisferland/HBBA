@@ -14,18 +14,42 @@ class iw_server:
         self.desires = {}
         self.srv_add = \
             rospy.Service('add_desires', AddDesires, self.add_desires_srv)
-        self.srv_up = rospy.Service('set_desire_intensity', \
+        self.srv_int = rospy.Service('set_desire_intensity', \
 			SetDesireIntensity, self.set_desire_intensity_srv)
         self.srv_del = rospy.Service('remove_desires', RemoveDesires, \
 			self.remove_desires_srv)
+        self.srv_up  = rospy.Service('update_desires', UpdateDesires, \
+            self.update_desires_srv)
         self.pub_set = rospy.Publisher('desires_set', DesiresSet, latch=True)
 
-    def add_desires_srv(self, req):
-        for d in req.desires:
+    def add_desires(self, desires):
+        for d in desires:
             rospy.logdebug('Adding new desire with id ' + d.id)
             self.desires[d.id] = d
+
+    def add_desires_srv(self, req):
+        self.add_desires(req.desires)
         self.publish_set()
         return AddDesiresResponse()
+
+    def remove_desires(self, ids):
+        for d in ids:
+            rospy.logdebug('Removing desire with id ' + d)
+            if d in self.desires:
+                del self.desires[d]
+            else:
+                rospy.logwarn('No desire with id ' + d)
+
+    def remove_desires_srv(self, req):
+        self.remove_desires(req.ids)
+        self.publish_set()
+        return RemoveDesiresResponse()
+
+    def update_desires_srv(self, req):
+        self.add_desires(req.add)
+        self.remove_desires(req.remove)
+        self.publish_set()
+        return UpdateDesiresResponse()
 
     def set_desire_intensity_srv(self,req):
     	for d in self.desires:
@@ -33,16 +57,6 @@ class iw_server:
                 d.intensity = req.value
         self.publish_set()
         return SetDesireIntensityResponse()
-
-    def remove_desires_srv(self, req):
-        for d in req.ids:
-            rospy.logdebug('Removing desire with id ' + d)
-            if d in self.desires:
-                del self.desires[d]
-            else:
-                rospy.logwarn('No desire with id ' + d)
-        self.publish_set()
-        return RemoveDesiresResponse()
 
     def filter_set(self):
         # Go through each desires, find duplicates in a utility class, keep the

@@ -15,10 +15,8 @@ Runtime::Runtime(const Rules& rules): rules_(rules)
 
     sub_events_ = n.subscribe("events", 100, &Runtime::eventsCB, this);
 
-    scl_add_ = n.serviceClient<hbba_msgs::AddDesires>(   "add_desires",
-                                                         true);
-    scl_del_ = n.serviceClient<hbba_msgs::RemoveDesires>("remove_desires", 
-                                                         true);
+    scl_update_ = n.serviceClient<hbba_msgs::UpdateDesires>("update_desires", 
+                                                            true);
 
     parseRules(rules);
 }
@@ -27,7 +25,7 @@ void Runtime::addDesire(const hbba_msgs::Desire& d)
 {
     ROS_DEBUG("IWObserver rt: add desire of type '%s'",
               d.type.c_str());
-    add_desires_set_.push_back(d);
+    update_des_.request.add.push_back(d);
 
 }
 
@@ -35,7 +33,7 @@ void Runtime::removeDesire(const std::string& id)
 {
     ROS_DEBUG("IWObserver rt: del desire with id '%s'",
               id.c_str());
-    del_ids_.push_back(id);
+    update_des_.request.remove.push_back(id);
 
 }
 
@@ -68,19 +66,12 @@ void Runtime::eventsCB(const hbba_msgs::Event::ConstPtr& msg)
 
     // Look for changes in both add and delete vectors, call the proper
     // services.
-    if (!add_desires_set_.empty()) {
-        // This sequence probably result in multiple copies of the desire
-        // descriptions, but it's not a major issue for the moment:
-        hbba_msgs::AddDesires c;
-        c.request.desires = add_desires_set_;
-        scl_add_.call(c);
-        add_desires_set_.clear();
-    }
-    if (!del_ids_.empty()) {
-        hbba_msgs::RemoveDesires c;
-        c.request.ids = del_ids_;
-        scl_del_.call(c);
-        del_ids_.clear();
+    std::vector<hbba_msgs::Desire>& add_set = update_des_.request.add;
+    std::vector<std::string>&       rem_set = update_des_.request.remove;
+    if (!add_set.empty() || !rem_set.empty()) {
+        scl_update_.call(update_des_);
+        add_set.clear();
+        rem_set.clear();
     }
 }
 

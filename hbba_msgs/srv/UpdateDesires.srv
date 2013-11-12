@@ -1,0 +1,4 @@
+# Combines both AddDesires and RemoveDesires in a single service.
+Desire[] add     # Desires to add.
+string[] remove  # Desire ids to remove.
+

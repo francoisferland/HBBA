@@ -87,11 +87,11 @@ class Shell:
                     continue
             elif (state == 2):
                 state = 3 # AddTypeInt
-                desire.intensity = float(t)
+                desire.intensity = int(t)
                 continue
             elif (state == 3):
                 state = 4 # AddTypeIntParams 
-                desire.utility = float(t)
+                desire.utility = int(t)
                 continue
             elif (state == 4):
                 desire.params += t

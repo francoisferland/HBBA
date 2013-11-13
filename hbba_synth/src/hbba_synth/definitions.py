@@ -305,20 +305,34 @@ def generateCostDefArrayPy(costs):
 class ModuleLinkDef:
     def __init__(self, content, structure, verbose=False):
         self.structure = structure
+        self.filters = []
         if type(content) is dict:
             self.module_name = content.keys()[0]
             self.filters = content.values()[0]
         else:
-            # Behavior link:
             self.module_name = content
-            bm = structure.behaviors[self.module_name]
-            self.filters = []
-            for i in bm.input:
-                t = TopicDef(i, structure)
-                if t.filtered:
-                    self.filters.append(bm.inputFilterName(t.name))
-            for o in bm.output:
-                self.filters.append(bm.outputFilterName(o))
+            # Can be a behavior or proc module, check:
+            if (self.module_name in structure.behaviors):
+                bm = structure.behaviors[self.module_name]
+                for i in bm.input:
+                    t = TopicDef(i, structure)
+                    if t.filtered:
+                        self.filters.append(bm.inputFilterName(t.name))
+                for o in bm.output:
+                    self.filters.append(bm.outputFilterName(o))
+            elif (self.module_name in structure.procmodules):
+                pm = structure.procmodules[self.module_name]
+                for i in pm.input:
+                    if (type(i) is str):
+                        # Inputs are filtered by default in ProcModules:
+                        self.filters.append(i)
+                    else:
+                        # Otherwise, check with the full definition.
+                        t = TopicDef(i, structure)
+                        if t.filtered:
+                            self.filters.append(pm.inputFilterName(t.name))
+            else:
+                print "Error: Unknown module '" + self.module_name + "', skipping."
 
     def generateJSCall(self, func, fname, level):
         return "{0}('{1}', {2});\n".format(func, fname, level)

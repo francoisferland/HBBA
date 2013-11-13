@@ -35,6 +35,8 @@ namespace iw_translator
     ///                 translator will not be initialized and will not run.
     ///                 See StrategyParser for details.
     ///  - ~res_caps:   An array of resource capacity definitions.
+    ///  - ~max_p:      Maximise total utility production (p).
+    ///                 Default: false.
     ///
     class IWTranslator
     {
@@ -46,6 +48,8 @@ namespace iw_translator
         ros::Subscriber                  sub_desires_;
         ros::Publisher                   pub_intention_;
         ros::ServiceClient               srv_eval_script_;
+
+        bool                             max_p_;
 
     public:
         /// \brief Constructor.

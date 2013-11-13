@@ -51,6 +51,8 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
         StrategyParser::parseCosts(res_caps_def, res_caps);
     }
 
+    np.param("max_p", max_p_, false);
+
     solver_model_.reset(new SolverModel(strats_, res_caps));
 
     sub_desires_ = n.subscribe(
@@ -75,7 +77,7 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
         ROS_WARN("Class with unknown desires will be ignored.");
     }
 
-    Solver solver(*solver_model_, g, s);
+    Solver solver(*solver_model_, g, s, max_p_);
 
     ActivationVector a;
     if (solver.result(a)) {

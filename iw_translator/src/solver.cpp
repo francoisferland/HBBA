@@ -79,10 +79,9 @@ Solver::Solver(
         std::copy(ur_col.begin(), ur_col.end(), ur_k.begin());
 
         // Keep a copy of the scalar products for optimization.
-        //au.push_back(solver.MakeScalProd(a, u_k)->Var());
         aur.push_back(solver.MakeScalProd(a, ur_k)->Var());
         if (g[k] > 0) {
-            // Only maximise production for (positively) defined desire classes.
+            // Only maximize production for (positively) defined desire classes.
             au.push_back(solver.MakeScalProd(a, u_k)->Var());
         }
 

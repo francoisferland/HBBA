@@ -37,7 +37,7 @@ namespace iw_translator
         ///                     for the solver.
         /// \param g            The required utility vector, or goal (G)
         /// \param s            The intensity vector (S)
-        /// \param max_p        If it should maximise utility production.
+        /// \param max_p        If it should maximize utility production.
         ///                     False by default.
         Solver(const SolverModel& solver_model, 
                const Vector&      g,

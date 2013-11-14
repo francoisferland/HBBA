@@ -23,7 +23,8 @@ rosbuild_gensrv()
 
 rosbuild_add_executable(filtered_publisher_test src/filtered_publisher_test.cpp)
 rosbuild_add_executable(filtered_subscriber_test src/filtered_subscriber_test.cpp)
-rosbuild_add_library(generic_divider src/generic_divider.cpp)
+rosbuild_add_library(generic_divider src/generic_divider_nodelet.cpp)
+rosbuild_add_executable(generic_divider_node src/generic_divider.cpp)
 rosbuild_add_executable(topic_delay src/topic_delay.cpp)
 
 #common commands for building c++ executables and libraries

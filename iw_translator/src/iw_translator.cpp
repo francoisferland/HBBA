@@ -139,23 +139,33 @@ void IWTranslator::initStrategies()
 
 void IWTranslator::activateIntention(const hbba_msgs::Intention& intent)
 {
+    // Check for activation state transitions:
+    //  - 0 -> 1: bup, covers params changes between common strats.
+    //  - 1 -> 0: bdn.
+    //  - 0 -> 0: nop.
+    //  - 1 -> 1 & params change: bup.
+    // NOTE: We assume all strategies are deactivated at startup.
+    // Furthermore, always run bdn first, so that a bup won't be cancelled by a
+    // bdn in a later call.
+    
     assert(intent.enabled.size() == strats_.size());
 
     const std::vector<unsigned char>& a = intent.enabled;
     const std::vector<std::string>&   p = intent.params;
 
-    std::stringstream ss;
+    std::stringstream ss_bup, ss_bdn;
     for (size_t i = 0; i < intent.enabled.size(); ++i) {
         const hbba_msgs::Strategy& strat = strats_[i];
         if (a[i] && strat.bringup_function != EMPTY) {
-            ss << strats_[i].bringup_function << "(" << p[i] << ");";
+            ss_bup << strats_[i].bringup_function << "(" << p[i] << ");";
         } else if (strats_[i].bringdown_function != EMPTY) {
-            ss << strats_[i].bringdown_function << "();";
+            ss_bdn << strats_[i].bringdown_function << "();";
         }
     }
 
+    std::string script_full = ss_bdn.str() + ss_bup.str();
     std::string result;
-    script_engine_.eval(ss.str(), result);
+    script_engine_.eval(script_full, result);
 
 }
 

@@ -68,6 +68,7 @@ namespace iw_translator
 
         /// \brief Call activation (or deactivation) scripts for each strategy.
         ///
+        /// Only call scripts on activation state and parameter changes.
         /// NOTE: This function assumes the strategies in intent are ordered as
         /// in the strats_ vector.
         void activateIntention(const hbba_msgs::Intention& intent);

@@ -36,7 +36,7 @@ namespace iw_translator
     ///                 See StrategyParser for details.
     ///  - ~res_caps:   An array of resource capacity definitions.
     ///  - ~max_p:      Maximise total utility production (p).
-    ///                 Default: false.
+    ///                 Default: true.
     ///
     class IWTranslator
     {

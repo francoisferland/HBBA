@@ -51,7 +51,7 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
         StrategyParser::parseCosts(res_caps_def, res_caps);
     }
 
-    np.param("max_p", max_p_, false);
+    np.param("max_p", max_p_, true);
 
     solver_model_.reset(new SolverModel(strats_, res_caps));
 

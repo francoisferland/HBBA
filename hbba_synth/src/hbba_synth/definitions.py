@@ -231,6 +231,9 @@ class ProcModuleDef:
             t = TopicDef(e, self.structure)
             self.structure.addRootRemapEx("/" + self.name + "/" + t.name, t.src)
 
+    def inputFilterName(self, name):
+        return self.name + "_" + name + "_filter"
+
     def createInputFilter(self, topic):
         elems = []
         filter_name = "{0}_{1}_filter".format(self.name, topic.src)
@@ -325,7 +328,7 @@ class ModuleLinkDef:
                 for i in pm.input:
                     if (type(i) is str):
                         # Inputs are filtered by default in ProcModules:
-                        self.filters.append(i)
+                        self.filters.append(pm.inputFilterName(i))
                     else:
                         # Otherwise, check with the full definition.
                         t = TopicDef(i, structure)

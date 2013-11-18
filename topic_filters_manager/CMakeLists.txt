@@ -29,7 +29,7 @@ rosbuild_gensrv()
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-rosbuild_add_library(${PROJECT_NAME} src/manager.cpp)
+rosbuild_add_library(${PROJECT_NAME} src/manager.cpp src/gd_manager.cpp)
 
 rosbuild_add_library(tfm_se_plugins src/engine_plugins.cpp)
 target_link_libraries(tfm_se_plugins ${PROJECT_NAME})

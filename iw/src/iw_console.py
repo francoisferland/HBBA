@@ -94,10 +94,12 @@ class Shell:
                 desire.utility = int(t)
                 continue
             elif (state == 4):
-                desire.params += t
+                desire.params += t + " "
                 continue
             elif (state == 5):
                 del_ids.append(t)
+
+        desire.params.strip()
 
         if (final):
             if (cmd == "add"):

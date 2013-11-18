@@ -51,7 +51,9 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
         StrategyParser::parseCosts(res_caps_def, res_caps);
     }
 
-    np.param("max_p", max_p_, true);
+    np.param("max_p",      solver_params_.max_p,       true);
+    np.param("solver_log", solver_params_.log,        false);
+    np.param("time_limit", solver_params_.time_limit,     0);
 
     solver_model_.reset(new SolverModel(strats_, res_caps));
 
@@ -66,6 +68,12 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
         10,
         true); // Always latch.
 
+
+    // We set the last activation state to all off, since we can assume that
+    // strategies at initialization are already in a "off" state.
+    last_a_ = std::vector<unsigned char>(strats_.size(), 0);
+    last_p_ = std::vector<std::string>(strats_.size(), std::string("")); 
+
     initStrategies();
 }
 
@@ -77,7 +85,7 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
         ROS_WARN("Class with unknown desires will be ignored.");
     }
 
-    Solver solver(*solver_model_, g, s, max_p_);
+    Solver solver(*solver_model_, g, s, solver_params_);
 
     ActivationVector a;
     if (solver.result(a)) {
@@ -156,16 +164,21 @@ void IWTranslator::activateIntention(const hbba_msgs::Intention& intent)
     std::stringstream ss_bup, ss_bdn;
     for (size_t i = 0; i < intent.enabled.size(); ++i) {
         const hbba_msgs::Strategy& strat = strats_[i];
-        if (a[i] && strat.bringup_function != EMPTY) {
-            ss_bup << strats_[i].bringup_function << "(" << p[i] << ");";
-        } else if (strats_[i].bringdown_function != EMPTY) {
-            ss_bdn << strats_[i].bringdown_function << "();";
+        if (a[i] ^ last_a_[i] || (a[i] && p[i] != last_p_[i])) {
+            if (a[i] && strat.bringup_function != EMPTY) {
+                ss_bup << strats_[i].bringup_function << "(" << p[i] << ");";
+            } else if (strats_[i].bringdown_function != EMPTY) {
+                ss_bdn << strats_[i].bringdown_function << "();";
+            }
         }
     }
 
     std::string script_full = ss_bdn.str() + ss_bup.str();
     std::string result;
     script_engine_.eval(script_full, result);
+
+    last_a_ = a;
+    last_p_ = p;
 
 }
 

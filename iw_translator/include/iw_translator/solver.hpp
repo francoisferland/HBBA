@@ -13,6 +13,30 @@ namespace iw_translator
     /// \brief A vector for strategy activation results (bool)
     typedef std::vector<bool> ActivationVector;
 
+    /// \brief Solver configuration structure.
+    struct SolverParams
+    {
+        /// \brief If total utility production for defined, positive, and 
+        /// activated should be done.
+        /// Default: false.
+        bool max_p;
+
+        /// \brief Search time limit, in ms.
+        /// Default: 0 (no limit)
+        int time_limit;
+
+        /// \brief If search should be logged to the standard output.
+        /// Default: false.
+        bool log;
+
+        SolverParams():
+            max_p(false),
+            time_limit(0),
+            log(false)
+        {
+        }
+    };
+
     /// \brief A Google OR Tools-based solver for the Intention Workspace.
     ///
     /// Work based on the previous version of the solver (iw_solver_ortools).
@@ -37,12 +61,12 @@ namespace iw_translator
         ///                     for the solver.
         /// \param g            The required utility vector, or goal (G)
         /// \param s            The intensity vector (S)
-        /// \param max_p        If it should maximize utility production.
-        ///                     False by default.
-        Solver(const SolverModel& solver_model, 
-               const Vector&      g,
-               const Vector&      s,
-               const bool         max_p = false);
+        /// \param params       A SolverParams instance that sets different
+        ///                     solving options.
+        Solver(const SolverModel&  solver_model, 
+               const Vector&       g,
+               const Vector&       s,
+               const SolverParams& params = SolverParams());
 
         /// \brief Destructor.
         ~Solver();

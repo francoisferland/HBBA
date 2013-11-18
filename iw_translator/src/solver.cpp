@@ -8,7 +8,7 @@ Solver::Solver(
     const SolverModel& solver_model, 
     const Vector& g, 
     const Vector& s,
-    const bool max_p): 
+    const SolverParams& params): 
         impl_(new SolverImpl())
 {
     namespace or_tools = operations_research;
@@ -81,8 +81,10 @@ Solver::Solver(
         // Keep a copy of the scalar products for optimization.
         aur.push_back(solver.MakeScalProd(a, ur_k)->Var());
         if (g[k] > 0) {
-            // Only maximize production for (positively) defined desire classes.
-            au.push_back(solver.MakeScalProd(a, u_k)->Var());
+            // Only maximize production for (positively) defined and activated 
+            // desire classes.
+            au.push_back(solver.MakeProd(f[k], 
+                                         solver.MakeScalProd(a, u_k))->Var());
         }
 
         // Add ">=" constraints for positive goals, as we don't mind if we
@@ -125,7 +127,8 @@ Solver::Solver(
     or_tools::IntVar*      f_s       = solver.MakeScalProd(f, s)->Var();
     or_tools::IntVar*      p         = solver.MakeSum(au)->Var(); 
 
-    or_tools::IntVar* opt_sum = max_p ? solver.MakeSum(f_s, p)->Var() : f_s;
+    or_tools::IntVar* opt_sum = params.max_p ? solver.MakeSum(f_s, p)->Var() : 
+                                               f_s;
 
     or_tools::OptimizeVar* opt_var = solver.MakeMaximize(opt_sum, 1);
 
@@ -148,7 +151,20 @@ Solver::Solver(
     coll->Add(full_sol);
     coll->AddObjective(opt_sum);
 
-    solver.NewSearch(db, coll);
+    std::vector<or_tools::SearchMonitor*> monitors;
+    monitors.push_back(coll);
+    
+    if (params.log) {
+        // Full search log monitors, output to stdout. 
+        monitors.push_back(solver.MakeSearchLog(100000));
+    }
+
+    if (params.time_limit > 0) {
+        // Search time limit, in ms.
+        monitors.push_back(solver.MakeTimeLimit(params.time_limit));
+    }
+
+    solver.NewSearch(db, monitors);
     solver.Solve(db, coll, opt_var);
 
     int nb_sols = coll->solution_count();

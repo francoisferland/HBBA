@@ -37,6 +37,10 @@ namespace iw_translator
     ///  - ~res_caps:   An array of resource capacity definitions.
     ///  - ~max_p:      Maximise total utility production (p).
     ///                 Default: true.
+    ///  - ~solver_log: Solver search log in standard output.
+    ///                 Default: false.
+    ///  - ~time_limit: Solver search time limit, in ms.
+    ///                 Default: 0 (no limit).
     ///
     class IWTranslator
     {
@@ -49,7 +53,10 @@ namespace iw_translator
         ros::Publisher                   pub_intention_;
         ros::ServiceClient               srv_eval_script_;
 
-        bool                             max_p_;
+        SolverParams                     solver_params_;
+
+        std::vector<unsigned char>       last_a_;
+        std::vector<std::string>         last_p_;
 
     public:
         /// \brief Constructor.

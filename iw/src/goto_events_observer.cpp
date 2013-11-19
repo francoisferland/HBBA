@@ -72,8 +72,8 @@ namespace iw
 
         std::vector<hbba_msgs::Desire> desires_;
 
-        // Contains the last set of desires where the goal is in reached, used
-        // to detect ON->OFF/OFF->ON transitions:
+        // Contains the last set of desires where the goal has being reached, 
+        // used to detect ON->OFF/OFF->ON transitions:
         Model                          model_;
 
     public:

@@ -25,6 +25,10 @@ namespace iw_translator
         /// Default: 0 (no limit)
         int time_limit;
 
+        /// \brief Perform simulated annealing in solution search.
+        /// Default: false.
+        bool sa;
+
         /// \brief If search should be logged to the standard output.
         /// Default: false.
         bool log;
@@ -32,6 +36,7 @@ namespace iw_translator
         SolverParams():
             max_p(false),
             time_limit(0),
+            sa(false),
             log(false)
         {
         }

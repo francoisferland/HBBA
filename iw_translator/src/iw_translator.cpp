@@ -54,6 +54,7 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
     np.param("max_p",      solver_params_.max_p,       true);
     np.param("solver_log", solver_params_.log,        false);
     np.param("time_limit", solver_params_.time_limit,     0);
+    np.param("solver_sa",  solver_params_.sa,         false);
 
     solver_model_.reset(new SolverModel(strats_, res_caps));
 

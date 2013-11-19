@@ -164,6 +164,15 @@ Solver::Solver(
         monitors.push_back(solver.MakeTimeLimit(params.time_limit));
     }
 
+    if (params.sa) {
+        // TODO: Find actual documentation on this / way to monitor its effect, 
+        // not available in the official one.
+        monitors.push_back(solver.MakeSimulatedAnnealing(true,
+                                                         opt_sum,
+                                                         1,
+                                                         100));
+    }
+
     ros::Time search_start = ros::Time::now();
 
     solver.NewSearch(db, monitors);

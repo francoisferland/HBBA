@@ -37,6 +37,8 @@ namespace iw_translator
     ///  - ~res_caps:   An array of resource capacity definitions.
     ///  - ~max_p:      Maximise total utility production (p).
     ///                 Default: true.
+    ///  - ~solver_sa:  Perform simulated annealing.
+    ///                 Default: false.
     ///  - ~solver_log: Solver search log in standard output.
     ///                 Default: false.
     ///  - ~time_limit: Solver search time limit, in ms.

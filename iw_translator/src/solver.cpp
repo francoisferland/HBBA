@@ -141,7 +141,7 @@ Solver::Solver(
     // all (everything deactivated).
     or_tools::DecisionBuilder* const db = solver.MakePhase(
        full_sol, 
-       or_tools::Solver::CHOOSE_RANDOM,
+       or_tools::Solver::CHOOSE_FIRST_UNBOUND,
        or_tools::Solver::ASSIGN_MIN_VALUE);
 
     or_tools::SolutionCollector* coll = 

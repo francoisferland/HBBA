@@ -11,8 +11,8 @@ namespace iw
 {
     /// \brief Say-class events observer and generator.
     ///
-    /// Subscribes to the current set of desires, filters it for Say-class
-    /// events, and publishes "ACC_ON" events when the robot finished to 
+    /// Subscribes to the current set of desires, filters it for the first
+    /// Say-class events, and publishes "ACC_ON" events when the robot finished
     /// to speak.
     /// Will not repeat "ACC_ON" publications, only when transitions are
     /// detected.
@@ -21,19 +21,12 @@ namespace iw
     /// A desire can be accomplished even if it's not part of the robot's
     /// current intention.
     ///
-    /// Note: A string parameter is cached, so events for desires that do not 
-    /// change names might not be properly tracked.
-    ///
     /// Parameters:
     ///  - say_class:       Class name of Say desire class.
     ///                     Default: "Say".
     ///  - pause_duration:  Pause in audio stream indicating the speech 
     ///                     synthesizer end. 
     ///                     Default: 0.5 s.
-    ///  - period:          Update period for event detection.
-    ///                     Note: events detection is performed on each
-    ///                     reception of a new desires set.
-    ///                     Default: 1.0 s.
     ///
     /// Topics:
     ///  - desires_set:     The current active desires set as given by IW.
@@ -66,6 +59,7 @@ namespace iw
         SayEventsObserver(ros::NodeHandle& n, ros::NodeHandle& np)
         {
             np.param("say_class", say_class_, std::string("Say"));
+
             double pd;
             np.param("pause_duration", pd, 0.5);
             pause_duration_ = ros::Duration(pd);

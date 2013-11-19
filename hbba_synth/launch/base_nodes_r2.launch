@@ -5,5 +5,11 @@
             output="screen"/>
         <node name="events_generator" pkg="iw" type="events_generator"/>
         <node name="goto_events_observer" pkg="iw" type="goto_events_observer"/>
+        <rosparam>
+            solver_model:
+                solver_log: false
+                time_limit:  1000
+                max_p:       true
+        </rosparam>
     </group>
 </launch>

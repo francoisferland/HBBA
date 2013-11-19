@@ -164,8 +164,13 @@ Solver::Solver(
         monitors.push_back(solver.MakeTimeLimit(params.time_limit));
     }
 
+    ros::Time search_start = ros::Time::now();
+
     solver.NewSearch(db, monitors);
     solver.Solve(db, coll, opt_var);
+
+    ros::Duration search_time = ros::Time::now() - search_start;
+    ROS_DEBUG("Solving search duration: %f s", search_time.toSec());
 
     int nb_sols = coll->solution_count();
     ROS_DEBUG("Solutions count: %i", nb_sols);
@@ -191,6 +196,7 @@ Solver::Solver(
     ROS_DEBUG("F vector: %s", ss.str().c_str());
 
     solver.EndSearch();
+
 }
 
 Solver::~Solver()

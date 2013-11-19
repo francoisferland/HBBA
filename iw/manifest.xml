@@ -14,6 +14,7 @@
   <depend package="std_srvs"/>
   <depend package="topic_tools"/>
   <depend package="tf"/>
+  <depend package="rt_audio_ros"/>
 
   <rosdep name="yaml-cpp"/>
 

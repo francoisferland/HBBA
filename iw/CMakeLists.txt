@@ -38,3 +38,6 @@ target_link_libraries(exploitation_matcher iw)
 rosbuild_add_executable(goto_events_observer src/goto_events_observer.cpp)
 target_link_libraries(goto_events_observer iw yaml-cpp)
 
+rosbuild_add_executable(say_events_observer src/say_events_observer.cpp)
+target_link_libraries(say_events_observer iw)
+

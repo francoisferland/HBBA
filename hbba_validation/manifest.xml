@@ -1,0 +1,16 @@
+<package>
+  <description brief="hbba_validation">
+
+     hbba_validation - Configuration and motivation nodes for a HBBA validation scenario.
+
+  </description>
+  <author>fferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/hbba_validation</url>
+  <depend package="hbba_synth"/>
+  <depend package="roscpp"/>
+
+</package>
+
+

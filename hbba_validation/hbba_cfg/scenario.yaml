@@ -1,0 +1,93 @@
+# HBBA validation scenario, meant for IRL-1/TR.
+
+hbba_conf:
+
+- include: {pkg: 'hbba_synth',    file: 'common_newrev.yaml'}
+
+# Proc modules:
+- include: {pkg: 'irl1_hbba_cfg', file: 'jn0_proc_sphinx.yaml'}
+#- include: {pkg: 'irl1_ios_demo', file: 'jn0_proc_rtabmap.yaml'}
+#- include: {pkg: 'irl1_ios_demo', file: 'jn0_proc_wiss.yaml'}
+#- include: {pkg: 'irl1_ios_demo', file: 'tr_proc_static_map.yaml'}
+- include: {pkg: 'irl1_hbba_cfg', file: 'irl1_proc_people_tracking.yaml'}
+
+# Behaviors:
+- include: {pkg: 'irl1_hbba_cfg', file: 'tr_bhvr_teleop.yaml'}
+- include: {pkg: 'irl1_hbba_cfg', file: 'tr_bhvr_slam_planner.yaml'}
+- include: {pkg: 'irl1_hbba_cfg', file: 'irl1_bhvr_engage.yaml'}
+- include: {pkg: 'irl1_hbba_cfg', file: 'irl1_bhvr_spring_arm_follow.yaml'}
+- include: {pkg: 'irl1_ios_demo', file: 'jn0_bhvr_say.yaml'}
+- include: {pkg: 'jn0_hbba_cfg',  file: 'irl1_bhvr_arm_keep_down.yaml'}
+
+# Combined priorities:
+- behavior_priority: {name: 'tr_teleop',            value: 100}
+- behavior_priority: {name: 'spring_arm_follow',    value: 90}
+- behavior_priority: {name: 'az3_slam_planner',     value: 50}
+- behavior_priority: {name: 'arm_keep_down',        value: 30}
+
+# Available resources:
+- resources:
+    CPU: 100
+
+#- motivation:
+#    name: ios_demo
+#    launch: {pkg: 'irl1_ios_demo', path: 'launch/irl1_motv_ios_demo.launch'}
+#    input:
+#        - rtabmap/info
+#        - dialog_ios: sphinx_result
+#        - wiss_ident
+#        - tracked_sources
+#    output:
+#        - rtabmap_np         # Namespace used for RTABMap parameters update.
+#        - dialog_irl1
+#        - parameters_updated
+    
+# Static sphinx (for testing purposes):
+- desire:
+    id: sphinx
+    type: SpeechRecognition
+    utility: 1
+    intensity: 1.0
+    security: False
+
+# Static engage (for testing purposes):
+- desire:
+    id: engage_static
+    type: EngagePerson
+    intensity: 1
+    utility: 1
+    security: false
+- desire:
+    id: track_people_static # Static to maximize utility.
+    type: TrackPeople
+    intensity: 1
+    utility: 1
+    security: false
+
+# Arm follow (and keep down in neutral) motivations (static, essentially free).
+- desire:
+    id: arm_keep_down
+    type: ArmKeepDown
+    utility: 1
+    intensity: 1
+    security: False
+- desire:
+    id: spring_arm_follow
+    type: ArmFollow
+    utility: 1
+    intensity: 5
+    security: False
+
+# Teleoperation.
+- desire:
+    id: irl1_teleop
+    type: Teleop
+    utility: 1
+    intensity: 1
+    security: True
+
+# Baseline emotion(s):
+- emo_intensity:
+    name: Joy
+    value: 0.25
+

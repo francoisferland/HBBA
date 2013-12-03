@@ -28,3 +28,11 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
+
+
+# Automatic build of hbba_cfg:
+rosbuild_find_ros_package(hbba_synth)
+include(${hbba_synth_PACKAGE_PATH}/cmake/build.cmake)
+
+add_hbba_cfg(scenario irl1_tr NEWREV)
+

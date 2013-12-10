@@ -5,6 +5,7 @@ hbba_conf:
 - include: {pkg: 'hbba_synth',    file: 'common_newrev.yaml'}
 
 # Exploration modules:
+- include: {pkg: 'irl1_hbba_cfg', file: 'irl1_proc_qrcode_finder.yaml'}
 - include: {pkg: 'irl1_hbba_cfg', file: 'tr_bhvr_costmap_wander.yaml'}
 
 # Interaction modules:

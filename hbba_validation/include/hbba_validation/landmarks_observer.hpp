@@ -34,6 +34,8 @@ namespace hbba_validation
         std::string robot_frame_;
 
         MapType map_;
+        
+        boost::function<void (const std::string&)> cb_;
 
     public:
         /// \brief Constructor.
@@ -49,6 +51,24 @@ namespace hbba_validation
         /// This can be verified by looking at the pose's timestamp: A zero
         /// value indicates a null pose.
         const MapType& landmarks() const { return map_; }
+
+        /// \brief Return true if a landmark with the given code is known.
+        ///
+        /// NOTE: Does not guarantee that the landmark's pose is valid.
+        bool hasLandmark(const std::string& code) const {
+            MapType::const_iterator i = map_.find(code);
+            return (i != map_.end());
+        }
+
+        /// \brief Register a callback for newly-registered landmarks.
+        ///
+        /// The callback is called from the decoded codes callback, and the map
+        /// obtained from landmarks() will be fully updated.
+        template <class T>
+        void registerCB(void (*fun)(const std::string&), T* obj)
+        {
+            cb_ = boost::bind(fun, obj, _1);
+        }
 
     private:
         void codesCB(const std_msgs::String& msg);

@@ -20,7 +20,16 @@ void LandmarksObserver::codesCB(const std_msgs::String& msg)
 
     // Find out the latest robot's pose, save that as the landmark's
     // location.
-    geometry_msgs::PoseStamped& p = map_[code];
+
+    bool              new_code = false;
+    MapType::iterator i        = map_.find(code); 
+    if (i == map_.end()) {
+        i = map_.insert(std::make_pair(code, 
+                                       geometry_msgs::PoseStamped())).first;
+        new_code = true;
+    }
+    geometry_msgs::PoseStamped& p = i->second;
+
     tf::StampedTransform        st;
     if (!irl1_interaction::latestTransform(tf_, 
                                            fixed_frame_, 
@@ -29,6 +38,10 @@ void LandmarksObserver::codesCB(const std_msgs::String& msg)
         // NOTE: We always save a pose, the zeroed timestamp serves as marking
         // a landmark with an unknown robot location.
         p.header.stamp = ros::Time(); // Zeroed timestamp.
+    }
+
+    if (new_code && cb_) {
+        cb_(code);
     }
 }
 

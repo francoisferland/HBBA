@@ -9,6 +9,7 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/hbba_validation</url>
   <depend package="hbba_synth"/>
+  <depend package="irl1_interaction"/>
   <depend package="roscpp"/>
 
 </package>

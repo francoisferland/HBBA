@@ -60,6 +60,16 @@ namespace hbba_validation
             return (i != map_.end());
         }
 
+        /// \brief Save the current location as a custom landmark.
+        ///
+        /// Warning: Might save an invalid pose (header.stamp == 0) if it could
+        /// not be obtained.
+        ///
+        /// \param code      The landmark identifier.
+        /// \param enable_cb Enable callback firing if it's a newly discovered
+        ///                  code.
+        void saveLandmark(const std::string& code, bool enable_cb = true);
+
         /// \brief Register a callback for newly-registered landmarks.
         ///
         /// The callback is called from the decoded codes callback, and the map

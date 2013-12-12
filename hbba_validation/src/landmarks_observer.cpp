@@ -16,8 +16,11 @@ LandmarksObserver::LandmarksObserver(ros::NodeHandle& n, ros::NodeHandle& np)
 
 void LandmarksObserver::codesCB(const std_msgs::String& msg)
 {
-    const std::string& code = msg.data;
+    saveLandmark(msg.data, true);
+}
 
+void LandmarksObserver::saveLandmark(const std::string& code, bool enable_cb)
+{
     // Find out the latest robot's pose, save that as the landmark's
     // location.
 
@@ -40,7 +43,7 @@ void LandmarksObserver::codesCB(const std_msgs::String& msg)
         p.header.stamp = ros::Time(); // Zeroed timestamp.
     }
 
-    if (new_code && cb_) {
+    if (enable_cb && new_code && cb_) {
         cb_(code);
     }
 }

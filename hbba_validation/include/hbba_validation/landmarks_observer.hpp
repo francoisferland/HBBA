@@ -12,8 +12,8 @@ namespace hbba_validation
     /// saves the latest robot's location they were seen.
     ///
     /// Topics:
-    ///  - qrcodes_decoded: std_msgs/String, decoded QR codes.
-    ///  - /tf:             Used by TransformListener.
+    ///  - qrcode_decoded: std_msgs/String, decoded QR codes.
+    ///  - /tf:            Used by TransformListener.
     ///
     /// Parameters:
     ///  - fixed_frame: The global reference frame.

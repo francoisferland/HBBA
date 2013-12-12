@@ -23,6 +23,8 @@ class iw_server:
         self.pub_set = rospy.Publisher('desires_set', DesiresSet, latch=True)
 
     def add_desires(self, desires):
+        if len(desires) < 1:
+            rospy.logwarn("Received an empty desires set in add_desires.")
         for d in desires:
             rospy.logdebug('Adding new desire with id ' + d.id)
             self.desires[d.id] = d

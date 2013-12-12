@@ -9,7 +9,7 @@ GoToLandmark::GoToLandmark(ros::NodeHandle& n, ros::NodeHandle& np):
 {
     sub_goal_ = n.subscribe("landmark_goal", 10, &GoToLandmark::goalCB, this);
 
-    scl_add_ = n.serviceClient<hbba_msgs::AddDesires>("add_desires");
+    scl_add_ = n.serviceClient<hbba_msgs::AddDesires>("add_desires", true);
 }
 
 void GoToLandmark::goalCB(const std_msgs::String& msg)
@@ -33,6 +33,7 @@ bool GoToLandmark::goTo(const std::string& code)
         return false;
     }
 
+    ROS_DEBUG("Received a valid landmark goal (%s).", code.c_str());
     gotoDesire(goal);
 
     return true;
@@ -41,7 +42,7 @@ bool GoToLandmark::goTo(const std::string& code)
 void GoToLandmark::sayDesire(const std::string& data)
 {
     hbba_msgs::AddDesires req;
-    std::vector<hbba_msgs::Desire> desires = req.request.desires;
+    std::vector<hbba_msgs::Desire>& desires = req.request.desires;
     desires.resize(1);
     hbba_msgs::Desire& des_say = desires[0];
     
@@ -59,7 +60,7 @@ void GoToLandmark::sayDesire(const std::string& data)
 void GoToLandmark::gotoDesire(const geometry_msgs::PoseStamped& goal)
 {
     hbba_msgs::AddDesires req;
-    std::vector<hbba_msgs::Desire> desires = req.request.desires;
+    std::vector<hbba_msgs::Desire>& desires = req.request.desires;
     desires.resize(1);
     hbba_msgs::Desire& des_goto = desires[0];
     

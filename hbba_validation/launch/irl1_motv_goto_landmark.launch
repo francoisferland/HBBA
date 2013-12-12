@@ -1,0 +1,3 @@
+<launch>
+    <node name="goto_landmark" pkg="hbba_validation" type="goto_landmark_node"/>
+</launch>

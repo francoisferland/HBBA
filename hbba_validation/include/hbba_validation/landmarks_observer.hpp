@@ -44,7 +44,7 @@ namespace hbba_validation
         /// \param np Node handle for parameters.
         LandmarksObserver(ros::NodeHandle& n, ros::NodeHandle& np);
 
-        /// \brief Return a const reference to the map of  known landmarks.
+        /// \brief Return a const reference to the map of known landmarks.
         ///
         /// Note: Poses contained in the map can be invalid if the robot's
         /// location could not be found. 

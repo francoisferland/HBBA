@@ -49,6 +49,11 @@ namespace hbba_validation
         /// Return false if the goal is invalid.
         bool goTo(const std::string& code);
 
+        /// \brief Return a reference to the LandmarksObserver instance.
+        LandmarksObserver&       observer()       { return obs_; } 
+        /// \brief Return a const reference to the LandmarksObserver instance.
+        const LandmarksObserver& observer() const { return obs_; } 
+
     private:
         void goalCB(const std_msgs::String& msg);
         void newLandmarkCB(const std::string& code);

@@ -88,7 +88,9 @@ namespace hbba_validation
 
         /// \brief Default constructor: does not produce a working state
         /// machine.
-        StateMachine() {}
+        StateMachine():
+            state_(0)
+        {}
 
         /// \brief Constructor.
         ///
@@ -135,6 +137,9 @@ namespace hbba_validation
                 
         }
 
+        /// \brief Return the current state of the machine.
+        Handle state() const { return state_; }
+
         /// \brief Return the number of states managed by this machine.
         Handle size() const { return states_.size(); }
 
@@ -179,6 +184,7 @@ namespace hbba_validation
         ///         the current state if it isn't.
         Handle callState(const Handle state)
         {
+            assert(state < size());
             const StateFunction& fun = states_[state];
             if (fun != 0) {
                 return (host_->*fun)();

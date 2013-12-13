@@ -30,9 +30,9 @@ void LandmarksObserver::saveLandmark(const std::string& code, bool enable_cb)
         i = map_.insert(std::make_pair(code, 
                                        geometry_msgs::PoseStamped())).first;
         new_code = true;
-        ROS_DEBUG("Observed a new QRCode: %s", code.c_str());
+        ROS_DEBUG("Observed a new landmark: %s", code.c_str());
     } else {
-        ROS_DEBUG("Observed a known QRCode: %s", code.c_str());
+        ROS_DEBUG("Observed a known landmark: %s", code.c_str());
     }
 
     geometry_msgs::PoseStamped& p = i->second;

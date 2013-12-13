@@ -23,6 +23,7 @@ void GoToLandmark::goalCB(const std_msgs::String& msg)
 bool GoToLandmark::goTo(const std::string& code)
 {
     if (!obs_.hasLandmark(code)) {
+        ROS_DEBUG("GoToLandmark received an unknown goal: %s.", code.c_str());
         return false;
     }
 
@@ -30,6 +31,9 @@ bool GoToLandmark::goTo(const std::string& code)
         obs_.landmarks().find(code)->second;
 
     if (goal.header.stamp.isZero()) {
+        ROS_DEBUG("GoToLandmark received a goal for a known but invalid "
+                  "landmark: %s.", 
+                  code.c_str());
         return false;
     }
 

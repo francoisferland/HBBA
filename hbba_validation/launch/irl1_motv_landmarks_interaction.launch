@@ -1,0 +1,4 @@
+<launch>
+    <node name="landmarks_interaction" pkg="hbba_validation"
+        type="landmarks_interaction_node"/>
+</launch>

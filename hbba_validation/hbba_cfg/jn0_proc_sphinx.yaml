@@ -1,0 +1,25 @@
+# Same as the one found in irl1_hbba_cfg, but with a landmarks-specific
+# language model.
+
+hbba_conf:
+    
+- resources: {Sphinx: 1}
+
+- procmodule:
+    name: sphinx 
+    launch: {pkg: 'hbba_validation', path: 'launch/jn0_proc_sphinx.launch'}
+    input:
+        - audio_stream: ios_audio
+    output:
+        - sphinx_result
+
+
+- strat:
+    name: SphinxSpeechRec
+    class: SpeechRecognition
+    utility: 10
+    costs: {Sphinx: 1}
+    modules:
+        - sphinx:
+            - ios_audio: 1 
+

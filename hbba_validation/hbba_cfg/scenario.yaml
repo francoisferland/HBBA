@@ -2,29 +2,26 @@
 
 hbba_conf:
 
-- include: {pkg: 'hbba_synth',    file: 'common_newrev.yaml'}
+- include: {pkg: 'hbba_synth',      file: 'common_newrev.yaml'}
 
 # Exploration modules:
-- include: {pkg: 'irl1_hbba_cfg', file: 'irl1_proc_qrcode_finder.yaml'}
-- include: {pkg: 'irl1_hbba_cfg', file: 'tr_bhvr_costmap_wander.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'irl1_proc_qrcode_finder.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_costmap_wander.yaml'}
 
 # Interaction modules:
-- include: {pkg: 'irl1_hbba_cfg', file: 'jn0_proc_sphinx.yaml'}
-#- include: {pkg: 'irl1_ios_demo', file: 'jn0_proc_rtabmap.yaml'}
-#- include: {pkg: 'irl1_ios_demo', file: 'jn0_proc_wiss.yaml'}
-#- include: {pkg: 'irl1_ios_demo', file: 'tr_proc_static_map.yaml'}
-- include: {pkg: 'irl1_hbba_cfg', file: 'irl1_proc_people_tracking.yaml'}
+- include: {pkg: 'hbba_validation', file: 'jn0_proc_sphinx.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'irl1_proc_people_tracking.yaml'}
 
-- include: {pkg: 'irl1_hbba_cfg', file: 'irl1_bhvr_engage.yaml'}
-- include: {pkg: 'irl1_hbba_cfg', file: 'irl1_bhvr_spring_arm_follow.yaml'}
-- include: {pkg: 'irl1_ios_demo', file: 'jn0_bhvr_say.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'irl1_bhvr_engage.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'irl1_bhvr_spring_arm_follow.yaml'}
+- include: {pkg: 'irl1_ios_demo',   file: 'jn0_bhvr_say.yaml'}
 
 # Common modules:
-- include: {pkg: 'jn0_hbba_cfg',  file: 'jn0_proc_slam_gmapping.yaml'}
+- include: {pkg: 'jn0_hbba_cfg',    file: 'jn0_proc_slam_gmapping.yaml'}
 
-- include: {pkg: 'irl1_hbba_cfg', file: 'tr_bhvr_teleop.yaml'}
-- include: {pkg: 'irl1_hbba_cfg', file: 'tr_bhvr_slam_planner.yaml'}
-- include: {pkg: 'jn0_hbba_cfg',  file: 'irl1_bhvr_arm_keep_down.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_teleop.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_slam_planner.yaml'}
+- include: {pkg: 'jn0_hbba_cfg',    file: 'irl1_bhvr_arm_keep_down.yaml'}
 
 # Combined priorities:
 - behavior_priority: {name: 'tr_teleop',           value: 100}
@@ -37,6 +34,13 @@ hbba_conf:
 # Available resources:
 - resources:
     CPU: 100
+
+- motivation:
+    name: landmarks_interaction
+    launch: {pkg: 'hbba_validation', path: 'launch/irl1_motv_landmarks_interaction.launch'}
+    input:
+        - sphinx_result        
+        - qrcode_decoded
 
 #- motivation:
 #    name: ios_demo

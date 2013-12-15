@@ -1,15 +1,23 @@
 <launch>
+    <node name="src_select" pkg="audio_tools" type="source_selector">
+        <remap from="tracked_sources_out" to="selected_sources"/>
+    </node>
     <node name="sphinx_node" pkg="audio_tools" type="sphinx_node"
         output="screen">
 
+        <remap from="tracked_sources" to="selected_sources"/>
+        <remap from="audio_stream"    to="/null_sources"/>
         <remap from="voice_stream"    to="/null_voice"/>
-        <remap from="tracked_sources" to="/null_sources"/>
 
         <param name="model_basepath" 
                value="$(find hbba_validation)/data/6466"/>
 
         <rosparam>
-            min_energy:      0.05
+            pre_norm:       false
+            use_pf:          true
+            min_energy:     0.040
+            channel:            2
+            time_based:     false
             voice_trigger:    480
             silent_trigger: 19200
         </rosparam>

@@ -1,5 +1,5 @@
 # Same as the one found in irl1_hbba_cfg, but with a landmarks-specific
-# language model.
+# language model and ManyEars input (instead of ios_audio).
 
 hbba_conf:
     
@@ -9,7 +9,7 @@ hbba_conf:
     name: sphinx 
     launch: {pkg: 'hbba_validation', path: 'launch/jn0_proc_sphinx.launch'}
     input:
-        - audio_stream: ios_audio
+        - tracked_sources
     output:
         - sphinx_result
 
@@ -21,5 +21,5 @@ hbba_conf:
     costs: {Sphinx: 1}
     modules:
         - sphinx:
-            - ios_audio: 1 
+            - tracked_sources: 1 
 

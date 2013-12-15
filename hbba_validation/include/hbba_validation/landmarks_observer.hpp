@@ -75,7 +75,7 @@ namespace hbba_validation
         /// The callback is called from the decoded codes callback, and the map
         /// obtained from landmarks() will be fully updated.
         template <class T>
-        void registerCB(void (*fun)(const std::string&), T* obj)
+        void registerCB(void (T::*fun)(const std::string&), T* obj)
         {
             cb_ = boost::bind(fun, obj, _1);
         }

@@ -57,12 +57,18 @@ hbba_conf:
     
 # Static sphinx (for testing purposes):
 - desire:
-    id: sphinx
+    id: sphinx_static
     type: SpeechRecognition
     utility: 1
     intensity: 1.0
     security: False
-
+# Static SLAM (for testing purposes):
+- desire:
+    id: slam_static
+    type: SLAM
+    utility: 1
+    intensity: 1.0
+    security: False
 # Static engage (for testing purposes):
 - desire:
     id: engage_static

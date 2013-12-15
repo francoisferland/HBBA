@@ -38,6 +38,8 @@ bool GoToLandmark::goTo(const std::string& code)
     }
 
     ROS_DEBUG("Received a valid landmark goal (%s).", code.c_str());
+    std::string utt = "I am going to " + code;
+    sayDesire(utt);
     gotoDesire(goal);
 
     return true;

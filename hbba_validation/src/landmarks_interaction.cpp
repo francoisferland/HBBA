@@ -12,6 +12,8 @@ LandmarksInteraction::LandmarksInteraction(ros::NodeHandle& n,
                               &LandmarksInteraction::sphinxCB,
                               this);
 
+    goto_.observer().registerCB(&LandmarksInteraction::newLandmarkCB, this);
+
     // State machine preparation:
     SM::States states;
     states.push_back(&LandmarksInteraction::stateWait);
@@ -118,5 +120,11 @@ std::string LandmarksInteraction::formatLandmark(const std::string& code) const
     static const std::string landmark_prefix("IRL1_LANDMARK_");
 
     return landmark_prefix + code;
+}
+
+void LandmarksInteraction::newLandmarkCB(const std::string& code)
+{
+    // TODO: 'Say' desire.
+    ROS_DEBUG("Registered a new landmark: %s", code.c_str());
 }
 

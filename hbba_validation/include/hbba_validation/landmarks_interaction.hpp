@@ -70,6 +70,8 @@ namespace hbba_validation
         SM::Handle stateLead();
         SM::Handle stateGoTo();
 
+        void newLandmarkCB(const std::string& code);
+
         /// \brief Push an event to the state machine queue and automatically
         /// process it.
         void pushEvent(const SM::Handle event);

@@ -14,7 +14,7 @@
 
         <rosparam>
             pre_norm:       false
-            use_pf:          true
+            use_pf:         false
             min_energy:     0.040
             channel:            2
             time_based:     false

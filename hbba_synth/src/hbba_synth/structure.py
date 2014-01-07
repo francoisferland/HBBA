@@ -2,10 +2,13 @@ from definitions import *
 from xml.etree.ElementTree import ElementTree, Element, tostring 
 from xml.dom import minidom
 from sets import Set
+import os
+import stat
 
 # Some constant expressions that are formatted later:
 
-python_header_common = """
+python_header_common = """#!/usr/bin/env python
+
 import roslib; roslib.load_manifest("hbba_synth")
 import rospy;
 from hbba_msgs.msg import *
@@ -344,9 +347,11 @@ class Structure:
                 print ""
 
             if not opts.model_only:
-                pyfile = file(basepath + ".py", "w")
+                pyfile_path = basepath + ".py"
+                pyfile = file(pyfile_path, "w")
                 pyfile.write(python_header_common.format(
                     self.getRootTopicFullName("emo_intensity")))
+                os.chmod(pyfile_path, os.stat(pyfile_path).st_mode | stat.S_IEXEC)
                 if not opts.new_rev:
                     pyfile.write(python_header_model)
 

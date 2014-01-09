@@ -1,6 +1,6 @@
 GoTo :       {Joy:  0.01,  Anger: -0.01 }
 not_GoTo :   {Joy: -0.05,  Anger:  0.05 }
-Wander :     {Joy:  -0.005, Anger: 0.005}
+Wander :     {Joy:  -0.002, Anger: 0.002}
 not_Wander : {Joy: -0.008, Anger:  0.008}
 Teleop :     {Joy:  0.02,  Anger: -0.04 }
 not_Teleop : {Joy: 0,  Anger:  0 }

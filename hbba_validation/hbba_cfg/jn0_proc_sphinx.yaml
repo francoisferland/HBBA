@@ -13,12 +13,12 @@ hbba_conf:
     output:
         - sphinx_result
 
-
 - strat:
     name: SphinxSpeechRec
     class: SpeechRecognition
     utility: 10
     costs: {Sphinx: 1}
+    dependencies: {LocateVoice: 1}
     modules:
         - sphinx:
             - tracked_sources: 1 

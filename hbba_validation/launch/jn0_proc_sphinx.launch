@@ -20,9 +20,9 @@
             time_based:      true
             pause_duration: 0.400
             # For direct input, ManyEars already selects sound:
-            time_based:     false
-            voice_trigger:    480
-            silent_trigger: 19200
+            # time_based:     false
+            # voice_trigger:    480
+            # silent_trigger: 19200
         </rosparam>
     </node>
 </launch>

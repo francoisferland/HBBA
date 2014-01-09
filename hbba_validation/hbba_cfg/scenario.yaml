@@ -33,7 +33,7 @@ hbba_conf:
 
 # Available resources:
 - resources:
-    CPU: 100
+    CPU: 300
 
 - motivation:
     name: landmarks_interaction
@@ -61,6 +61,13 @@ hbba_conf:
     type: SpeechRecognition
     utility: 1
     intensity: 1.0
+    security: False
+# Static QRCodes (for testing purposes):
+- desire:
+    id: qr_codes_static
+    type: FindQRCodes
+    utility: 1
+    intensity: 1
     security: False
 # Static SLAM (for testing purposes):
 - desire:

@@ -16,12 +16,20 @@ from hbba_msgs.srv import *
 from script_engine.srv import EvalScript
 from emotions_msgs.msg import EmoIntensity
 
+import os
+import sys
+
+if ("-c" in sys.argv):
+    if (os.fork() == 0):
+        os.system("roslaunch {0}")
+        sys.exit(0)
+
 rospy.init_node("hbba_struct", anonymous=True)
 
-rospy.wait_for_service("hbba/add_desires", 1.0)
+rospy.wait_for_service("hbba/add_desires", 30.0)
 add_desires = rospy.ServiceProxy("hbba/add_desires", AddDesires)
 
-pubEmoIntensity = rospy.Publisher("{0}", EmoIntensity)
+pubEmoIntensity = rospy.Publisher("{1}", EmoIntensity)
 
 """
 
@@ -350,6 +358,7 @@ class Structure:
                 pyfile_path = basepath + ".py"
                 pyfile = file(pyfile_path, "w")
                 pyfile.write(python_header_common.format(
+                    os.path.join(os.getcwd(), basepath + ".launch"),
                     self.getRootTopicFullName("emo_intensity")))
                 os.chmod(pyfile_path, os.stat(pyfile_path).st_mode | stat.S_IEXEC)
                 if not opts.new_rev:

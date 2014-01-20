@@ -21,13 +21,15 @@ hbba_conf:
 
 - include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_teleop.yaml'}
 #- include: {pkg: 'hbba_validation', file: 'tr_bhvr_combined_goto.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_stop.yaml'}
 - include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_goto.yaml'}
 - include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_slam_planner.yaml'}
 - include: {pkg: 'jn0_hbba_cfg',    file: 'irl1_bhvr_arm_keep_down.yaml'}
 
 # Combined priorities:
 - behavior_priority: {name: 'tr_teleop',           value: 100}
-- behavior_priority: {name: 'spring_arm_follow',   value: 90}
+- behavior_priority: {name: 'tr_stop',             value: 90}
+- behavior_priority: {name: 'spring_arm_follow',   value: 80}
 - behavior_priority: {name: 'irl1_engage',         value: 70}
 - behavior_priority: {name: 'tr_slam_planner',     value: 50}
 - behavior_priority: {name: 'tr_goto',             value: 45}
@@ -111,6 +113,14 @@ hbba_conf:
     utility: 1
     intensity: 5
     security: False
+
+# Emergency stop.
+- desire:
+    id: irl1_stop
+    type: Stop
+    utility: 1
+    intensity: 1
+    security: True
 
 # Teleoperation.
 - desire:

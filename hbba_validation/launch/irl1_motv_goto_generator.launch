@@ -1,0 +1,3 @@
+<launch>
+    <node name="goto_generator" pkg="irl1_interaction" type="goto_generator"/>
+</launch>

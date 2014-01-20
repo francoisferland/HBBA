@@ -45,6 +45,11 @@ hbba_conf:
     name: irl1_webapp
     launch: {pkg: 'irl1_webapp', path: 'launch/irl1_webapp.launch'}
 
+# Goto generator motivation for testing purposes.
+- motivation:
+    name: goto_generator
+    launch: {pkg: 'hbba_validation', path: 'launch/irl1_motv_goto_generator.launch'}
+
 - motivation:
     name: landmarks_interaction
     launch: {pkg: 'hbba_validation', path: 'launch/irl1_motv_landmarks_interaction.launch'}

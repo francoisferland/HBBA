@@ -1,0 +1,23 @@
+# Combined configuration of the SLAM-based navigation planner and the simpler
+# GoTo.
+
+hbba_conf:
+
+- include: {pkg: 'irl1_hbba_cfg', file: 'tr_bhvr_slam_planner.yaml'}
+- include: {pkg: 'irl1_hbba_cfg', file: 'tr_bhvr_goto.yaml'}
+
+- strat:
+    name: TRCombinedGoTo
+    class: GoTo
+    utility: 3
+    costs: {CPU: 3}                 # Very low on JN0.
+    dependencies: {SLAM: 1}
+    modules:
+        - tr_slam_planner_sensors:
+            - base_scan:     2
+            - openni_points: 3
+        - tr_slam_planner
+        - tr_goto
+    custom_bringup: "pubNavGoal('/planner_goal', params.frame_id, params.x, params.y, params.t);"
+
+

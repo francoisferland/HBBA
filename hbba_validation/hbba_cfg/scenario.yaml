@@ -20,6 +20,8 @@ hbba_conf:
 - include: {pkg: 'jn0_hbba_cfg',    file: 'jn0_proc_slam_gmapping.yaml'}
 
 - include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_teleop.yaml'}
+#- include: {pkg: 'hbba_validation', file: 'tr_bhvr_combined_goto.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_goto.yaml'}
 - include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_slam_planner.yaml'}
 - include: {pkg: 'jn0_hbba_cfg',    file: 'irl1_bhvr_arm_keep_down.yaml'}
 
@@ -28,6 +30,7 @@ hbba_conf:
 - behavior_priority: {name: 'spring_arm_follow',   value: 90}
 - behavior_priority: {name: 'irl1_engage',         value: 70}
 - behavior_priority: {name: 'tr_slam_planner',     value: 50}
+- behavior_priority: {name: 'tr_goto',             value: 45}
 - behavior_priority: {name: 'tr_costmap_wander',   value: 40}
 - behavior_priority: {name: 'arm_keep_down',       value: 30}
 

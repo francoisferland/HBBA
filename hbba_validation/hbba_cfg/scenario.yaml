@@ -38,6 +38,11 @@ hbba_conf:
 - resources:
     CPU: 300
 
+# Fake motivation used to start the HBBA webapp.
+- motivation:
+    name: irl1_webapp
+    launch: {pkg: 'irl1_webapp', path: 'launch/irl1_webapp.launch'}
+
 - motivation:
     name: landmarks_interaction
     launch: {pkg: 'hbba_validation', path: 'launch/irl1_motv_landmarks_interaction.launch'}

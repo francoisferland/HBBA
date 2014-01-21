@@ -7,6 +7,8 @@ hbba_conf:
 # Exploration modules:
 - include: {pkg: 'irl1_hbba_cfg',   file: 'irl1_proc_qrcode_finder.yaml'}
 - include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_costmap_wander.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_wander.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_avoid.yaml'}
 
 # Interaction modules:
 - include: {pkg: 'hbba_validation', file: 'jn0_proc_sphinx.yaml'}
@@ -34,7 +36,9 @@ hbba_conf:
 - behavior_priority: {name: 'tr_slam_planner',     value: 50}
 - behavior_priority: {name: 'tr_goto',             value: 45}
 - behavior_priority: {name: 'tr_costmap_wander',   value: 40}
-- behavior_priority: {name: 'arm_keep_down',       value: 30}
+- behavior_priority: {name: 'tr_avoid',            value: 37}
+- behavior_priority: {name: 'tr_wander',           value: 35}
+- behavior_priority: {name: 'arm_keep_down',       value: 10}
 
 # Available resources:
 - resources:
@@ -119,10 +123,16 @@ hbba_conf:
     intensity: 5
     security: False
 
-# Emergency stop.
+# Emergency stop and low-level obstacle avoidance.
 - desire:
     id: irl1_stop
     type: Stop
+    utility: 1
+    intensity: 1
+    security: True
+- desire:
+    id: irl1_avoid
+    type: Avoid
     utility: 1
     intensity: 1
     security: True

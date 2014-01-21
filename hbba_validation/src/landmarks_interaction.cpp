@@ -1,4 +1,5 @@
 #include <hbba_validation/landmarks_interaction.hpp>
+#include <irl1_interaction/common.hpp>
 #include <boost/algorithm/string.hpp>
 
 using namespace hbba_validation;
@@ -38,24 +39,28 @@ LandmarksInteraction::SM::Handle LandmarksInteraction::stateWait()
 LandmarksInteraction::SM::Handle LandmarksInteraction::stateSave()
 {
     ROS_DEBUG("In STATE_SAVE");
+
+    say("Okay, I will remember this as landmark " + last_code_num_ + ".");
     goto_.observer().saveLandmark(last_code_);
+
     return STATE_WAIT;
 }
 
 LandmarksInteraction::SM::Handle LandmarksInteraction::stateLead()
 {
     ROS_DEBUG("In STATE_LEAD");
-    // TODO: Interaction / say.
+    say("Okay, please lead the way.");
     return sm_.state();
 }
 
 LandmarksInteraction::SM::Handle LandmarksInteraction::stateGoTo()
 {
     ROS_DEBUG("In STATE_GOTO");
-    // TODO: Interaction / say when the code is valid/invalid.
     if (goto_.goTo(last_code_)) {
+        say("Okay, I will go to landmark " + last_code_num_ + ".");
         ROS_DEBUG("STATE_GOTO: nav goal produced.");
     } else {
+        say("Sorry, I do not know where landmark " + last_code_ + " is.");
         ROS_DEBUG("STATE_GOTO: Could not produce a nav goal from '%s'",
                   last_code_.c_str());
     }
@@ -80,7 +85,7 @@ void LandmarksInteraction::sphinxCB(const std_msgs::String& msg)
 
     boost::iterator_range<std::string::const_iterator> i;
     if (i = boost::find_first(data, req_save)) {
-        if (codeFromRequest(data, i, last_code_)) {
+        if (codeFromRequest(data, i, last_code_, last_code_num_)) {
             ROS_DEBUG("Got a valid request to save a landmark as '%s'", 
                       last_code_.c_str());
             pushEvent(EVENT_REQ_SAVE);
@@ -89,7 +94,7 @@ void LandmarksInteraction::sphinxCB(const std_msgs::String& msg)
                       data.c_str());
         }
     } else if (i = boost::find_first(data, req_goto)) {
-        if (codeFromRequest(data, i, last_code_)) {
+        if (codeFromRequest(data, i, last_code_, last_code_num_)) {
             ROS_DEBUG("Got a valid request to go to landmark '%s'",
                       last_code_.c_str());
             pushEvent(EVENT_REQ_GOTO);
@@ -104,11 +109,13 @@ void LandmarksInteraction::sphinxCB(const std_msgs::String& msg)
 
 bool LandmarksInteraction::codeFromRequest(const std::string& req, 
                                            const StringRange& loc,
-                                           std::string&       out) const
+                                           std::string&       out,
+                                           std::string&       num) const
 {
     std::string::const_iterator l = (loc.end() + 1);
     if (l <= req.end()) {
-        out = formatLandmark(std::string(l, l+1));
+        num = std::string(l, l + 1);
+        out = formatLandmark(num);
         return true;
     } else {
         return false;
@@ -126,5 +133,22 @@ void LandmarksInteraction::newLandmarkCB(const std::string& code)
 {
     // TODO: 'Say' desire.
     ROS_DEBUG("Registered a new landmark: %s", code.c_str());
+}
+
+void LandmarksInteraction::say(const std::string& text)
+{
+    hbba_msgs::AddDesires req;
+    req.request.desires.resize(1);
+    hbba_msgs::Desire& des = req.request.desires[0];
+
+    des.id        = ros::this_node::getName() + "_say";
+    des.type      = "SayPhrase";
+    des.utility   = 1;
+    des.intensity = 1;
+    
+    irl1_interaction::stringToDialog(text, des.params);
+
+    ros::service::call("add_desires", req);
+
 }
 

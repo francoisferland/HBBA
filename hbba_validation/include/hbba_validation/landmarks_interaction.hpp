@@ -35,7 +35,9 @@ namespace hbba_validation
         ros::Subscriber sub_sphinx_;
         GoToLandmark    goto_;
 
-        std::string last_code_; // Last landmark identifier received.
+        std::string last_code_;     // Last landmark identifier received.
+        std::string last_code_num_; // Last landmark identifier, numerical part.
+
         // State identifiers:
         enum {
             STATE_WAIT = 0,     // Initial state.
@@ -90,15 +92,21 @@ namespace hbba_validation
         /// \param loc Location where the request was found.
         ///            The landmark code should be situated right after this
         ///            location.
-        /// \param out Output string.
+        /// \param out Output string, fully formatted ("IRL_LANDMARK_...").
+        /// \param num Landmark identifier output, numerical part only.
         ///
         /// \return False if the code could not be extracted, usually because
         ///               the string is too short.
         ///               The output string will not be affected.
         bool codeFromRequest(const std::string& req, 
                              const StringRange& loc,
-                             std::string&       out) const;
+                             std::string&       out,
+                             std::string&       num) const;
 
+        /// \brief Produces a desire to say something.
+        ///
+        /// \param text Text to say.
+        void say(const std::string& text);
     };
 }
 

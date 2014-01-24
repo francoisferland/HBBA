@@ -5,6 +5,7 @@ using namespace hbba_validation;
 
 GoToLandmark::GoToLandmark(ros::NodeHandle& n, ros::NodeHandle& np):
     obs_(n, np),
+    events_filter_(n, "NULL"),
     desires_set_(desires_req_.request.desires)
 {
     sub_goal_ = n.subscribe("landmark_goal", 10, &GoToLandmark::goalCB, this);
@@ -38,29 +39,10 @@ bool GoToLandmark::goTo(const std::string& code)
     }
 
     ROS_DEBUG("Received a valid landmark goal (%s).", code.c_str());
-    std::string utt = "I am going to " + code;
-    sayDesire(utt);
+    code_ = code;
     gotoDesire(goal);
 
     return true;
-}
-
-void GoToLandmark::sayDesire(const std::string& data)
-{
-    hbba_msgs::AddDesires req;
-    std::vector<hbba_msgs::Desire>& desires = req.request.desires;
-    desires.resize(1);
-    hbba_msgs::Desire& des_say = desires[0];
-    
-    des_say.id        = ros::this_node::getName() + 
-                        std::string("_goto_landmark_say");
-    des_say.type      = "Say";
-    des_say.intensity = 1;
-    des_say.utility   = 1;
-
-    irl1_interaction::stringToDialog(data, des_say.params);
-
-    scl_add_.call(req);
 }
 
 void GoToLandmark::gotoDesire(const geometry_msgs::PoseStamped& goal)
@@ -79,5 +61,17 @@ void GoToLandmark::gotoDesire(const geometry_msgs::PoseStamped& goal)
     irl1_interaction::poseStampedToNavGoal(goal, des_goto.params);
 
     scl_add_.call(req);
+
+    events_filter_.id(des_goto.id);
+}
+
+void GoToLandmark::eventCB(const hbba_msgs::Event& evt)
+{
+    if (evt.type == hbba_msgs::Event::ACC_ON) {
+        // The goal was reached, fire the callback.
+        if (cb_) {
+            cb_(code_);
+        }
+    }
 }
 

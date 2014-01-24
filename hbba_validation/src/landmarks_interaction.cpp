@@ -14,6 +14,7 @@ LandmarksInteraction::LandmarksInteraction(ros::NodeHandle& n,
                               this);
 
     goto_.observer().registerCB(&LandmarksInteraction::newLandmarkCB, this);
+    goto_.registerCB(&LandmarksInteraction::reachedCB, this);
 
     // State machine preparation:
     SM::States states;
@@ -21,11 +22,13 @@ LandmarksInteraction::LandmarksInteraction(ros::NodeHandle& n,
     states.push_back(&LandmarksInteraction::stateSave);
     states.push_back(&LandmarksInteraction::stateLead);
     states.push_back(&LandmarksInteraction::stateGoTo);
+    states.push_back(&LandmarksInteraction::stateReached);
 
     SM::Transitions transitions;
     SM::generateTransitionsMatrix(STATE_SIZE, EVENT_SIZE, transitions);
     transitions[STATE_WAIT][EVENT_REQ_SAVE] = STATE_SAVE;
     transitions[STATE_WAIT][EVENT_REQ_GOTO] = STATE_GOTO;
+    transitions[STATE_WAIT][EVENT_REACHED]  = STATE_REACHED;
 
     sm_ = SM(states, transitions, this);
 }
@@ -64,6 +67,14 @@ LandmarksInteraction::SM::Handle LandmarksInteraction::stateGoTo()
         ROS_DEBUG("STATE_GOTO: Could not produce a nav goal from '%s'",
                   last_code_.c_str());
     }
+    return STATE_WAIT;
+}
+
+LandmarksInteraction::SM::Handle LandmarksInteraction::stateReached()
+{
+    ROS_DEBUG("In STATE_REACHED");
+    say("Okay, I am at landmark " + reached_code_num_ + ".");
+
     return STATE_WAIT;
 }
 
@@ -133,6 +144,13 @@ void LandmarksInteraction::newLandmarkCB(const std::string& code)
 {
     // TODO: 'Say' desire.
     ROS_DEBUG("Registered a new landmark: %s", code.c_str());
+}
+
+void LandmarksInteraction::reachedCB(const std::string& code)
+{
+    ROS_DEBUG("Reached the GoTo goal.");
+    reached_code_num_ = std::string(code.end() - 1, code.end());
+    pushEvent(EVENT_REACHED);
 }
 
 void LandmarksInteraction::say(const std::string& text)

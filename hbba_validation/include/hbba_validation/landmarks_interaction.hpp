@@ -5,6 +5,7 @@
 #include "state_machine.hpp"
 #include <boost/range.hpp>
 #include <string>
+
 namespace hbba_validation
 {
     /// \brief Motivation module for interacting with people about landmarks.
@@ -35,8 +36,9 @@ namespace hbba_validation
         ros::Subscriber sub_sphinx_;
         GoToLandmark    goto_;
 
-        std::string last_code_;     // Last landmark identifier received.
-        std::string last_code_num_; // Last landmark identifier, numerical part.
+        std::string last_code_;        // Last landmark received.
+        std::string last_code_num_;    // Last landmark, numerical part.
+        std::string reached_code_num_; // Last reached goal, numerical.
 
         // State identifiers:
         enum {
@@ -44,6 +46,7 @@ namespace hbba_validation
             STATE_SAVE,         // Save the current location as a landmark.
             STATE_LEAD,         // The robot is being lead to a landmark.
             STATE_GOTO,         // The robot is going to a known landmark.
+            STATE_REACHED,      // The robot is at its goal landmark.
             STATE_SIZE
         };
 
@@ -51,6 +54,7 @@ namespace hbba_validation
         enum {
             EVENT_REQ_SAVE = 0, // A request to save a landmark was received.
             EVENT_REQ_GOTO,     // A request to go to a landmark was received.
+            EVENT_REACHED,      // The robot reached the navigation goal.
             EVENT_SIZE
         };
 
@@ -71,6 +75,7 @@ namespace hbba_validation
         SM::Handle stateSave();
         SM::Handle stateLead();
         SM::Handle stateGoTo();
+        SM::Handle stateReached();
 
         void newLandmarkCB(const std::string& code);
 
@@ -79,6 +84,8 @@ namespace hbba_validation
         void pushEvent(const SM::Handle event);
 
         void sphinxCB(const std_msgs::String& msg);
+
+        void reachedCB(const std::string& code);
 
         /// \brief Take a single number string and convert it in a valid
         /// QR-style landmark code.

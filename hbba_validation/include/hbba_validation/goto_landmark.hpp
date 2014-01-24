@@ -2,8 +2,10 @@
 #define GOTO_LANDMARK_HPP
 
 #include "landmarks_observer.hpp"
+#include <iw/events_filter.hpp>
 #include <hbba_msgs/AddDesires.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <boost/function.hpp>
 
 namespace hbba_validation
 {
@@ -13,13 +15,13 @@ namespace hbba_validation
     /// fashion.
     /// Integrates a LandmarksObserver, produces navigation goals based on
     /// previously decoded landmarks.
-    /// Also produces desires to tell when a new landmark has been discovered.
     /// Invalid landmarks should be handled by the motivation module that
     /// integrates this one and thus normally interacts with someone.
     /// 
     /// Topics (see LandmarksObserver for others):
     ///  - landmark_goal: std_msgs/String, external interface to navigation goal
     ///                   production.
+    ///  - events:        HBBA events, used to track reached goals.
     ///
     class GoToLandmark
     {
@@ -27,12 +29,15 @@ namespace hbba_validation
         ros::Subscriber    sub_goal_;
         ros::ServiceClient scl_add_;
         LandmarksObserver  obs_;
+        iw::EventsFilter   events_filter_;
+
+        boost::function<void (const std::string&)> cb_;
+        std::string                                code_; // Current goal code.
 
         hbba_msgs::AddDesires           desires_req_;
         std::vector<hbba_msgs::Desire>& desires_set_;
         enum {
-            DES_GOTO = 0,
-            DES_SAY  = 1
+            DES_GOTO = 0
         };
 
     public:
@@ -54,11 +59,20 @@ namespace hbba_validation
         /// \brief Return a const reference to the LandmarksObserver instance.
         const LandmarksObserver& observer() const { return obs_; } 
 
+        /// \brief Register a callback for when the goal has been reached.
+        ///
+        /// Calls the callback with the reached landmark code.
+        template <class T>
+        void registerCB(void (T::*fun)(const std::string&), T* obj)
+        {
+            cb_ = boost::bind(fun, obj, _1);
+        }
+
     private:
         void goalCB(const std_msgs::String& msg);
         void newLandmarkCB(const std::string& code);
+        void eventCB(const hbba_msgs::Event& evt);
 
-        void sayDesire(const std::string& data);
         void gotoDesire(const geometry_msgs::PoseStamped& goal);
 
     };

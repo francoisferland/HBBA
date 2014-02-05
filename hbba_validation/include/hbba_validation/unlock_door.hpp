@@ -3,6 +3,9 @@
 
 #include "state_machine.hpp"
 #include "cardreader_localizer_openni.hpp"
+#include <jn0_arm_tools/arm_control_imp.hpp>
+#include <jn0_arm_tools/point_at_trajectory.hpp>
+#include <tf/transform_listener.h>
 #include <ros/ros.h>
 
 namespace hbba_validation
@@ -49,15 +52,25 @@ namespace hbba_validation
     ///                 Default: 0.2.
     ///  - imp_k:       Cartesian trajectory impedance coefficient K.
     ///                 Default: 35.0.
+    ///  - arm_dist:    Arm extension distance.
+    ///                 Default: 0.50 m.
+    ///  - arm_vel:     Arm extension velocity.
+    ///                 Default: 0.25 m/s^2.
     ///              
     class UnlockDoor
     {
     private:
-        ros::Publisher pub_cmd_vel_;
-        ros::Publisher pub_look_at_;
-        ros::Timer     timer_;
+        ros::Publisher        pub_cmd_vel_;
+        ros::Publisher        pub_look_at_;
+        ros::Timer            timer_;
+        tf::TransformListener tf_;
 
         CardreaderLocalizerOpenNI localizer_;
+        
+        boost::scoped_ptr<jn0_arm_tools::ArmStateSubscriber> arm_state_;
+        boost::scoped_ptr<jn0_arm_tools::ArmControlImp>      arm_ctrl_;
+        boost::scoped_ptr<jn0_arm_tools::PointAtTrajectory>  arm_point_at_;
+        jn0_arm_tools::LinearCartesianTrajectory             arm_traj_;
 
         enum State {
             STATE_WAIT = 0,
@@ -84,6 +97,8 @@ namespace hbba_validation
         double      lin_k_;
         double      ang_k_;
         double      imp_k_;
+        double      arm_dist_;
+        double      arm_vel_;
 
         geometry_msgs::PoseStamped cur_pose_;
 

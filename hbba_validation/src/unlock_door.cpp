@@ -13,9 +13,19 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
     np.param("look_y",      look_y_,      0.00);
     np.param("look_z",      look_z_,      1.00);
     np.param("imp_k",       imp_k_,       35.0);
+    np.param("arm_dist",    arm_dist_,    0.50);
+    np.param("arm_vel",     arm_vel_,     0.25);
 
     localizer_.registerValidCB(&UnlockDoor::validCB, this);
     localizer_.registerInvalidCB(&UnlockDoor::invalidCB, this);
+
+    arm_state_.reset(new jn0_arm_tools::ArmStateSubscriber("L_", n, np));
+    arm_ctrl_.reset(new jn0_arm_tools::ArmControlImp("L_", 
+                                                     arm_state_.get(), 
+                                                     true));
+    arm_point_at_.reset(new jn0_arm_tools::PointAtTrajectory(arm_state_.get(),
+                                                             arm_dist_,
+                                                             arm_vel_));
 
     SM::States states;
     states.push_back(&UnlockDoor::stateWait);
@@ -36,9 +46,23 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
 
 void UnlockDoor::validCB(const geometry_msgs::PoseStamped& pose)
 {
-    // TODO: Transform the pose in the fixed frame.
-    cur_pose_ = pose;
-    sm_.pushEvent(EVENT_VALID);
+    // Save the detected pose in the fixed frame.
+    try {
+        tf::Stamped<tf::Pose> pose_tf;
+        tf::poseStampedMsgToTF(pose, pose_tf);
+        tf::StampedTransform t;
+        tf_.lookupTransform(fixed_frame_, robot_frame_, ros::Time(), t);
+        pose_tf.setData(t * pose_tf);
+        pose_tf.frame_id_ = fixed_frame_;
+        pose_tf.stamp_    = t.stamp_;
+        tf::poseStampedTFToMsg(pose_tf, cur_pose_);
+        sm_.pushEvent(EVENT_VALID);
+    } catch (tf::TransformException e) {
+        ROS_ERROR("Could not transform detected cardreader pose in the "
+                  "fixed frame, reason: %s",
+                  e.what());
+        sm_.pushEvent(EVENT_INVALID);
+    }
 }
 
 void UnlockDoor::invalidCB()
@@ -48,17 +72,27 @@ void UnlockDoor::invalidCB()
 
 UnlockDoor::SM::Handle UnlockDoor::stateWait()
 {
-    // TODO: Set impedance to zero, stop the robot from moving.
+    // Revert to neutral look.
+    cur_pose_.header.frame_id    = robot_frame_;
+    cur_pose_.pose.position.x    = look_x_;
+    cur_pose_.pose.position.y    = look_y_;
+    cur_pose_.pose.position.z    = look_z_;
+    cur_pose_.pose.orientation.x = 0;
+    cur_pose_.pose.orientation.y = 0;
+    cur_pose_.pose.orientation.z = 0;
+    cur_pose_.pose.orientation.w = 1;
+
+    arm_ctrl_->setImpedance(0.0, 0.0);
 
     return STATE_WAIT;
 }
 
 UnlockDoor::SM::Handle UnlockDoor::stateSeek()
 {
-    // TODO: Set impedance to imp_k.
+    arm_point_at_->generate(cur_pose_, arm_traj_);
+    // Impedance is set in the timer loop to make sure the controller has a set
+    // point first.
 
-    pub_look_at_.publish(cur_pose_);
-    
     return STATE_SEEK;
 }
 
@@ -66,13 +100,14 @@ void UnlockDoor::timerCB(const ros::TimerEvent&)
 {
     sm_.processQueue();
 
-    switch (sm_.state()) {
-        case STATE_WAIT:
-            break;
-        case STATE_SEEK:
-            break;
-        default:
-            break;
-    };
+    pub_look_at_.publish(cur_pose_);
+
+    if (sm_.state() == STATE_SEEK) {
+        tf::Point goal;
+        arm_traj_.calc(ros::Time::now(), goal);
+        arm_ctrl_->setPointInstant(goal);
+        arm_ctrl_->setImpedance(imp_k_, 0.0);
+    }
+
 }
 

@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/hbba_validation</url>
   <depend package="hbba_synth"/>
   <depend package="irl1_interaction"/>
+  <depend package="openni_tools"/>
   <depend package="roscpp"/>
 
 </package>

@@ -42,9 +42,9 @@ namespace hbba_validation
         ///         A negative value means an error occured, while a value
         ///         that is too high (depends on the image resolution) suggests
         ///         that there might be more than one red light source.
-        int process(const sensor_msgs::ImagePtr& img, 
-                          int&                   x, 
-                          int&                   y) const;
+        int process(const sensor_msgs::Image::ConstPtr& img, 
+                          int&                          x, 
+                          int&                          y) const;
     };
 }
 

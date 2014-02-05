@@ -11,9 +11,9 @@ CardreaderLocalizer::CardreaderLocalizer(const int threshold):
 {
 }
 
-int CardreaderLocalizer::process(const sensor_msgs::ImagePtr& img, 
-                                       int&                   x,
-                                       int&                   y) const
+int CardreaderLocalizer::process(const sensor_msgs::Image::ConstPtr& img, 
+                                       int&                          x,
+                                       int&                          y) const
 {
     if (!sensor_msgs::image_encodings::isColor(img->encoding)) {
         ROS_ERROR("CardreaderLocalizer was given a non-color image.");

@@ -38,6 +38,8 @@ rosbuild_add_library(${PROJECT_NAME}
     src/goto_landmark.cpp
     src/landmarks_interaction.cpp
     src/cardreader_localizer.cpp
+    src/cardreader_localizer_openni.cpp
+    src/unlock_door.cpp
 )
 
 rosbuild_add_executable(goto_landmark_node

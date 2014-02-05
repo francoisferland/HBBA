@@ -37,6 +37,7 @@ rosbuild_add_library(${PROJECT_NAME}
     src/landmarks_observer.cpp
     src/goto_landmark.cpp
     src/landmarks_interaction.cpp
+    src/cardreader_localizer.cpp
 )
 
 rosbuild_add_executable(goto_landmark_node
@@ -48,6 +49,11 @@ rosbuild_add_executable(landmarks_interaction_node
     src/landmarks_interaction_node.cpp
 )
 target_link_libraries(landmarks_interaction_node ${PROJECT_NAME})
+
+rosbuild_add_executable(cardreader_localizer_test
+    src/cardreader_localizer_test.cpp
+)
+target_link_libraries(cardreader_localizer_test ${PROJECT_NAME})
 
 # Automatic build of hbba_cfg:
 rosbuild_find_ros_package(hbba_synth)

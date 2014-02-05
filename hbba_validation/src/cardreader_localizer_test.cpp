@@ -7,8 +7,11 @@ namespace {
 
     void imageCB(const sensor_msgs::ImagePtr& img)
     {
-        int x, y, c = localizer_.process(img, x, y);
-        ROS_INFO("c: %i, x: %i, y: %i", c, x, y);
+        int x, y, c;
+        c = localizer_.process(img, x, y);
+        ROS_INFO("Red   c: %i, x: %i, y: %i", c, x, y);
+        c = localizer_.process(img, x, y, true);
+        ROS_INFO("Green c: %i, x: %i, y: %i", c, x, y);
     }
 
 }

@@ -35,16 +35,18 @@ namespace hbba_validation
         /// \brief Processes the given image, return the possible location of a
         /// card reader.
         ///
-        /// \param img The image to process, RGB format required.
-        /// \param x   A reference to the output coordinate in X.
-        /// \param y   A reference to the output coordinate in Y.
+        /// \param img   The image to process, RGB format required.
+        /// \param x     A reference to the output coordinate in X.
+        /// \param y     A reference to the output coordinate in Y.
+        /// \param green Process for a green LED instead of red.
         /// \return The number of pixels used in the selection process.
         ///         A negative value means an error occured, while a value
         ///         that is too high (depends on the image resolution) suggests
         ///         that there might be more than one red light source.
         int process(const sensor_msgs::Image::ConstPtr& img, 
                           int&                          x, 
-                          int&                          y) const;
+                          int&                          y,
+                          bool                          green = false) const;
     };
 }
 

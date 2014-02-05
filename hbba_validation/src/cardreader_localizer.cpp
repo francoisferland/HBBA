@@ -11,9 +11,11 @@ CardreaderLocalizer::CardreaderLocalizer(const int threshold):
 {
 }
 
-int CardreaderLocalizer::process(const sensor_msgs::Image::ConstPtr& img, 
-                                       int&                          x,
-                                       int&                          y) const
+int CardreaderLocalizer::process(
+    const sensor_msgs::Image::ConstPtr& img, 
+          int&                          x,
+          int&                          y,
+          bool                          green) const
 {
     if (!sensor_msgs::image_encodings::isColor(img->encoding)) {
         ROS_ERROR("CardreaderLocalizer was given a non-color image.");
@@ -37,15 +39,16 @@ int CardreaderLocalizer::process(const sensor_msgs::Image::ConstPtr& img,
     cv::Mat rgb[3];
     cv::split(mat, rgb);
 
-    cv::Mat r = rgb[ri] - rgb[gi] - rgb[bi];
+    cv::Mat eval = green ? rgb[gi] - rgb[ri] - rgb[bi]
+                         : rgb[ri] - rgb[gi] - rgb[bi];
 
     x = y = 0;
 
     int sum = 0;
     int c   = 0;
-    for (int i = 0; i < r.rows; ++i) {
-        for (int j = 0; j < r.cols; ++j) {
-            int v = r.at<unsigned char>(i, j);
+    for (int i = 0; i < eval.rows; ++i) {
+        for (int j = 0; j < eval.cols; ++j) {
+            int v = eval.at<unsigned char>(i, j);
             if (v > threshold_) {
                 ++c;
                 sum += v;

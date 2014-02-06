@@ -39,6 +39,7 @@ rosbuild_add_library(${PROJECT_NAME}
     src/landmarks_interaction.cpp
     src/cardreader_localizer.cpp
     src/cardreader_localizer_openni.cpp
+    src/cardreader_localizer_imv.cpp
     src/unlock_door.cpp
 )
 

@@ -4,7 +4,8 @@
 using namespace hbba_validation;
 
 UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
-    localizer_(n, np)
+    localizer_openni_(n, ros::NodeHandle(np, "localizer_openni_")),
+    localizer_imv_(n, ros::NodeHandle(np, "localizer_imv_"), true)
 {
     np.param("fixed_frame", fixed_frame_, std::string("/odom"));
     np.param("robot_frame", robot_frame_, std::string("/base_link"));
@@ -16,8 +17,10 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
     np.param("arm_dist",    arm_dist_,    0.50);
     np.param("arm_vel",     arm_vel_,     0.25);
 
-    localizer_.registerValidCB(&UnlockDoor::validCB, this);
-    localizer_.registerInvalidCB(&UnlockDoor::invalidCB, this);
+    localizer_openni_.registerValidCB(&UnlockDoor::validCB, this);
+    localizer_openni_.registerInvalidCB(&UnlockDoor::invalidCB, this);
+    localizer_imv_.registerCB(&UnlockDoor::greenCB, this);
+
 
     arm_state_.reset(new jn0_arm_tools::ArmStateSubscriber("L_", n, np));
     arm_ctrl_.reset(new jn0_arm_tools::ArmControlImp("L_", 
@@ -33,7 +36,8 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
     SM::Transitions transitions;
     SM::generateTransitionsMatrix(STATE_SIZE, EVENT_SIZE, transitions);
     transitions[STATE_WAIT][EVENT_VALID]   = STATE_SEEK;
-    transitions[STATE_SEEK][EVENT_INVALID] = STATE_WAIT;
+    transitions[STATE_SEEK][EVENT_GREEN]   = STATE_WAIT;
+    transitions[STATE_SEEK][EVENT_TIMEOUT] = STATE_WAIT;
     sm_ = SM(states, transitions, this);
 
     double p;
@@ -56,6 +60,7 @@ void UnlockDoor::validCB(const geometry_msgs::PoseStamped& pose)
         pose_tf.frame_id_ = fixed_frame_;
         pose_tf.stamp_    = t.stamp_;
         tf::poseStampedTFToMsg(pose_tf, cur_pose_);
+        timeout_start_ = ros::Time::now(); // Starts timeout counter.
         sm_.pushEvent(EVENT_VALID);
     } catch (tf::TransformException e) {
         ROS_ERROR("Could not transform detected cardreader pose in the "
@@ -68,6 +73,11 @@ void UnlockDoor::validCB(const geometry_msgs::PoseStamped& pose)
 void UnlockDoor::invalidCB()
 {
     sm_.pushEvent(EVENT_INVALID);
+}
+
+void UnlockDoor::greenCB(const sensor_msgs::Image&, double, double)
+{
+    sm_.pushEvent(EVENT_GREEN);
 }
 
 UnlockDoor::SM::Handle UnlockDoor::stateWait()
@@ -98,6 +108,12 @@ UnlockDoor::SM::Handle UnlockDoor::stateSeek()
 
 void UnlockDoor::timerCB(const ros::TimerEvent&)
 {
+    const ros::Time now = ros::Time::now();
+    if (!timeout_start_.isZero() && ((now - timeout_start_) > timeout_)) {
+        timeout_start_ = ros::Time(); // Reset to zero.
+        sm_.pushEvent(EVENT_TIMEOUT);
+    }
+
     sm_.processQueue();
 
     pub_look_at_.publish(cur_pose_);

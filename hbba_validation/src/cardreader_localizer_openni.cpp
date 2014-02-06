@@ -2,8 +2,8 @@
 
 using namespace hbba_validation;
 
-CardreaderLocalizerOpenNI::CardreaderLocalizerOpenNI(ros::NodeHandle& n,
-                                                     ros::NodeHandle& np):
+CardreaderLocalizerOpenNI::CardreaderLocalizerOpenNI(      ros::NodeHandle& n,
+                                                     const ros::NodeHandle& np):
     openni_tools::RectToPose<CardreaderLocalizerOpenNI>(n)
 {
     int t;

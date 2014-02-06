@@ -3,6 +3,7 @@
 
 #include "state_machine.hpp"
 #include "cardreader_localizer_openni.hpp"
+#include "cardreader_localizer_imv.hpp"
 #include <jn0_arm_tools/arm_control_imp.hpp>
 #include <jn0_arm_tools/point_at_trajectory.hpp>
 #include <tf/transform_listener.h>
@@ -20,6 +21,16 @@ namespace hbba_validation
     /// Return both the arm and head in a neutral position if the red LED of the
     /// cardreader is not visible.
     ///
+    /// Operates a simple state machine:
+    ///
+    ///  - WAIT: Initial state, waits for a valid cardreader detection to
+    ///          go to SEEK.
+    ///  - SEEK: Control the robot toward the cardreader until a timeout event
+    ///          occurs (time since last valid cardreader detection) to go back
+    ///          to WAIT, or a valid green LED detection occured (indicates the
+    ///          door has been unlocked).
+    ///          
+    /// 
     /// Topics (see jn0_arm_tools for arm-related topics):
     ///  - image:        RGB image produced by the Kinect camera.
     ///  - depth:        Depth image produced by the Kinect camera.
@@ -29,6 +40,8 @@ namespace hbba_validation
     /// Parameters: 
     ///  - period:      Control loop update period.
     ///                 Default: 0.10 s.
+    ///  - timeout:     Period used to detect timeouts.
+    ///                 Default: 2.00 s.
     ///  - fixed_frame: Reference frame in which all detected cardreader poses
     ///                 are transformed.
     ///                 Default: "/odom".
@@ -57,6 +70,8 @@ namespace hbba_validation
     ///  - arm_vel:     Arm extension velocity.
     ///                 Default: 0.25 m/s^2.
     ///              
+    /// CardreaderLocalizerOpenNI-related parameters are in "~localizer_openni",
+    /// and IMV-related ones in "~localizer_imv".
     class UnlockDoor
     {
     private:
@@ -65,7 +80,8 @@ namespace hbba_validation
         ros::Timer            timer_;
         tf::TransformListener tf_;
 
-        CardreaderLocalizerOpenNI localizer_;
+        CardreaderLocalizerOpenNI localizer_openni_;
+        CardreaderLocalizerIMV    localizer_imv_;
         
         boost::scoped_ptr<jn0_arm_tools::ArmStateSubscriber> arm_state_;
         boost::scoped_ptr<jn0_arm_tools::ArmControlImp>      arm_ctrl_;
@@ -81,6 +97,8 @@ namespace hbba_validation
         enum Events {
             EVENT_VALID = 0,
             EVENT_INVALID,
+            EVENT_TIMEOUT,
+            EVENT_GREEN,
             EVENT_SIZE
         };
 
@@ -88,18 +106,20 @@ namespace hbba_validation
         typedef StateMachine<UnlockDoor> SM;
         SM sm_;
 
-        std::string fixed_frame_;
-        std::string robot_frame_;
-        double      offset_y_;
-        double      look_x_;
-        double      look_y_;
-        double      look_z_;
-        double      lin_k_;
-        double      ang_k_;
-        double      imp_k_;
-        double      arm_dist_;
-        double      arm_vel_;
+        ros::Duration timeout_;
+        std::string   fixed_frame_;
+        std::string   robot_frame_;
+        double        offset_y_;
+        double        look_x_;
+        double        look_y_;
+        double        look_z_;
+        double        lin_k_;
+        double        ang_k_;
+        double        imp_k_;
+        double        arm_dist_;
+        double        arm_vel_;
 
+        ros::Time                  timeout_start_;
         geometry_msgs::PoseStamped cur_pose_;
 
     public:
@@ -112,6 +132,7 @@ namespace hbba_validation
     private:
         void validCB(const geometry_msgs::PoseStamped& pose);
         void invalidCB();
+        void greenCB(const sensor_msgs::Image&, double, double);
 
         SM::Handle stateWait();
         SM::Handle stateSeek();

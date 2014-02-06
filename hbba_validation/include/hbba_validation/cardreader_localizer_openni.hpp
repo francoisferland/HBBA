@@ -48,7 +48,8 @@ namespace hbba_validation
         ///
         /// \param n  Node handle for topics.
         /// \param np Node handle for parameters.
-        CardreaderLocalizerOpenNI(ros::NodeHandle& n, ros::NodeHandle& np);
+        CardreaderLocalizerOpenNI(      ros::NodeHandle& n, 
+                                  const ros::NodeHandle& np);
 
         /// \brief Register a valid detection callback.
         /// 

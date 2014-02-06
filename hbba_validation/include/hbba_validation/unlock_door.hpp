@@ -34,6 +34,7 @@ namespace hbba_validation
     /// Topics (see jn0_arm_tools for arm-related topics):
     ///  - image:           RGB image produced by the Kinect camera.
     ///  - depth:           Depth image produced by the Kinect camera.
+    ///  - image_imv_raw:   Raw IMV image used by CardreaderLocalizerIMV.
     ///  - cmd_vel:         Twist commands output for the mobile base.
     ///  - look_at_pose:    Look at commands, is a straight publication of the
     ///                     latest cardreader pose.

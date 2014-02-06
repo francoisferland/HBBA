@@ -58,10 +58,16 @@ rosbuild_add_executable(cardreader_localizer_test
 )
 target_link_libraries(cardreader_localizer_test ${PROJECT_NAME})
 
+rosbuild_add_executable(unlock_door_node
+    src/unlock_door_node.cpp
+)
+target_link_libraries(unlock_door_node ${PROJECT_NAME})
+
 # Automatic build of hbba_cfg:
 rosbuild_find_ros_package(hbba_synth)
 include(${hbba_synth_PACKAGE_PATH}/cmake/build.cmake)
 
-add_hbba_cfg(scenario       irl1_tr NEWREV)
-add_hbba_cfg(test_landmarks irl1_tr NEWREV)
+add_hbba_cfg(scenario         irl1_tr NEWREV)
+add_hbba_cfg(test_landmarks   irl1_tr NEWREV)
+add_hbba_cfg(test_unlock_door irl1_tr NEWREV)
 

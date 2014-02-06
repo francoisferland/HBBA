@@ -1,0 +1,40 @@
+# Test configuration for UnlockDoor strategy.
+hbba_conf:
+
+- include: {pkg: 'hbba_synth',      file: 'common_newrev.yaml'}
+- include: {pkg: 'hbba_validation', file: 'irl1_bhvr_unlock_door.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_teleop.yaml'}
+- include: {pkg: 'jn0_hbba_cfg',    file: 'irl1_bhvr_arm_keep_down.yaml'}
+
+- resources: {CPU: 100}
+
+- behavior_priority: {name: 'tr_teleop',           value: 100}
+- behavior_priority: {name: 'irl1_unlock_door',    value:  50}
+- behavior_priority: {name: 'arm_keep_down',       value:  10}
+
+# Static desires for testing purposes:
+- desire:
+    id: unlock_door
+    type: UnlockDoor
+    utility: 1
+    intensity: 1.0
+    security: False
+- desire:
+    id: teleop
+    type: Teleop
+    utility: 1
+    intensity: 1.0
+    security: True
+- desire:
+    id: arm_keep_down
+    type: ArmKeepDown
+    utility: 1
+    intensity: 1.0
+    security: True
+
+- motivation:
+    name: goto_landmark
+    launch: {pkg: 'hbba_validation', path: 'launch/irl1_motv_goto_landmark.launch'}
+    input:
+        - qrcode_decoded
+        - landmark_goal

@@ -1,0 +1,23 @@
+hbba_conf:
+- behavior:
+    name: irl1_unlock_door
+    launch: {pkg: 'hbba_validation', path: 'launch/irl1_bhvr_unlock_door.launch'}
+    priority: 10
+    input:
+        - image_imv_raw
+        - image: image_rgb
+        - depth: image_depth
+    output:
+        - look_at_pose
+        - cmd_vel
+        - L_impedance
+        - L_set_point
+
+- strat:
+    name: IRL1UnlockDoor
+    class: UnlockDoor
+    utility: 3
+    costs: {}           # TODO!
+    dependencies: {}
+    modules:
+        -  irl1_unlock_door

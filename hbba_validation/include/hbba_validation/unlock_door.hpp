@@ -32,10 +32,13 @@ namespace hbba_validation
     ///          
     /// 
     /// Topics (see jn0_arm_tools for arm-related topics):
-    ///  - image:        RGB image produced by the Kinect camera.
-    ///  - depth:        Depth image produced by the Kinect camera.
-    ///  - cmd_vel:      Twist commands output for the mobile base.
-    ///  - look_at_pose: Look at commands.
+    ///  - image:           RGB image produced by the Kinect camera.
+    ///  - depth:           Depth image produced by the Kinect camera.
+    ///  - cmd_vel:         Twist commands output for the mobile base.
+    ///  - look_at_pose:    Look at commands, is a straight publication of the
+    ///                     latest cardreader pose.
+    ///  - ~cardreader_pose Test input for cardreader poses, produces a valid
+    ///                     detection event.
     ///
     /// Parameters: 
     ///  - period:      Control loop update period.
@@ -63,6 +66,11 @@ namespace hbba_validation
     ///                 Default: 0.2.
     ///  - ang_k:       Angular velocity mobile base location error coefficient.
     ///                 Default: 0.2.
+    ///  - lin_max:     Maximum linear velocity (minimum is always zero).
+    ///                 Default: 0.1 m/s.
+    ///  - ang_max:     Maximum angular velocity (will be bounded between
+    ///                 (-max, +max).
+    ///                 Default: 0.3 rad/s.
     ///  - imp_k:       Cartesian trajectory impedance coefficient K.
     ///                 Default: 35.0.
     ///  - arm_dist:    Arm extension distance.
@@ -77,6 +85,7 @@ namespace hbba_validation
     private:
         ros::Publisher        pub_cmd_vel_;
         ros::Publisher        pub_look_at_;
+        ros::Subscriber       sub_pose_;
         ros::Timer            timer_;
         tf::TransformListener tf_;
 
@@ -102,7 +111,6 @@ namespace hbba_validation
             EVENT_SIZE
         };
 
-
         typedef StateMachine<UnlockDoor> SM;
         SM sm_;
 
@@ -115,6 +123,8 @@ namespace hbba_validation
         double        look_z_;
         double        lin_k_;
         double        ang_k_;
+        double        lin_max_;
+        double        ang_max_;
         double        imp_k_;
         double        arm_dist_;
         double        arm_vel_;
@@ -138,6 +148,8 @@ namespace hbba_validation
         SM::Handle stateSeek();
        
         void timerCB(const ros::TimerEvent&);
+
+        void produceVel();
 
     };
 }

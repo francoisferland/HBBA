@@ -13,6 +13,10 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
     np.param("look_x",      look_x_,      2.00);
     np.param("look_y",      look_y_,      0.00);
     np.param("look_z",      look_z_,      1.00);
+    np.param("lin_k",       lin_k_,        0.5);
+    np.param("ang_k",       ang_k_,        0.5);
+    np.param("lin_max",     lin_max_,      0.1);
+    np.param("ang_max",     ang_max_,      0.3);
     np.param("imp_k",       imp_k_,       35.0);
     np.param("arm_dist",    arm_dist_,    0.50);
     np.param("arm_vel",     arm_vel_,     0.25);
@@ -46,6 +50,11 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
 
     pub_cmd_vel_ = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     pub_look_at_ = n.advertise<geometry_msgs::PoseStamped>("look_at_pose", 1);
+
+    sub_pose_    = np.subscribe("cardreader_pose", 
+                                1, 
+                                &UnlockDoor::validCB, 
+                                this);
 }
 
 void UnlockDoor::validCB(const geometry_msgs::PoseStamped& pose)
@@ -55,7 +64,7 @@ void UnlockDoor::validCB(const geometry_msgs::PoseStamped& pose)
         tf::Stamped<tf::Pose> pose_tf;
         tf::poseStampedMsgToTF(pose, pose_tf);
         tf::StampedTransform t;
-        tf_.lookupTransform(fixed_frame_, robot_frame_, ros::Time(), t);
+        tf_.lookupTransform(fixed_frame_, pose.header.frame_id, ros::Time(), t);
         pose_tf.setData(t * pose_tf);
         pose_tf.frame_id_ = fixed_frame_;
         pose_tf.stamp_    = t.stamp_;
@@ -119,11 +128,42 @@ void UnlockDoor::timerCB(const ros::TimerEvent&)
     pub_look_at_.publish(cur_pose_);
 
     if (sm_.state() == STATE_SEEK) {
+        produceVel();
         tf::Point goal;
         arm_traj_.calc(ros::Time::now(), goal);
         arm_ctrl_->setPointInstant(goal);
         arm_ctrl_->setImpedance(imp_k_, 0.0);
     }
+
+}
+
+void UnlockDoor::produceVel()
+{
+    // 1. Transpose the location of the cardreader in the robot's XY plane.
+    tf::StampedTransform f2r;
+    try {
+        tf_.lookupTransform(robot_frame_, fixed_frame_, ros::Time(), f2r);
+    } catch (tf::TransformException e) {
+        ROS_ERROR_THROTTLE(1.0,
+                           "Cannot transform cardreader's pose "
+                           "in the robot's frame: %s",
+                           e.what());
+        return;
+    }
+
+    tf::Stamped<tf::Pose> pose;
+    tf::poseStampedMsgToTF(cur_pose_, pose);
+    tf::Point p = (f2r * pose).getOrigin(); // The cardreader's position.
+
+    double ex = p.x() - arm_dist_;
+    double ey = p.y() - offset_y_;
+
+    geometry_msgs::Twist cmd;
+
+    cmd.linear.x  = std::max(std::min(lin_k_ * ex, lin_max_),       0.0);
+    cmd.angular.z = std::max(std::min(ang_k_ * ey, ang_max_), -ang_max_); 
+
+    pub_cmd_vel_.publish(cmd);
 
 }
 

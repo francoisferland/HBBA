@@ -63,6 +63,11 @@ namespace iw
         /// \param timeout: The time at which an event should be fired.
         void resetExpTimeout(const ros::Time& timeout);
 
+        /// \brief Change the desire id to filter on.
+        void id(const std::string& id) { id_ = id; }
+        /// \brief Return the current desire id being filtered.
+        const std::string& id() const { return id_; }
+
     private:
         void eventsCB(const hbba_msgs::Event::ConstPtr& msg);
         void expTimeoutTimerCB(const ros::TimerEvent&);

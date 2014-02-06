@@ -1,3 +1,7 @@
 <launch>
-    <node name="unlock_door" pkg="hbba_validation" type="unlock_door_node"/>
+    <node name="unlock_door" pkg="hbba_validation" type="unlock_door_node">
+        <rosparam>
+            arm_dist: 0.65
+        </rosparam>
+    </node>
 </launch>

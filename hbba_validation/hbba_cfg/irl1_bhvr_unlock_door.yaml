@@ -7,6 +7,8 @@ hbba_conf:
         - image_imv_raw
         - image: image_rgb
         - depth: image_depth
+        - camera_info
+        - joint_states
     output:
         - look_at_pose
         - cmd_vel

@@ -33,6 +33,11 @@ void CardreaderLocalizerIMV::imageCB(const sensor_msgs::Image& img)
 
     int x, y, c = localizer_.process(img_proc, x, y);
 
+    ROS_DEBUG("IMV Cardreader detector (x, y, c): (%i, %i, %i)",
+              x,
+              y,
+              c);
+
     if ((c > min_c_) && (c < max_c_)) {
         double p = 0.0;
         double t = 0.0;

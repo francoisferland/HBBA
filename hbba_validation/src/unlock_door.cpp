@@ -47,6 +47,8 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
     double p;
     np.param("period", p, 0.10);
     timer_ = n.createTimer(ros::Duration(p), &UnlockDoor::timerCB, this);
+    np.param("timeout", p, 2.00);
+    timeout_ = ros::Duration(p);
 
     pub_cmd_vel_ = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     pub_look_at_ = n.advertise<geometry_msgs::PoseStamped>("look_at_pose", 1);
@@ -59,6 +61,7 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
 
 void UnlockDoor::validCB(const geometry_msgs::PoseStamped& pose)
 {
+    ROS_DEBUG("Got a valid detection.");
     // Save the detected pose in the fixed frame.
     try {
         tf::Stamped<tf::Pose> pose_tf;
@@ -81,16 +84,20 @@ void UnlockDoor::validCB(const geometry_msgs::PoseStamped& pose)
 
 void UnlockDoor::invalidCB()
 {
+    ROS_DEBUG("Got an invalid detection.");
     sm_.pushEvent(EVENT_INVALID);
 }
 
 void UnlockDoor::greenCB(const sensor_msgs::Image&, double, double)
 {
+    ROS_DEBUG("Got a green LED detection.");
     sm_.pushEvent(EVENT_GREEN);
 }
 
 UnlockDoor::SM::Handle UnlockDoor::stateWait()
 {
+    ROS_DEBUG("In STATE_WAIT");
+
     // Revert to neutral look.
     cur_pose_.header.frame_id    = robot_frame_;
     cur_pose_.pose.position.x    = look_x_;
@@ -108,6 +115,7 @@ UnlockDoor::SM::Handle UnlockDoor::stateWait()
 
 UnlockDoor::SM::Handle UnlockDoor::stateSeek()
 {
+    ROS_DEBUG("In STATE_SEEK");
     arm_point_at_->generate(cur_pose_, arm_traj_);
     // Impedance is set in the timer loop to make sure the controller has a set
     // point first.
@@ -157,6 +165,11 @@ void UnlockDoor::produceVel()
 
     double ex = p.x() - arm_dist_;
     double ey = p.y() - offset_y_;
+
+    ROS_DEBUG_THROTTLE(1.0, 
+                       "Velocity control (ex, ey): (%f, %f).",
+                       ex,
+                       ey);
 
     geometry_msgs::Twist cmd;
 

@@ -9,6 +9,8 @@ using namespace hbba_validation;
 CardreaderLocalizer::CardreaderLocalizer(const int threshold):
     threshold_(threshold)
 {
+    ros::NodeHandle np("~");
+    pub_found_ = np.advertise<sensor_msgs::Image>("led_found", 1);
 }
 
 int CardreaderLocalizer::process(
@@ -61,6 +63,15 @@ int CardreaderLocalizer::process(
     if (c > 0) {
         x /= sum;
         y /= sum;
+
+        if (pub_found_.getNumSubscribers() > 0) {
+            cv_bridge::CvImage found_cv(*p_img);
+            cv::circle(found_cv.image, 
+                       cv::Point(x, y), 
+                       5, 
+                       cv::Scalar(255, 255, 255));
+            pub_found_.publish(found_cv.toImageMsg());
+        }
     }
 
     return c;

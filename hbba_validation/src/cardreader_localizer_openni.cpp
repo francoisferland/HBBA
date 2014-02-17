@@ -22,10 +22,10 @@ void CardreaderLocalizerOpenNI::imageCB(const sensor_msgs::Image::ConstPtr& i,
     int x, y, c = localizer_.process(i, x, y);
     if (c > min_c_ && c < max_c_ && valid_cb_) {
         geometry_msgs::PoseStamped pose;
-        if (getPoseStamped(cv::Rect(x - led_radius_, 
-                                    y - led_radius_, 
-                                    2 * led_radius_, 
-                                    2 * led_radius_),
+        if (getPoseStamped(cv::Rect(std::max(x - led_radius_, 0), 
+                                    std::max(y - led_radius_, 0), 
+                                    std::min(2 * led_radius_, int(d->width)), 
+                                    std::min(2 * led_radius_, int(d->height))),
                            pose)) {
             valid_cb_(pose);
         } else {

@@ -2,6 +2,7 @@
 #define CARDREADER_LOCALIZER_HPP
 
 #include <sensor_msgs/Image.h>
+#include <ros/ros.h>
 
 namespace hbba_validation
 {
@@ -16,10 +17,16 @@ namespace hbba_validation
     /// (R - G - B) > threshold.
     /// The result is in pixel coordinates, and further processing is needed to
     /// properly localize the cardreader, depending on the image's source.
+    ///
+    /// Also publishes a "~led_found" topic for diagnostic purposes.
+    /// Only publishes an image if at least one pixel passed the threshold.
+    ///
     class CardreaderLocalizer
     {
     private:
-        int threshold_;
+        ros::Publisher pub_found_;
+
+        int            threshold_;
 
     public:
         /// \brief Constructor.

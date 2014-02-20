@@ -1,0 +1,8 @@
+<launch>
+    <node name="unlock_door_image_imv_raw_passthrough" pkg="topic_tools" type="relay"
+        args="image_imv_raw image_imv_raw_unlock_door"/>
+    <node name="unlock_door_image_passthrough" pkg="topic_tools" type="relay"
+        args="image image_unlock_door"/>
+    <node name="unlock_door_depth_passthrough" pkg="topic_tools" type="relay"
+        args="depth depth_unlock_door"/>
+</launch>

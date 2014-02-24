@@ -2,6 +2,7 @@
 #define TOUR_GUIDE_HPP
 
 #include "state_machine.hpp"
+#include <hbba_msgs/Desire.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <ros/ros.h>
 
@@ -45,7 +46,12 @@ namespace hbba_validation
 
         /// \brief Execute the state and return true if the scenario should
         /// progress to the next state.
-        virtual bool run() = 0;
+        /// 
+        /// \param desires_set A reference to a desire set to fill.
+        ///                    Desires in this set will be added to the
+        ///                    Intention Workspace and marked for deletion when
+        ///                    the state ends.
+        virtual bool run(std::vector<hbba_msgs::Desire>& desires_set) = 0;
 
     };
 
@@ -80,6 +86,12 @@ namespace hbba_validation
     /// add_desires and remove_desires services, and events topic.
     class TourGuide
     {
+    private:
+        typedef StateMachine<TourGuide> SM;
+
+        SM                     sm_;
+        std::vector<TourStep*> steps_;
+
     public:
         /// \brief Constructor.
         ///
@@ -93,11 +105,22 @@ namespace hbba_validation
         ~TourGuide();
 
     private:
+        enum {
+            EVENT_LOC_REACHED,
+            EVENT_SPEECH_DONE,
+            EVENT_TURNAROUND_DONE,
+            EVENT_UNLOCKED,
+            EVENT_SIZE
+        };
+
         bool parseScenario(const ros::NodeHandle& np);
-        bool parseElem(const std::string& key, XmlRpc::XmlRpcValue& elem);
+        bool parseElem(const std::string&         key, 
+                             XmlRpc::XmlRpcValue& elem,
+                             std::string&         next,
+                             unsigned int&        type);
 
-        std::vector<TourStep*> steps_;
-
+        SM::Handle step();
+       
     };
 
     class WaypointStep: public TourStep
@@ -110,7 +133,7 @@ namespace hbba_validation
 
         void pose(const geometry_msgs::PoseStamped& pose) { pose_ = pose; }
 
-        bool run();
+        bool run(std::vector<hbba_msgs::Desire>& desires_set);
     };
 
     class SpeechStep: public TourStep
@@ -138,7 +161,7 @@ namespace hbba_validation
 
         void pointAt(Point p) { point_at_ = p; }
 
-        bool run();
+        bool run(std::vector<hbba_msgs::Desire>& desires_set);
     };
 
     class UnlockStep: public TourStep
@@ -146,14 +169,15 @@ namespace hbba_validation
     public:
         UnlockStep(const std::string& name): TourStep(name) {}
 
-        bool run();
+        bool run(std::vector<hbba_msgs::Desire>& desires_set);
     };
 
     class TurnaroundStep: public TourStep
     {
+    public:
         TurnaroundStep(const std::string& name): TourStep(name) {}
 
-        bool run();
+        bool run(std::vector<hbba_msgs::Desire>& desires_set);
     };
 
 }

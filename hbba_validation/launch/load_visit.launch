@@ -1,0 +1,11 @@
+<launch>
+    <node name="tour_guide" 
+          pkg="hbba_validation" 
+          type="tour_guide_node"
+          output="screen">
+        <rosparam file="$(find hbba_validation)/data/visit.yaml" 
+                  command="load"
+                  ns="tour"/>
+    </node>
+
+</launch>

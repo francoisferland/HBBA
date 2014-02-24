@@ -41,6 +41,7 @@ rosbuild_add_library(${PROJECT_NAME}
     src/cardreader_localizer_openni.cpp
     src/cardreader_localizer_imv.cpp
     src/unlock_door.cpp
+    src/tour_guide.cpp
 )
 
 rosbuild_add_executable(goto_landmark_node
@@ -62,6 +63,11 @@ rosbuild_add_executable(unlock_door_node
     src/unlock_door_node.cpp
 )
 target_link_libraries(unlock_door_node ${PROJECT_NAME})
+
+rosbuild_add_executable(tour_guide_node
+    src/tour_guide_node.cpp
+)
+target_link_libraries(tour_guide_node ${PROJECT_NAME})
 
 # Automatic build of hbba_cfg:
 rosbuild_find_ros_package(hbba_synth)

@@ -1,0 +1,51 @@
+start: wp1
+
+wp1:
+    type:     waypoint
+    landmark: IRL1_LANDMARK_1
+    next:     wp1_speech
+
+wp1_speech:
+    type:     speech
+    text:     "Bienvenue au 3.I.T. Veuillez me suivre."
+    next:     wp2
+
+wp2:
+    type:     waypoint
+    landmark: IRL1_LANDMARK_2
+    next:     wp2_pre_speech
+
+wp2_pre_speech:
+    type:     speech
+    text:     "Je vais maintenant déverouiller la porte menant au L.C.P."
+    next:     wp2_door
+
+wp2_door:
+    type:     unlock
+    next:     wp2_post_speech
+
+wp2_post_speech:
+    type:     speech
+    text:     "Pouvez-vous ouvrir la porte ?"
+    next:     wp3
+
+wp3:
+    type:     waypoint
+    landmark: IRL1_LANDMARK_3
+    next:     wp3_turnaround
+
+wp3_turnaround:
+    type:     turnaround
+    next:     wp3_speech
+
+wp3_speech:
+    type:     speech
+    text:     "Ceci est l'atelier de prototypage mécanique."
+    point_at: right
+    next:     wp4
+
+wp4:
+    type:     waypoint
+    landmark: IRL1_LANDMARK_4
+    next:     stop
+

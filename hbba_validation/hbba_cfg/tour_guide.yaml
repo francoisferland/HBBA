@@ -1,0 +1,159 @@
+# Tour guide scenario meant for IRL-1/TR.
+# NOTE: Based on full scenario, with removed elements for lighter testing.
+
+hbba_conf:
+
+- include: {pkg: 'hbba_synth',      file: 'common_newrev.yaml'}
+
+# Exploration modules:
+#- include: {pkg: 'irl1_hbba_cfg',   file: 'irl1_proc_qrcode_finder.yaml'}
+#- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_costmap_wander.yaml'}
+#- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_wander.yaml'}
+#- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_avoid.yaml'}
+
+# Interaction modules:
+#- include: {pkg: 'hbba_validation', file: 'jn0_proc_sphinx.yaml'}
+#- include: {pkg: 'irl1_hbba_cfg',   file: 'irl1_proc_people_tracking.yaml'}
+
+#- include: {pkg: 'irl1_hbba_cfg',   file: 'irl1_bhvr_engage.yaml'}
+#- include: {pkg: 'irl1_hbba_cfg',   file: 'irl1_bhvr_spring_arm_follow.yaml'}
+- include: {pkg: 'irl1_ios_demo',   file: 'jn0_bhvr_say.yaml'}
+
+# Common modules:
+- include: {pkg: 'jn0_hbba_cfg',    file: 'jn0_proc_slam_gmapping.yaml'}
+
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_teleop.yaml'}
+#- include: {pkg: 'hbba_validation', file: 'tr_bhvr_combined_goto.yaml'}
+- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_stop.yaml'}
+- include: {pkg: 'hbba_validation', file: 'tr_bhvr_turn_around.yaml'}
+#- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_goto.yaml'}
+#- include: {pkg: 'irl1_hbba_cfg',   file: 'tr_bhvr_slam_planner.yaml'}
+- include: {pkg: 'jn0_hbba_cfg',    file: 'irl1_bhvr_arm_keep_down.yaml'}
+
+# Combined priorities:
+- behavior_priority: {name: 'tr_teleop',           value: 100}
+- behavior_priority: {name: 'tr_stop',             value: 90}
+#- behavior_priority: {name: 'spring_arm_follow',   value: 80}
+- behavior_priority: {name: 'tr_turn_around',      value: 75}
+#- behavior_priority: {name: 'irl1_engage',         value: 70}
+#- behavior_priority: {name: 'tr_slam_planner',     value: 50}
+#- behavior_priority: {name: 'tr_goto',             value: 45}
+#- behavior_priority: {name: 'tr_costmap_wander',   value: 40}
+#- behavior_priority: {name: 'tr_avoid',            value: 37}
+#- behavior_priority: {name: 'tr_wander',           value: 35}
+- behavior_priority: {name: 'arm_keep_down',       value: 10}
+
+# Available resources:
+- resources:
+    CPU: 300
+
+# Fake motivation used to start the HBBA webapp.
+- motivation:
+    name: irl1_webapp
+    launch: {pkg: 'irl1_webapp', path: 'launch/irl1_webapp.launch'}
+
+# Goto generator motivation for testing purposes.
+- motivation:
+    name: goto_generator
+    launch: {pkg: 'hbba_validation', path: 'launch/irl1_motv_goto_generator.launch'}
+
+#- motivation:
+#    name: landmarks_interaction
+#    launch: {pkg: 'hbba_validation', path: 'launch/irl1_motv_landmarks_interaction.launch'}
+#    input:
+#        - sphinx_result        
+#        - qrcode_decoded
+
+- motivation:
+    name: tour_guide
+    launch: {pkg: 'hbba_validation', path: 'launch/irl1_motv_tour_guide.launch'}
+
+#- motivation:
+#    name: ios_demo
+#    launch: {pkg: 'irl1_ios_demo', path: 'launch/irl1_motv_ios_demo.launch'}
+#    input:
+#        - rtabmap/info
+#        - dialog_ios: sphinx_result
+#        - wiss_ident
+#        - tracked_sources
+#    output:
+#        - rtabmap_np         # Namespace used for RTABMap parameters update.
+#        - dialog_irl1
+#        - parameters_updated
+    
+# Static sphinx (for testing purposes):
+#- desire:
+#    id: sphinx_static
+#    type: SpeechRecognition
+#    utility: 1
+#    intensity: 1.0
+#    security: False
+# Static QRCodes (for testing purposes):
+#- desire:
+#    id: qr_codes_static
+#    type: FindQRCodes
+#    utility: 1
+#    intensity: 1
+#    security: False
+# Static SLAM (for testing purposes):
+- desire:
+    id: slam_static
+    type: SLAM
+    utility: 1
+    intensity: 1.0
+    security: False
+# Static engage (for testing purposes):
+#- desire:
+#    id: engage_static
+#    type: EngagePerson
+#    intensity: 1
+#    utility: 1
+#    security: false
+#- desire:
+#    id: track_people_static # Static to maximize utility.
+#    type: TrackPeople
+#    intensity: 1
+#    utility: 1
+#    security: false
+
+# Arm follow (and keep down in neutral) motivations (static, essentially free).
+- desire:
+    id: arm_keep_down
+    type: ArmKeepDown
+    utility: 1
+    intensity: 1
+    security: False
+#- desire:
+#    id: spring_arm_follow
+#    type: ArmFollow
+#    utility: 1
+#    intensity: 5
+#    security: False
+
+# Emergency stop and low-level obstacle avoidance.
+- desire:
+    id: irl1_stop
+    type: Stop
+    utility: 1
+    intensity: 1
+    security: True
+#- desire:
+#    id: irl1_avoid
+#    type: Avoid
+#    utility: 1
+#    intensity: 1
+#    security: True
+
+# Teleoperation.
+- desire:
+    id: irl1_teleop
+    type: Teleop
+    utility: 1
+    intensity: 1
+    security: True
+
+# Baseline emotion(s):
+- emo_intensity:
+    name: Joy
+    value: 0.25
+

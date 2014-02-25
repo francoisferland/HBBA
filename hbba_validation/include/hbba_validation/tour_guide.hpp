@@ -3,6 +3,7 @@
 
 #include "state_machine.hpp"
 #include <hbba_msgs/Desire.h>
+#include <hbba_msgs/Event.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <ros/ros.h>
 
@@ -84,14 +85,18 @@ namespace hbba_validation
     ///                
     /// As the machine mostly interact with HBBA, it only requires access to the
     /// add_desires and remove_desires services, and events topic.
+    ///
     class TourGuide
     {
     private:
         typedef StateMachine<TourGuide> SM;
 
-        SM                     sm_;
-        std::vector<TourStep*> steps_;
+        SM                       sm_;
+        std::vector<TourStep*>   steps_;
 
+        ros::Subscriber          sub_event_;
+
+        std::vector<std::string> cur_desire_ids_; 
     public:
         /// \brief Constructor.
         ///
@@ -112,6 +117,8 @@ namespace hbba_validation
             EVENT_UNLOCKED,
             EVENT_SIZE
         };
+
+        void eventCB(const hbba_msgs::Event& msg);
 
         bool parseScenario(const ros::NodeHandle& np);
         bool parseElem(const std::string&         key, 

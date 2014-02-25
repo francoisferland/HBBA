@@ -2,6 +2,15 @@
 
 using namespace hbba_validation;
 
+namespace {
+    static const char* DESIRE_GOTO       = "GoTo";
+    static const char* DESIRE_TURNAROUND = "Turnaround";
+    static const char* DESIRE_SAY        = "Say";
+    static const char* DESIRE_POINT_AT   = "PointAt";
+    static const char* DESIRE_UNLOCK     = "UnlockDoor";
+
+}
+
 TourGuide::TourGuide(ros::NodeHandle& n, ros::NodeHandle& np)
 {
     if (!parseScenario(np)) { 
@@ -11,6 +20,8 @@ TourGuide::TourGuide(ros::NodeHandle& n, ros::NodeHandle& np)
     }
 
     ROS_INFO("Tour correctly parsed, launching scenario...");
+
+    sub_event_ = n.subscribe("hbba_vents", 50, &TourGuide::eventCB, this);
 }
 
 TourGuide::~TourGuide()
@@ -159,6 +170,27 @@ bool TourGuide::parseElem(const std::string&         key,
     return true;
 }
 
+void TourGuide::eventCB(const hbba_msgs::Event& msg)
+{
+    if (std::find(cur_desire_ids_.begin(), 
+                  cur_desire_ids_.end(), 
+                  msg.desire) == cur_desire_ids_.end()) {
+        return;
+    }
+
+    if (msg.type == hbba_msgs::Event::ACC_ON) {
+        if (msg.desire_type == DESIRE_GOTO) {        
+            sm_.pushEvent(EVENT_LOC_REACHED);
+        } else if (msg.desire_type == DESIRE_UNLOCK) {
+            sm_.pushEvent(EVENT_UNLOCKED);
+        } else if (msg.desire_type == DESIRE_TURNAROUND) {
+            sm_.pushEvent(EVENT_TURNAROUND_DONE);
+        } else if (msg.desire_type == DESIRE_SAY) {
+            sm_.pushEvent(EVENT_SPEECH_DONE);
+        }
+    }
+}
+
 TourGuide::SM::Handle TourGuide::step()
 {
     std::vector<hbba_msgs::Desire> desires_set;
@@ -166,6 +198,8 @@ TourGuide::SM::Handle TourGuide::step()
     TourStep* state = steps_[sm_.state()];
     state->run(desires_set);
 
+    // TODO: Call remove_desires on old set, add_desires on new one.
+    // TODO: Save the current desire ids.
     // TODO: Do proper transitions when possible.
     return sm_.state();
 
@@ -173,21 +207,54 @@ TourGuide::SM::Handle TourGuide::step()
 
 bool WaypointStep::run(std::vector<hbba_msgs::Desire>& desires_set)
 {
+    desires_set.resize(1);
+    hbba_msgs::Desire& d = desires_set[0];
+
+    d.id   = "TourGuide" + name() + DESIRE_GOTO;
+    d.type = DESIRE_GOTO;
+    // TODO: Pose.
     return false;
 }
 
 bool SpeechStep::run(std::vector<hbba_msgs::Desire>& desires_set)
 {
+    hbba_msgs::Desire ds;
+    ds.id   = "TourGuide" + name() + DESIRE_SAY;
+    ds.type = DESIRE_SAY;
+    // TODO: Text.
+
+    desires_set.push_back(ds);
+
+    if (point_at_ != POINT_NONE) {
+        hbba_msgs::Desire dp;
+        dp.id   = "TourGuide" + name() + DESIRE_POINT_AT;
+        dp.type = DESIRE_POINT_AT;
+        // TODO: Direction.
+
+        desires_set.push_back(dp);
+    }
+
     return false;
 }
 
 bool UnlockStep::run(std::vector<hbba_msgs::Desire>& desires_set)
 {
+    desires_set.resize(1);
+    hbba_msgs::Desire& d = desires_set[0];
+
+    d.id   = "TourGuide" + name() + DESIRE_UNLOCK;
+    d.type = DESIRE_UNLOCK;
+
     return false;
 }
 
 bool TurnaroundStep::run(std::vector<hbba_msgs::Desire>& desires_set)
 {
+    desires_set.resize(1);
+    hbba_msgs::Desire& d = desires_set[0];
+
+    d.id   = "TourGuide" + name() + DESIRE_TURNAROUND;
+    d.type = DESIRE_TURNAROUND;
     return false;
 }
 

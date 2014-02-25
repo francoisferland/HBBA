@@ -1,0 +1,21 @@
+hbba_cfg:
+- behavior:
+    name: tr_turn_around
+    launch: {pkg: 'hbba_validation', path: 'launch/tr_bhvr_turn_around.launch'}
+    priority: 10
+    input:
+        - odom
+        - turn_trigger
+    output:
+        - turn_done
+        - cmd_vel
+
+- strat:
+    name: TRTurnAround
+    class: TurnAround
+    utility: 10 
+    costs: {}
+    dependencies: {}
+    modules:
+        - tr_turn_around
+    custom_bringup: "pubEmpty('/turn_trigger');"

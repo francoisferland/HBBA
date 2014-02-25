@@ -6,9 +6,11 @@ hbba_cfg:
     input:
         - odom
         - turn_trigger
+        - desires_set
     output:
-        - turn_done
         - cmd_vel
+    services:
+        - events    # Not a true service, but shouldn't be arbitrated.
 
 - strat:
     name: TRTurnAround

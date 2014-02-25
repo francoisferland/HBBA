@@ -35,6 +35,13 @@
 		  Executes commands on the shell through a system() call. 
 		</description>
 	</class>
+	<class name="script_engine/PubEmpty" 
+			type="common_plugins::pub_empty::PubEmptyPlugin"
+			base_class_type="script_engine::engine_module">
+		<description>
+		  Publish an empty message on the specified topic.
+		</description>
+	</class>
 	<class name="script_engine/PubString" 
 			type="common_plugins::pub_string::PubStringPlugin"
 			base_class_type="script_engine::engine_module">

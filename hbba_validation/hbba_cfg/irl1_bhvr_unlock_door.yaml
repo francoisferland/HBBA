@@ -9,10 +9,13 @@ hbba_conf:
         - image_imv_raw
         - image: image_rgb
         - depth: image_depth
+        - desires_set
     output:
         - image_imv_raw_unlock_door
         - image_unlock_door
         - depth_unlock_door
+    services:
+        - events
 
 - behavior:
     name: irl1_unlock_door

@@ -40,6 +40,8 @@ namespace hbba_validation
     ///                     latest cardreader pose.
     ///  - ~cardreader_pose Test input for cardreader poses, produces a valid
     ///                     detection event.
+    ///  - unlock_done:     A std_msgs/Empty output to signal that the door has
+    ///                     been unlocked (green LED detected).
     ///
     /// Parameters: 
     ///  - period:      Control loop update period.
@@ -86,6 +88,7 @@ namespace hbba_validation
     private:
         ros::Publisher        pub_cmd_vel_;
         ros::Publisher        pub_look_at_;
+        ros::Publisher        pub_done_;
         ros::Subscriber       sub_pose_;
         ros::Timer            timer_;
         tf::TransformListener tf_;
@@ -101,6 +104,7 @@ namespace hbba_validation
         enum State {
             STATE_WAIT = 0,
             STATE_SEEK,
+            STATE_DONE,
             STATE_SIZE
         };
 
@@ -147,6 +151,7 @@ namespace hbba_validation
 
         SM::Handle stateWait();
         SM::Handle stateSeek();
+        SM::Handle stateDone();
        
         void timerCB(const ros::TimerEvent&);
 

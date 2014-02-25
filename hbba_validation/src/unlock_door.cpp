@@ -1,5 +1,6 @@
 #include <hbba_validation/unlock_door.hpp>
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/Empty.h>
 
 using namespace hbba_validation;
 
@@ -40,7 +41,7 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
     SM::Transitions transitions;
     SM::generateTransitionsMatrix(STATE_SIZE, EVENT_SIZE, transitions);
     transitions[STATE_WAIT][EVENT_VALID]   = STATE_SEEK;
-    transitions[STATE_SEEK][EVENT_GREEN]   = STATE_WAIT;
+    transitions[STATE_SEEK][EVENT_GREEN]   = STATE_DONE;
     transitions[STATE_SEEK][EVENT_TIMEOUT] = STATE_WAIT;
     sm_ = SM(states, transitions, this);
 
@@ -52,6 +53,7 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
 
     pub_cmd_vel_ = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     pub_look_at_ = n.advertise<geometry_msgs::PoseStamped>("look_at_pose", 1);
+    pub_done_    = n.advertise<std_msgs::Empty>("unlock_done", 1);
 
     sub_pose_    = np.subscribe("cardreader_pose", 
                                 1, 
@@ -121,6 +123,15 @@ UnlockDoor::SM::Handle UnlockDoor::stateSeek()
     // point first.
 
     return STATE_SEEK;
+}
+
+UnlockDoor::SM::Handle UnlockDoor::stateDone()
+{
+    ROS_DEBUG("In STATE_DONE");
+    std_msgs::Empty msg;
+    pub_done_.publish(msg);
+
+    return STATE_WAIT;
 }
 
 void UnlockDoor::timerCB(const ros::TimerEvent&)

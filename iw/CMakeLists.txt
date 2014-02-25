@@ -41,3 +41,4 @@ target_link_libraries(goto_events_observer iw yaml-cpp)
 rosbuild_add_executable(say_events_observer src/say_events_observer.cpp)
 target_link_libraries(say_events_observer iw)
 
+rosbuild_add_executable(empty_event_generator src/empty_event_generator.cpp)

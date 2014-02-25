@@ -5,6 +5,7 @@
 #include "script_engine/UpdateRate.h"
 #include <pluginlib/class_list_macros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Empty.h>
 #include <std_srvs/Empty.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <tf/tf.h>
@@ -146,6 +147,22 @@ namespace common_plugins
 
     };
 
+    /// \brief A basic function to publish on std_msgs/Empty topics.
+    namespace pub_empty
+    {
+        extern void afun(const v8::Arguments&, std_msgs::Empty&)
+        {
+        }
+
+        const extern char pub_name[] = "pubEmpty";
+
+        typedef script_engine::publisher_topic_arg_base<
+            std_msgs::Empty,
+            pub_name,
+            afun> PubEmptyPlugin;
+    }
+    
+
     /// \brief A basic function to publish strings on topics.
     namespace pub_string
     {
@@ -228,6 +245,9 @@ PLUGINLIB_DECLARE_CLASS(script_engine, UpdateRateCall,
 PLUGINLIB_DECLARE_CLASS(script_engine, SysCall, 
 	common_plugins::SysCall,
 	script_engine::engine_module);
+PLUGINLIB_DECLARE_CLASS(script_engine, PubEmpty,
+    common_plugins::pub_empty::PubEmptyPlugin,
+    script_engine::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, PubString, 
 	common_plugins::pub_string::PubStringPlugin,
 	script_engine::engine_module);

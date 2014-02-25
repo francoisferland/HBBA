@@ -1,3 +1,8 @@
 <launch>
     <node name="turn_around" pkg="hbba_validation" type="turn_around_node"/>
+    <node name="turn_around_event_generator" pkg="iw"
+          type="empty_event_generator">
+        <param name="desire_type" value="TurnAround"/>
+        <remap from="trigger" to="turn_done"/>
+    </node>
 </launch>

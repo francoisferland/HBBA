@@ -4,4 +4,9 @@
             arm_dist: 0.65
         </rosparam>
     </node>
+    <node name="unlock_event_generator" pkg="iw"
+          type="empty_event_generator">
+        <param name="desire_type" value="UnlockDoor"/>
+        <remap from="trigger" to="unlock_done"/>
+    </node>
 </launch>

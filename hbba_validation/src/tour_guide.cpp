@@ -4,7 +4,7 @@ using namespace hbba_validation;
 
 namespace {
     static const char* DESIRE_GOTO       = "GoTo";
-    static const char* DESIRE_TURNAROUND = "Turnaround";
+    static const char* DESIRE_TURNAROUND = "TurnAround";
     static const char* DESIRE_SAY        = "Say";
     static const char* DESIRE_POINT_AT   = "PointAt";
     static const char* DESIRE_UNLOCK     = "UnlockDoor";
@@ -21,7 +21,7 @@ TourGuide::TourGuide(ros::NodeHandle& n, ros::NodeHandle& np)
 
     ROS_INFO("Tour correctly parsed, launching scenario...");
 
-    sub_event_ = n.subscribe("hbba_vents", 50, &TourGuide::eventCB, this);
+    sub_event_ = n.subscribe("events", 50, &TourGuide::eventCB, this);
 }
 
 TourGuide::~TourGuide()
@@ -180,12 +180,16 @@ void TourGuide::eventCB(const hbba_msgs::Event& msg)
 
     if (msg.type == hbba_msgs::Event::ACC_ON) {
         if (msg.desire_type == DESIRE_GOTO) {        
+            ROS_DEBUG("Pushing event LOC_REACHED");
             sm_.pushEvent(EVENT_LOC_REACHED);
         } else if (msg.desire_type == DESIRE_UNLOCK) {
+            ROS_DEBUG("Pushing event UNLOCKED");
             sm_.pushEvent(EVENT_UNLOCKED);
         } else if (msg.desire_type == DESIRE_TURNAROUND) {
+            ROS_DEBUG("Pushing event TURNAROUND_DONE");
             sm_.pushEvent(EVENT_TURNAROUND_DONE);
         } else if (msg.desire_type == DESIRE_SAY) {
+            ROS_DEBUG("Pushing event SPEECH_DONE");
             sm_.pushEvent(EVENT_SPEECH_DONE);
         }
     }
@@ -199,7 +203,14 @@ TourGuide::SM::Handle TourGuide::step()
     state->run(desires_set);
 
     // TODO: Call remove_desires on old set, add_desires on new one.
-    // TODO: Save the current desire ids.
+    
+    // Save the current active ids for future removal, event detection:
+    cur_desire_ids_.clear();
+    typedef std::vector<hbba_msgs::Desire>::const_iterator It;
+    for (It i = desires_set.begin(); i != desires_set.end(); ++i) {
+        cur_desire_ids_.push_back(i->id);
+    }
+
     // TODO: Do proper transitions when possible.
     return sm_.state();
 

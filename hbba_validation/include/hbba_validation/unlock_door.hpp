@@ -65,6 +65,9 @@ namespace hbba_validation
     ///                 Default: 0.00 m.
     ///  - look_z:      Neutral look position in the robot's base link (in Z).
     ///                 Default: 1.00 m, slightly tilted down.
+    ///  - imv_dist:    Distance to use when generating a full pose from a
+    ///                 IMV-detected red LED.
+    ///                 Default: 0.75 m.
     ///  - lin_k:       Linear velocity mobile base location error coefficient.
     ///                 Default: 0.2.
     ///  - ang_k:       Angular velocity mobile base location error coefficient.
@@ -126,6 +129,7 @@ namespace hbba_validation
         double        look_x_;
         double        look_y_;
         double        look_z_;
+        double        imv_dist_;
         double        lin_k_;
         double        ang_k_;
         double        lin_max_;
@@ -147,7 +151,7 @@ namespace hbba_validation
     private:
         void validCB(const geometry_msgs::PoseStamped& pose);
         void invalidCB();
-        void greenCB(const sensor_msgs::Image&, double, double);
+        void imvCB(const sensor_msgs::Image&, double, double, bool);
 
         SM::Handle stateWait();
         SM::Handle stateSeek();

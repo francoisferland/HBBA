@@ -4,8 +4,8 @@ using namespace hbba_validation;
 
 CardreaderLocalizerIMV::CardreaderLocalizerIMV(      ros::NodeHandle& n,
                                                const ros::NodeHandle& np,
-                                               const bool             gd):
-    green_(gd)
+                                               const Mode             mode):
+    mode_(mode)
 {
     double imv_pan, imv_tilt, imv_zoom;
     np.param("imv_pan",  imv_pan,   0.0);
@@ -31,26 +31,57 @@ void CardreaderLocalizerIMV::imageCB(const sensor_msgs::Image& img)
         return;
     }
 
-    int x, y, c = localizer_.process(img_proc, x, y);
+    int r_x, r_y, r_c = 0;
+    int g_x, g_y, g_c = 0;
+    
+    switch (mode_) {
+        case MODE_BOTH:
+            localizer_.processBoth(img_proc, r_x, r_y, r_c, g_x, g_y, g_c);
+            break;
+        case MODE_SINGLE_RED:
+            r_c = localizer_.process(img_proc, r_x, r_y, false);
+            break;
+        case MODE_SINGLE_GREEN:
+            g_c = localizer_.process(img_proc, g_x, g_y, true);
+            break;
+        default:
+            break;
+    };
 
-    ROS_DEBUG("IMV Cardreader detector (x, y, c): (%i, %i, %i)",
-              x,
-              y,
-              c);
+    ROS_DEBUG("imv cardreader detector (r_x, r_y, r_c): (%i, %i, %i)",
+              r_x,
+              r_y,
+              r_c);
+    ROS_DEBUG("imv cardreader detector (g_x, g_y, g_c): (%i, %i, %i)",
+              g_x,
+              g_y,
+              g_c);
 
-    if ((c > min_c_) && (c < max_c_)) {
-        double p = 0.0;
-        double t = 0.0;
-        if (!imv_proc_.orientationFromOutputPosition(x, y, p, t)) {
-            ROS_WARN("Could not convert (%i, %i) into proper pan/tilt angles.",
-                     x, 
-                     y);
-        }
-
-        if (cb_) {
-            cb_(*img_proc, p, t);
-        }
+    if ((r_c > min_c_) && (r_c < max_c_)) {
+        callCB(img_proc, r_x, r_y, false);
+    }
+    if ((g_c > min_c_) && (g_c < max_c_)) {
+        callCB(img_proc, g_x, g_y, true);
     }
 }
 
+void CardreaderLocalizerIMV::callCB(sensor_msgs::Image::Ptr img_proc,
+                                    int                     x, 
+                                    int                     y, 
+                                    bool                    green)
+{
+    if (!cb_) {
+        return;
+    }
 
+    double p = 0.0;
+    double t = 0.0;
+    if (!imv_proc_.orientationFromOutputPosition(x, y, p, t)) {
+        ROS_WARN("Could not convert (%i, %i) into proper pan/tilt angles.",
+                 x, 
+                 y);
+    }
+
+    cb_(*img_proc, p, t, green);
+
+}

@@ -6,7 +6,9 @@ using namespace hbba_validation;
 
 UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
     localizer_openni_(n, ros::NodeHandle(np, "localizer_openni_")),
-    localizer_imv_(n, ros::NodeHandle(np, "localizer_imv_"), true)
+    localizer_imv_(n, 
+                   ros::NodeHandle(np, "localizer_imv_"), 
+                   CardreaderLocalizerIMV::MODE_BOTH)
 {
     np.param("fixed_frame", fixed_frame_, std::string("/odom"));
     np.param("robot_frame", robot_frame_, std::string("/base_link"));
@@ -14,17 +16,18 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
     np.param("look_x",      look_x_,      2.00);
     np.param("look_y",      look_y_,      0.00);
     np.param("look_z",      look_z_,      1.00);
-    np.param("lin_k",       lin_k_,        0.5);
-    np.param("ang_k",       ang_k_,        0.5);
-    np.param("lin_max",     lin_max_,      0.1);
-    np.param("ang_max",     ang_max_,      0.3);
+    np.param("imv_dist",    imv_dist_,    0.75);
+    np.param("lin_k",       lin_k_,       0.50);
+    np.param("ang_k",       ang_k_,       0.50);
+    np.param("lin_max",     lin_max_,     0.10);
+    np.param("ang_max",     ang_max_,     0.30);
     np.param("imp_k",       imp_k_,       35.0);
     np.param("arm_dist",    arm_dist_,    0.50);
     np.param("arm_vel",     arm_vel_,     0.25);
 
     localizer_openni_.registerValidCB(&UnlockDoor::validCB, this);
     localizer_openni_.registerInvalidCB(&UnlockDoor::invalidCB, this);
-    localizer_imv_.registerCB(&UnlockDoor::greenCB, this);
+    localizer_imv_.registerCB(&UnlockDoor::imvCB, this);
 
 
     arm_state_.reset(new jn0_arm_tools::ArmStateSubscriber("L_", n, np));
@@ -90,10 +93,30 @@ void UnlockDoor::invalidCB()
     sm_.pushEvent(EVENT_INVALID);
 }
 
-void UnlockDoor::greenCB(const sensor_msgs::Image&, double, double)
+void UnlockDoor::imvCB(const sensor_msgs::Image& img, 
+                             double              pan, 
+                             double              tilt, 
+                             bool                g)
 {
-    ROS_DEBUG("Got a green LED detection.");
-    sm_.pushEvent(EVENT_GREEN);
+    if (g) {
+        ROS_DEBUG("Got a green LED detection on IMV.");
+        sm_.pushEvent(EVENT_GREEN);
+    } else {
+        ROS_DEBUG("Got a red LED detection on IMV.");
+        // NOTE: Baked-in transform, assuming the IMV frame's X points in front
+        // of the robot.
+        geometry_msgs::PoseStamped pose;
+        pose.header             = img.header;
+        pose.pose.position.x    = imv_dist_ * cos(-pan) * (1.0 - sin(tilt));
+        pose.pose.position.y    = imv_dist_ * sin(-pan) * (1.0 - sin(tilt));
+        pose.pose.position.z    = imv_dist_ * sin(tilt);
+        pose.pose.orientation.x = 0.0;
+        pose.pose.orientation.y = 0.0;
+        pose.pose.orientation.z = 0.0;
+        pose.pose.orientation.w = 1.0;
+        validCB(pose);
+
+    }
 }
 
 UnlockDoor::SM::Handle UnlockDoor::stateWait()

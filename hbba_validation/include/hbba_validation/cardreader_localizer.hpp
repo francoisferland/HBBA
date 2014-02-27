@@ -2,6 +2,8 @@
 #define CARDREADER_LOCALIZER_HPP
 
 #include <sensor_msgs/Image.h>
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <ros/ros.h>
 
 namespace hbba_validation
@@ -10,11 +12,12 @@ namespace hbba_validation
     /// 3IT.
     ///
     /// The localization algorithm is entirely dependent on the visibility of
-    /// the red LED on the device.
+    /// the red or green LED on the device.
     /// It assumes that no other purely red light are in the same field of view.
     ///
     /// The process is simple: find the center of mass of pixels where 
-    /// (R - G - B) > threshold.
+    /// (R - G - B) > threshold for the red LED, and (G - R - B) > threshold for
+    /// the green one.
     /// The result is in pixel coordinates, and further processing is needed to
     /// properly localize the cardreader, depending on the image's source.
     ///
@@ -39,8 +42,8 @@ namespace hbba_validation
         /// \brief Change the threshold value used to select searched pixels.
         void threshold(int t) { threshold_ = t; }
 
-        /// \brief Processes the given image, return the possible location of a
-        /// card reader.
+        /// \brief Processes the given image for a single LED, return the 
+        ///possible location of a card reader.
         ///
         /// \param img   The image to process, RGB format required.
         /// \param x     A reference to the output coordinate in X.
@@ -54,6 +57,40 @@ namespace hbba_validation
                           int&                          x, 
                           int&                          y,
                           bool                          green = false) const;
+
+        /// \brief Process the given image for both LED colors.
+        ///
+        /// \param r_x   A reference to the output coordinate in X for the red
+        ///              LED.
+        /// \param r_y   A reference to the output coordinate in Y for the red
+        ///              LED.
+        /// \param r_c   The number of selected pixels for the red LED.
+        /// \param g_x   A reference to the output coordinate in X for the green
+        ///              LED.
+        /// \param g_y   A reference to the output coordinate in Y for the green
+        ///              LED.
+        /// \param g_c   The number of selected pixels for the green LED.
+        /// \return      False if an error occured.
+        bool processBoth(const sensor_msgs::Image::ConstPtr& img,
+                               int&                          r_x,
+                               int&                          r_y,
+                               int&                          r_c,
+                               int&                          g_x,
+                               int&                          g_y,
+                               int&                          g_c) const;
+
+    private:
+        bool prepareImg(const sensor_msgs::Image::ConstPtr  &img,
+                              cv_bridge::CvImageConstPtr   &p_img,
+                              cv::Mat                     (&rgb)[3],
+                              int                          &ri,
+                              int                          &gi,
+                              int                          &bi) const;
+
+        int evalMat(const cv::Mat &m,
+                          int     &x,
+                          int     &y) const;
+        
     };
 }
 

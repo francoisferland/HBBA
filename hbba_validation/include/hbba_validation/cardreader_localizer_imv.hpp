@@ -33,44 +33,59 @@ namespace hbba_validation
     ///
     class CardreaderLocalizerIMV
     {
+    public:
+        enum Mode
+        {
+            MODE_SINGLE_RED,
+            MODE_SINGLE_GREEN,
+            MODE_BOTH
+        };
+
     private:
         ros::Subscriber                sub_image_;
         imv_camera::IMVCameraProcessor imv_proc_;
         CardreaderLocalizer            localizer_;
 
-        bool green_;
+        Mode mode_;
         int  min_c_;
         int  max_c_;
 
         boost::function<void (const sensor_msgs::Image&,
                                     double,
-                                    double)>             cb_;
+                                    double,
+                                    bool)>               cb_;
 
     public:
         /// \brief Constructor.
         ///
-        /// \param n  Node handle for topics.
-        /// \param np Node handle for parameters.
-        /// \param gd If the localizer should track green LEDs instead of red.
+        /// \param n    Node handle for topics.
+        /// \param np   Node handle for parameters.
+        /// \param mode Localization mode (see enum), default: MODE_SINGLE_RED.
         CardreaderLocalizerIMV(      ros::NodeHandle& n,
                                const ros::NodeHandle& np,
-                               const bool             gd = false);
+                               const Mode             mode = MODE_SINGLE_RED);
 
         /// \brief Register a callback on valid detections.
         ///
-        /// Your callback will receive a const reference to the processed image
-        /// and pan and tilt angles of the LED in the camera's reference frame.
+        /// Your callback will receive a const reference to the processed image,
+        /// pan and tilt angles of the LED in the camera's reference frame, and
+        /// a boolean indicating if it's a green (true) or red (false) one.
         template <class T>
         void registerCB(void (T::*fun)(const sensor_msgs::Image&, 
                                              double, 
-                                             double),
+                                             double,
+                                             bool),
                         T* obj)
         {
-            cb_ = boost::bind(fun, obj, _1, _2, _3);
+            cb_ = boost::bind(fun, obj, _1, _2, _3, _4);
         }
 
     private:
         void imageCB(const sensor_msgs::Image& img);
+        void callCB(sensor_msgs::Image::Ptr img_proc,
+                    int                     x, 
+                    int                     y,
+                    bool                    green);
 
     };
 }

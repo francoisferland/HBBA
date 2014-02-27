@@ -5,9 +5,9 @@
 using namespace hbba_validation;
 
 UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
-    localizer_openni_(n, ros::NodeHandle(np, "localizer_openni_")),
+    localizer_openni_(n, ros::NodeHandle(np, "localizer_openni")),
     localizer_imv_(n, 
-                   ros::NodeHandle(np, "localizer_imv_"), 
+                   ros::NodeHandle(np, "localizer_imv"), 
                    CardreaderLocalizerIMV::MODE_BOTH)
 {
     np.param("fixed_frame", fixed_frame_, std::string("/odom"));
@@ -41,6 +41,7 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
     SM::States states;
     states.push_back(&UnlockDoor::stateWait);
     states.push_back(&UnlockDoor::stateSeek);
+    states.push_back(&UnlockDoor::stateDone);
     SM::Transitions transitions;
     SM::generateTransitionsMatrix(STATE_SIZE, EVENT_SIZE, transitions);
     transitions[STATE_WAIT][EVENT_VALID]   = STATE_SEEK;
@@ -66,7 +67,7 @@ UnlockDoor::UnlockDoor(ros::NodeHandle& n, ros::NodeHandle& np):
 
 void UnlockDoor::validCB(const geometry_msgs::PoseStamped& pose)
 {
-    ROS_DEBUG("Got a valid detection.");
+    ROS_DEBUG_THROTTLE(1.0, "Got a valid detection.");
     // Save the detected pose in the fixed frame.
     try {
         tf::Stamped<tf::Pose> pose_tf;
@@ -89,7 +90,7 @@ void UnlockDoor::validCB(const geometry_msgs::PoseStamped& pose)
 
 void UnlockDoor::invalidCB()
 {
-    ROS_DEBUG("Got an invalid detection.");
+    ROS_DEBUG_THROTTLE(1.0, "Got an invalid detection.");
     sm_.pushEvent(EVENT_INVALID);
 }
 
@@ -99,10 +100,10 @@ void UnlockDoor::imvCB(const sensor_msgs::Image& img,
                              bool                g)
 {
     if (g) {
-        ROS_DEBUG("Got a green LED detection on IMV.");
+        ROS_DEBUG_THROTTLE(1.0, "Got a green LED detection on IMV.");
         sm_.pushEvent(EVENT_GREEN);
     } else {
-        ROS_DEBUG("Got a red LED detection on IMV.");
+        ROS_DEBUG_THROTTLE(1.0, "Got a red LED detection on IMV.");
         // NOTE: Baked-in transform, assuming the IMV frame's X points in front
         // of the robot.
         geometry_msgs::PoseStamped pose;

@@ -22,6 +22,9 @@ hbba_conf:
     launch: {pkg: 'hbba_validation', path: 'launch/irl1_bhvr_unlock_door.launch'}
     priority: 10
     input:
+        - image_imv_raw: image_imv_raw_unlock_door
+        - image:         image_unlock_door
+        - depth:         depth_unlock_door
         - camera_info
         - joint_states
     output:
@@ -39,6 +42,6 @@ hbba_conf:
     modules:
         - irl1_unlock_door_proc:
             - image_imv_raw: 5
-            - image_rgb:     5
-            - image_depth:   5
+            - image_rgb:     0
+            - image_depth:   0
         - irl1_unlock_door

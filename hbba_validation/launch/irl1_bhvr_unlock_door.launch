@@ -2,6 +2,8 @@
     <node name="unlock_door" pkg="hbba_validation" type="unlock_door_node">
         <rosparam>
             arm_dist: 0.65
+            localizer_imv:
+                max_c: 250
         </rosparam>
     </node>
     <node name="unlock_event_generator" pkg="iw"

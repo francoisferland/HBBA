@@ -126,5 +126,16 @@ bool CardreaderLocalizer::processBoth(
     r_c = evalMat(m_r, r_x, r_y);
     g_c = evalMat(m_g, g_x, g_y);
 
+    if (r_c > 0) {
+        if (pub_found_.getNumSubscribers() > 0) {
+            cv_bridge::CvImage found_cv(*p_img);
+            cv::circle(found_cv.image, 
+                       cv::Point(r_x, r_y), 
+                       5, 
+                       cv::Scalar(255, 255, 255));
+            pub_found_.publish(found_cv.toImageMsg());
+        }
+    }
+
     return true;
 }

@@ -13,6 +13,7 @@ namespace hbba_validation
     ///
     /// Topics:
     ///  - image_imv_raw: Raw (panamorph) image input.
+    ///  - ~img_proc:     Processed (cropped) image output.
     ///
     /// Parameters:
     ///  - imv_pan:     Pan angle for IMV processor, in degrees.
@@ -43,6 +44,7 @@ namespace hbba_validation
 
     private:
         ros::Subscriber                sub_image_;
+        ros::Publisher                 pub_proc_;
         imv_camera::IMVCameraProcessor imv_proc_;
         CardreaderLocalizer            localizer_;
 

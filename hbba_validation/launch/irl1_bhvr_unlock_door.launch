@@ -2,6 +2,12 @@
     <node name="unlock_door" pkg="hbba_validation" type="unlock_door_node">
         <rosparam>
             arm_dist: 0.65
+            imv_dist: 1.00
+            look_x:   1.00
+            look_z:   0.60
+            localizer_openni:
+                min_c: 6
+                threshold: 100 
             localizer_imv:
                 max_c: 250
         </rosparam>

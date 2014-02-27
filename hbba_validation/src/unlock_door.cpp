@@ -104,6 +104,11 @@ void UnlockDoor::imvCB(const sensor_msgs::Image& img,
         sm_.pushEvent(EVENT_GREEN);
     } else {
         ROS_DEBUG_THROTTLE(1.0, "Got a red LED detection on IMV.");
+        // Only produce a valid detection if the current pose is old to avoid
+        // replacing OpenNI-generated ones:
+        if ((ros::Time::now() - cur_pose_.header.stamp) < timeout_) {
+            return;
+        }
         // NOTE: Baked-in transform, assuming the IMV frame's X points in front
         // of the robot.
         geometry_msgs::PoseStamped pose;

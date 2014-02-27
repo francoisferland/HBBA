@@ -42,6 +42,6 @@ hbba_conf:
     modules:
         - irl1_unlock_door_proc:
             - image_imv_raw: 5
-            - image_rgb:     0
-            - image_depth:   0
+            - image_rgb:     5
+            - image_depth:   5
         - irl1_unlock_door

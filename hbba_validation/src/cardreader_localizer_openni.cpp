@@ -20,6 +20,11 @@ void CardreaderLocalizerOpenNI::imageCB(const sensor_msgs::Image::ConstPtr& i,
                                         const sensor_msgs::Image::ConstPtr& d)
 {
     int x, y, c = localizer_.process(i, x, y);
+    ROS_DEBUG_THROTTLE(1.0,
+                       "localizer openni (x, y, c): (%i, %i, %i)",
+                       x,
+                       y,
+                       c);
     if (c > min_c_ && c < max_c_ && valid_cb_) {
         geometry_msgs::PoseStamped pose;
         if (getPoseStamped(cv::Rect(std::max(x - led_radius_, 0), 

@@ -11,6 +11,7 @@
   <depend package="hbba_synth"/>
   <depend package="irl1_interaction"/>
   <depend package="openni_tools"/>
+  <depend package="image_tools"/>
   <depend package="imv_camera"/>
   <depend package="roscpp"/>
 

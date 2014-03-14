@@ -3,6 +3,8 @@
 
 #include <image_tools/dense_optical_flow.hpp>
 #include <imv_camera/imv_camera_processor.hpp>
+#include <std_msgs/Header.h>
+#include <ros/ros.h>
 
 namespace hbba_validation
 {
@@ -40,6 +42,8 @@ namespace hbba_validation
         int    imv_width_;
         int    imv_height_;
         double pose_dist_;
+
+        std_msgs::Header last_header_;
 
     public:
         /// \brief Constructor.

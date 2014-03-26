@@ -15,7 +15,7 @@ hbba_conf:
     launch: {pkg: 'hbba_validation', path: 'launch/irl1_bhvr_look_at_motion.launch'}
     priority: 10
     input:
-        - image_imv_raw: image_imv_opt_flow
+        - image_imv_raw: image_imv_raw_opt_flow
     output:
         - look_at_pose
 
@@ -28,4 +28,5 @@ hbba_conf:
     modules:
         - irl1_look_at_motion_proc:
             - image_imv_raw: 1
+        - irl1_look_at_motion
 

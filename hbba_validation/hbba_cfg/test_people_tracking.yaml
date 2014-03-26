@@ -9,8 +9,8 @@ hbba_conf:
 
 # Combined priorities:
 - behavior_priority: {name: 'tr_teleop',           value: 100}
-- behavior_priority: {name: 'irl1_engage',         value:  50}
-- behavior_priority: {name: 'irl1_look_at_motion', value:  40}
+- behavior_priority: {name: 'irl1_engage',         value:  70}
+- behavior_priority: {name: 'irl1_look_at_motion', value:  60}
 - behavior_priority: {name: 'jn0_hold_gaze',       value:  20}
 - behavior_priority: {name: 'arm_keep_down',       value:  10}
 
@@ -33,6 +33,12 @@ hbba_conf:
     intensity: 1
     security: True
 
+- desire:
+    id: irl1_track_people   # Necessary to maximise face output.
+    type: TrackPeople
+    intensity: 1
+    utility: 10
+    security: False
 - desire:
     id: irl1_engage
     type: EngagePerson

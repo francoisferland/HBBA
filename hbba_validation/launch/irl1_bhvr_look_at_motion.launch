@@ -1,0 +1,5 @@
+<launch>
+    <node name="opt_flow_pose" pkg="hbba_validation" type="opt_flow_pose_node">
+        <remap from="motion_pose" to="look_at_pose"/>
+    </node>
+</launch>

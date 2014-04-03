@@ -1,8 +1,0 @@
-<launch>
-  <node name="scenario" pkg="hbba_test" type="scenario_june_2011.py" ns="/hbba" output="screen">
-    <remap from="pose_detected_leg" to="/leg_detection/pose_leg"/>
-    <remap from="person_detected" to="/sensors/kinect/user_face_pose"/>
-    <remap from="face_detected" to="/sensors/kinect/user_face_pose"/>
-    <remap from="pedestrian_detected" to="/check_person/is_person"/>
-  </node>
-</launch>

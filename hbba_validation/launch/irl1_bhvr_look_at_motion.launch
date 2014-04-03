@@ -1,9 +1,0 @@
-<launch>
-    <node name="opt_flow_pose" pkg="hbba_validation" type="opt_flow_pose_node">
-        <rosparam>
-            opt_flow_min:  3500
-            opt_flow_max: 18000
-        </rosparam>
-        <remap from="motion_pose" to="look_at_pose"/>
-    </node>
-</launch>

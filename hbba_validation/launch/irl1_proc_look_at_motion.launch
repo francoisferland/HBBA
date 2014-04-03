@@ -1,6 +1,0 @@
-<launch>
-    <node name="opt_flow_relay" 
-          pkg="topic_tools" 
-          type="relay"
-          args="image_imv_raw image_imv_raw_opt_flow"/>
-</launch>

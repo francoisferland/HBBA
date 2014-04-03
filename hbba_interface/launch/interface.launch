@@ -1,6 +1,0 @@
-<launch>
-	<!-- Nodes -->
-	<node name="gui" pkg="hbba_interface" type="gui_node" ns="/hbba"/>
-	<node name="core" pkg="hbba_interface" type="core_node"/>
-	
-</launch>

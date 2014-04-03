@@ -1,5 +1,0 @@
-<launch>
-    <node name="map_server" pkg="map_server" type="map_server" 
-        args="$(find hbba_validation)/data/map_rdc.yaml"/>
-    <node name="amcl" type="amcl" pkg="amcl"/>
-</launch>

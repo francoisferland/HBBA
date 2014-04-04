@@ -3,7 +3,8 @@
   <name>or_tools</name>
   <version>0.0.0</version>
   <description>
-    A package that import and build Google operational research tools (or-tools)
+      Imports and builds Google operational research tools (or-tools).
+      Requires autoconf and yacc (bison).
   </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 

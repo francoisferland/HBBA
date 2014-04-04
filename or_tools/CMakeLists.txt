@@ -6,6 +6,8 @@ project(or_tools)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
 
+set(google-or-tools-ROOT
+    ${CMAKE_CURRENT_BINARY_DIR}/google-or-tools-prefix/src/google-or-tools)
 include(ExternalProject)
 externalproject_add(google-or-tools
     SVN_REPOSITORY    http://or-tools.googlecode.com/svn/trunk/
@@ -13,7 +15,8 @@ externalproject_add(google-or-tools
     CONFIGURE_COMMAND ""
     BUILD_COMMAND     make third_party cplibs lplibs algorithmslibs
     BUILD_IN_SOURCE   1
-
+    INSTALL_COMMAND   ${PROJECT_SOURCE_DIR}/install.sh 
+                      ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/../
 )
 
 ## System dependencies are found with CMake's conventions
@@ -86,8 +89,9 @@ externalproject_add(google-or-tools
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES or_tools
+    INCLUDE_DIRS ${google-or-tools-ROOT}/src
+                 ${google-or-tools-ROOT}/dependencies/install/include
+    LIBRARIES algorithms base constraint_solver linear_solver util
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )

@@ -1,0 +1,56 @@
+Index: makefiles/Makefile.third_party.unix
+===================================================================
+--- makefiles/Makefile.third_party.unix	(revision 3350)
++++ makefiles/Makefile.third_party.unix	(working copy)
+@@ -109,7 +109,7 @@
+ 	cd dependencies/sources/gflags-$(GFLAGS_TAG) && $(SET_PATH) ./autogen.sh
+ 
+ dependencies/sources/gflags-$(GFLAGS_TAG)/autogen.sh:
+-	svn co http://gflags.googlecode.com/svn/trunk/ -r $(GFLAGS_TAG) dependencies/sources/gflags-$(GFLAGS_TAG)
++	svn co http://gflags.googlecode.com/svn/trunk/ --non-interactive --trust-server-cert -r $(GFLAGS_TAG) dependencies/sources/gflags-$(GFLAGS_TAG)
+ 
+ # Install protocol buffers.
+ install_protobuf: dependencies/install/bin/protoc
+@@ -124,13 +124,13 @@
+ 	cd dependencies/sources/protobuf-$(PROTOBUF_TAG) && $(SET_PATH) ./autogen.sh
+ 
+ dependencies/sources/protobuf-$(PROTOBUF_TAG)/autogen.sh:
+-	svn co http://protobuf.googlecode.com/svn/trunk/ -r $(PROTOBUF_TAG) dependencies/sources/protobuf-$(PROTOBUF_TAG)
++	svn co http://protobuf.googlecode.com/svn/trunk/ --non-interactive --trust-server-cert -r $(PROTOBUF_TAG) dependencies/sources/protobuf-$(PROTOBUF_TAG)
+ 
+ # Intall Google Apputils Python.
+ install_google_apputils: dependencies/sources/google_apputils_python-$(GOOGLE_APPUTILS_TAG)/README
+ 
+ dependencies/sources/google_apputils_python-$(GOOGLE_APPUTILS_TAG)/README:
+-	svn co http://google-apputils-python.googlecode.com/svn/trunk/ -r $(GOOGLE_APPUTILS_TAG) dependencies/sources/google_apputils_python-$(GOOGLE_APPUTILS_TAG)
++	svn co http://google-apputils-python.googlecode.com/svn/trunk/ --non-interactive --trust-server-cert -r $(GOOGLE_APPUTILS_TAG) dependencies/sources/google_apputils_python-$(GOOGLE_APPUTILS_TAG)
+ 
+ # Install sparsehash.
+ install_sparsehash: dependencies/install/include/google/dense_hash_map
+@@ -145,7 +145,7 @@
+ 	cd dependencies/sources/sparsehash-$(SPARSEHASH_TAG) && $(SET_PATH) ./autogen.sh
+ 
+ dependencies/sources/sparsehash-$(SPARSEHASH_TAG)/autogen.sh:
+-	svn co http://sparsehash.googlecode.com/svn/trunk/ -r $(SPARSEHASH_TAG) dependencies/sources/sparsehash-$(SPARSEHASH_TAG)
++	svn co http://sparsehash.googlecode.com/svn/trunk/ --non-interactive --trust-server-cert -r $(SPARSEHASH_TAG) dependencies/sources/sparsehash-$(SPARSEHASH_TAG)
+ 	cd dependencies/sources/sparsehash-$(SPARSEHASH_TAG) && patch -p0 -i ../../archives/sparsehash.patch
+ 
+ # Install Coin CBC.
+@@ -158,7 +158,7 @@
+ 	cd dependencies/sources/cbc-$(CBC_TAG) && $(SET_PATH) ./configure --prefix=$(OR_ROOT_FULL)/dependencies/install --disable-bzlib --without-lapack --enable-static --enable-shared --with-pic
+ 
+ dependencies/sources/cbc-$(CBC_TAG)/Makefile.in:
+-	svn co https://projects.coin-or.org/svn/Cbc/releases/$(CBC_TAG) dependencies/sources/cbc-$(CBC_TAG)
++	svn co https://projects.coin-or.org/svn/Cbc/releases/$(CBC_TAG) --non-interactive --trust-server-cert dependencies/sources/cbc-$(CBC_TAG)
+ 
+ # Install pcre (dependency of SWIG).
+ dependencies/install/bin/pcretest: dependencies/sources/pcre-$(PCRE_TAG)/Makefile $(ACLOCAL_TARGET)
+@@ -186,7 +186,7 @@
+ 	cd dependencies/sources/swig-$(SWIG_TAG) && $(SET_PATH) ./autogen.sh
+ 
+ dependencies/sources/swig-$(SWIG_TAG)/autogen.sh:
+-	svn co https://github.com/swig/swig/trunk -r $(SWIG_TAG) dependencies/sources/swig-$(SWIG_TAG)
++	svn co https://github.com/swig/swig/trunk --non-interactive --trust-server-cert -r $(SWIG_TAG) dependencies/sources/swig-$(SWIG_TAG)
+ 
+ # Install glpk if needed.
+ install_glpk: $(GLPK_TARGET)

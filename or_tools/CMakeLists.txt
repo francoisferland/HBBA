@@ -11,9 +11,11 @@ set(google-or-tools-ROOT
 include(ExternalProject)
 externalproject_add(google-or-tools
     SVN_REPOSITORY    http://or-tools.googlecode.com/svn/trunk/
-    SVN_REVISION      -r2734
+    SVN_REVISION      -r3350
+    SVN_TRUST_CERT    1
+    PATCH_COMMAND     pwd; patch -i ${PROJECT_SOURCE_DIR}/svn_cert_patch.diff
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND     make third_party cplibs lplibs algorithmslibs
+    BUILD_COMMAND     make third_party && make cplibs 
     BUILD_IN_SOURCE   1
     INSTALL_COMMAND   ${PROJECT_SOURCE_DIR}/install.sh 
                       ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/../
@@ -88,13 +90,13 @@ externalproject_add(google-or-tools
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-    INCLUDE_DIRS ${google-or-tools-ROOT}/src
-                 ${google-or-tools-ROOT}/dependencies/install/include
-    LIBRARIES algorithms base constraint_solver linear_solver util
+#catkin_package(
+#    INCLUDE_DIRS ${google-or-tools-ROOT}/src
+#                 ${google-or-tools-ROOT}/dependencies/install/include
+#    LIBRARIES algorithms base constraint_solver linear_solver util
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
-)
+#)
 
 ###########
 ## Build ##

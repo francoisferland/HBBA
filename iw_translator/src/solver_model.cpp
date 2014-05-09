@@ -1,4 +1,5 @@
 #include <iw_translator/solver_model.hpp>
+#include <ros/ros.h>
 
 using namespace iw_translator;
 

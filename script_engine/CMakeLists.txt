@@ -86,7 +86,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES ...
+  LIBRARIES engine_v8
   CATKIN_DEPENDS roscpp std_msgs hbba_msgs 
 #  DEPENDS system_lib
 )
@@ -108,7 +108,7 @@ include_directories(
 #   src/${PROJECT_NAME}/audio_tools.cpp
 # )
 add_library(engine_v8 src/engine_v8.cpp)
-target_link_libraries(engine_v8 v8)
+target_link_libraries(engine_v8 v8 ${catkin_LIBRARIES})
 
 # Common plugins
 add_library(common_plugins 
@@ -120,6 +120,7 @@ target_link_libraries(script_engine
     engine_v8
     ${catkin_LIBRARIES})
 
+add_dependencies(engine_v8      script_engine_generate_messages_cpp)
 add_dependencies(common_plugins script_engine_generate_messages_cpp)
 add_dependencies(script_engine  script_engine_generate_messages_cpp)
 

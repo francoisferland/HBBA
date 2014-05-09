@@ -100,13 +100,26 @@ externalproject_add(google-or-tools
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-#catkin_package(
-#    INCLUDE_DIRS ${google-or-tools-ROOT}/src
-#                 ${google-or-tools-ROOT}/dependencies/install/include
-#    LIBRARIES algorithms base constraint_solver linear_solver util
+catkin_package(
+   INCLUDE_DIRS ${ORTOOLS_OUTPUT_DIR}/include/or-tools
+#                ${google-or-tools-ROOT}/dependencies/install/include
+#  LIBRARIES algorithms base constraint_solver linear_solver util
+   LIBRARIES constraint_solver 
+             linear_solver
+             CoinUtils
+             OsiClp
+             Osi
+             Clp
+             Cbc
+             CbcSolver
+             Cgl
+             util
+             base
+             protobuf
+             gflags
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
-#)
+)
 
 ###########
 ## Build ##

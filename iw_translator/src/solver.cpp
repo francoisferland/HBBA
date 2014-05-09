@@ -1,6 +1,7 @@
 #include "solver_impl.hpp"
 
 #include <iw_translator/solver.hpp>
+#include <ros/ros.h>
 
 using namespace iw_translator;
 

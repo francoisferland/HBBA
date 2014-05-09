@@ -16,8 +16,6 @@ else  (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
     set(ORTOOLS_OUTPUT_DIR ${PROJECT_SOURCE_DIR})
 endif (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 
-message("or-tools output: ${ORTOOLS_OUTPUT_DIR}")
-
 set(google-or-tools-ROOT
     ${CMAKE_CURRENT_BINARY_DIR}/google-or-tools-prefix/src/google-or-tools)
 include(ExternalProject)

@@ -1,2 +1,0 @@
-string id		# Name of the resource.
-uint32 value	# Value of the new max.

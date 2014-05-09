@@ -6,9 +6,18 @@ project(or_tools)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY 
-    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-    ${CMAKE_CURRENT_BINARY_DIR}) 
+# This is done to detect if we're building outside of a catkin workspace.
+# If we're in one, the or-tools files will be copied in the devel space.
+# Otherwise, they will end up in sub-folders of the project directory (include/
+# and lib/).
+if    (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set(ORTOOLS_OUTPUT_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/../)
+else  (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set(ORTOOLS_OUTPUT_DIR ${PROJECT_SOURCE_DIR})
+endif (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+
+message("or-tools output: ${ORTOOLS_OUTPUT_DIR}")
+
 set(google-or-tools-ROOT
     ${CMAKE_CURRENT_BINARY_DIR}/google-or-tools-prefix/src/google-or-tools)
 include(ExternalProject)
@@ -21,7 +30,7 @@ externalproject_add(google-or-tools
     BUILD_COMMAND     ${PROJECT_SOURCE_DIR}/build.sh
     BUILD_IN_SOURCE   1
     INSTALL_COMMAND   ${PROJECT_SOURCE_DIR}/install.sh 
-                      ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/../
+                      ${ORTOOLS_OUTPUT_DIR}
 )
 
 ## System dependencies are found with CMake's conventions

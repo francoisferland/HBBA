@@ -1,5 +1,6 @@
 #!/bin/sh
 
+mkdir -p $1/lib/
 cp $PWD/lib/*.so $1/lib/
 
 mkdir -p $1/include/or-tools/constraint_solver

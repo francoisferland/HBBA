@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>
       Imports and builds Google operational research tools (or-tools).
-      Requires autoconf and yacc (bison).
+      Requires autoconf, curl, texinfo, and yacc (bison).
   </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 

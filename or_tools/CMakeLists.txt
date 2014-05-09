@@ -6,6 +6,9 @@ project(or_tools)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY 
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    ${CMAKE_CURRENT_BINARY_DIR}) 
 set(google-or-tools-ROOT
     ${CMAKE_CURRENT_BINARY_DIR}/google-or-tools-prefix/src/google-or-tools)
 include(ExternalProject)
@@ -13,9 +16,9 @@ externalproject_add(google-or-tools
     SVN_REPOSITORY    http://or-tools.googlecode.com/svn/trunk/
     SVN_REVISION      -r3350
     SVN_TRUST_CERT    1
-    PATCH_COMMAND     pwd; patch -i ${PROJECT_SOURCE_DIR}/svn_cert_patch.diff
+    PATCH_COMMAND     patch -p0 -i ${PROJECT_SOURCE_DIR}/svn_cert_patch.diff
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND     make third_party && make cplibs 
+    BUILD_COMMAND     ${PROJECT_SOURCE_DIR}/build.sh
     BUILD_IN_SOURCE   1
     INSTALL_COMMAND   ${PROJECT_SOURCE_DIR}/install.sh 
                       ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/../

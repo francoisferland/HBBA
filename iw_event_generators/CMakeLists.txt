@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(iw)
+project(iw_event_generators)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
   hbba_msgs
-  topic_tools
+  iw
+  roscpp
+  std_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -18,7 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-catkin_python_setup()
+# catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -54,6 +55,8 @@ catkin_python_setup()
 ## Generate services in the 'srv' folder
 # add_service_files(
 #   FILES
+#   Service1.srv
+#   Service2.srv
 # )
 
 ## Generate actions in the 'action' folder
@@ -66,7 +69,7 @@ catkin_python_setup()
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs
+#   hbba_msgs#   std_msgs
 # )
 
 ###################################
@@ -80,8 +83,8 @@ catkin_python_setup()
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS rospy roscpp hbba_msgs
+#  LIBRARIES iw_event_generators
+  CATKIN_DEPENDS hbba_msgs iw roscpp std_msgs tf
 #  DEPENDS system_lib
 )
 
@@ -93,27 +96,28 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
-  ${PROJECT_SOURCE_DIR}/include
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(${PROJECT_NAME}
-    src/exploitation_matcher.cpp
-    src/events_generator.cpp
-    src/events_filter.cpp
-    src/rosgraph_monitor.cpp
-)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+## Declare a cpp library
+# add_library(iw_event_generators
+#   src/${PROJECT_NAME}/iw_event_generators.cpp
+# )
 
-add_executable(events_generator src/events_generator_node.cpp)
-target_link_libraries(events_generator ${PROJECT_NAME} ${catkin_LIBRARIES})
-add_executable(exploitation_matcher src/exploitation_matcher_node.cpp)
-target_link_libraries(exploitation_matcher ${PROJECT_NAME} ${catkin_LIBRARIES})
+## Declare a cpp executable
+# add_executable(iw_event_generators_node src/iw_event_generators_node.cpp)
 
-# TODO: Put event generators away from IW package:
-# add_executable(say_events_observer src/say_events_observer.cpp)
-# target_link_libraries(say_events_observer ${PROJECT_NAME} ${catkin_LIBRARIES})
-# add_executable(empty_events_generator src/empty_events_generator.cpp)
+## Add cmake target dependencies of the executable/library
+## as an example, message headers may need to be generated before nodes
+# add_dependencies(iw_event_generators_node iw_event_generators_generate_messages_cpp)
+
+## Specify libraries to link a library or executable target against
+# target_link_libraries(iw_event_generators_node
+#   ${catkin_LIBRARIES}
+# )
+
+add_executable(goto_events_observer src/goto_events_observer.cpp)
+target_link_libraries(goto_events_observer yaml-cpp ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -130,7 +134,7 @@ target_link_libraries(exploitation_matcher ${PROJECT_NAME} ${catkin_LIBRARIES})
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS audio_tools audio_tools_node
+# install(TARGETS iw_event_generators iw_event_generators_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -155,7 +159,7 @@ target_link_libraries(exploitation_matcher ${PROJECT_NAME} ${catkin_LIBRARIES})
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_audio_tools.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_iw_event_generators.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

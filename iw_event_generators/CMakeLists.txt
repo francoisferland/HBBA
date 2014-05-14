@@ -118,6 +118,12 @@ include_directories(
 
 add_executable(goto_events_observer src/goto_events_observer.cpp)
 target_link_libraries(goto_events_observer yaml-cpp ${catkin_LIBRARIES})
+add_executable(empty_event_generator src/empty_event_generator.cpp)
+target_link_libraries(empty_event_generator ${catkin_LIBRARIES})
+# TODO: Find a way to remove the rt_audio_ros dependency from say_events:
+# add_executable(say_events_observer src/say_events_observer.cpp)
+# target_link_libraries(say_events_observer ${PROJECT_NAME} ${catkin_LIBRARIES})
+
 
 #############
 ## Install ##

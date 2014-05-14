@@ -1,0 +1,5 @@
+# Service for state generator
+string name 	# name of the dimension to stimulate
+string type	# type of update. Can only be inc, new, dec
+int32 value	# updated value of dimension
+---

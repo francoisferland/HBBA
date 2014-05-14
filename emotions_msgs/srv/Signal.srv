@@ -1,0 +1,4 @@
+# Service containing a simple string to signal when an emotion is activated
+
+string emotion
+---

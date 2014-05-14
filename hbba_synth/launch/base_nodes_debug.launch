@@ -1,6 +1,6 @@
 <launch>
     <group ns="hbba">
-        <node name="iw" pkg="iw" type="iw.py"/>
+        <node name="iw" pkg="iw" type="iw"/>
         <node name="script_engine" pkg="script_engine" type="script_engine"
             output="screen">
             <param name="no_eval" value="true"/>

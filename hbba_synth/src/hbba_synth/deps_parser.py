@@ -29,6 +29,8 @@ class DepsParser:
 
         from definitions import typemap
         for conf_name, conf_content in doc.iteritems():
+            if (conf_content is None):
+                return
             for elem in conf_content:
                 key = elem.keys()[0]
                 if key == "include":

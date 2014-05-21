@@ -108,10 +108,10 @@ class BehaviorDef:
         # elems should be a namespace containing grp
         grp.append(Element("node", attrib={
             'name': node_name,
-            'pkg': 'nodelet',
-            'type': 'nodelet',
+            'pkg': 'topic_filters',
+            'type': 'generic_divider_node',
             'args': 
-            "standalone topic_filters/GenericDivider {0} {1}".format(
+            "{0} {1}".format(
                 topic_in, topic_out)
             }))
 #        elems.append(Element("node", attrib={
@@ -244,11 +244,10 @@ class ProcModuleDef:
         self.structure.addFilter(FilterDef(filter_name, filter_type))
         elems.append(Element("node", attrib = {
             'name': node_name,
-            'pkg': 'nodelet',
-            'type': 'nodelet',
+            'pkg': 'topic_filters',
+            'type': 'generic_divider_node',
             'args': 
-                "standalone topic_filters/{0} {1} {2}/{3}".format(
-                    filter_type, 
+                "{0} {1}/{2}".format(
                     self.structure.getRootTopicFullName(topic.src), 
                     self.name, topic.name)
             }))
@@ -710,7 +709,7 @@ class EmoIntensityDef:
         structure.addEmoIntensity(self)
 
     def generatePy(self):
-        code =  "emo_{0} = EmoIntensity()\n".format(self.name)
+        code =  "emo_{0} = Intensity()\n".format(self.name)
         code += "emo_{0}.name = \"{0}\"\n".format(self.name)
         code += "emo_{0}.value = {1}\n".format(self.name, self.value)
         code += "pubEmoIntensity.publish(emo_{0})\n".format(self.name)

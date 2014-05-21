@@ -9,12 +9,12 @@ import stat
 
 python_header_common = """#!/usr/bin/env python
 
-import roslib; roslib.load_manifest("hbba_synth")
-import rospy;
+import roslib
+import rospy
 from hbba_msgs.msg import *
 from hbba_msgs.srv import *
 from script_engine.srv import EvalScript
-from emotions_msgs.msg import EmoIntensity
+from emotions_msgs.msg import Intensity
 
 import os
 import sys
@@ -29,7 +29,7 @@ rospy.init_node("hbba_struct", anonymous=True)
 rospy.wait_for_service("hbba/add_desires", 30.0)
 add_desires = rospy.ServiceProxy("hbba/add_desires", AddDesires)
 
-pubEmoIntensity = rospy.Publisher("{1}", EmoIntensity)
+pubEmoIntensity = rospy.Publisher("{1}", Intensity)
 
 """
 

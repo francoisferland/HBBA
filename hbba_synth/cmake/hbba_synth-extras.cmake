@@ -1,13 +1,18 @@
-cmake_minimum_required(VERSION 2.4.6)
+cmake_minimum_required(VERSION 2.8.3)
+include(CMakeParseArguments)
 
+# add_hbba_cfg(BASE_NAME SRC [BHVR] [OLDREV])
 # Automatic build of hbba_cfg with "add_hbba_cfg" macro.
-# The BASENAME parameter should name a configuration file found in your project
-# package's hbba_cfg subfolder.
-# The ROBOT parameter should point to a config file basename found either in 
-# the current project's "hbba_cfg" folder, or in the one found in 
-# irl1_hbba_cfg, such as "irl1_tr".
+# The BASENAME parameter is the target name and has to be followed by a single
+# root source file for your setup.
+# The BHVR argument indicates that the configuration should be generated in pure
+# behavior-based mode.
+# The OLDREV argument activates code generation in the old revision of
+# hbba_synth (unsupported).
 
-macro(add_hbba_cfg BASENAME SRCS)
+macro(add_hbba_cfg BASENAME SRC)
+    set(_options OLDREV BHVR)
+    cmake_parse_arguments(ARG "${_options}" "" "" ${ARGN}) 
     set(HBBA_CFG_OUTPUT_PATH ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/hbba_cfg_out)
     file(MAKE_DIRECTORY ${HBBA_CFG_OUTPUT_PATH})
     set(HBBA_CFG_OUTPUT_BASENAME
@@ -17,20 +22,18 @@ macro(add_hbba_cfg BASENAME SRCS)
         ${HBBA_CFG_OUTPUT_BASENAME}.launch
         ${HBBA_CFG_OUTPUT_BASENAME}.py
     )
-    find_file(HBBA_CFG_SRC
-        ${SRCS}
+    find_file(_src_path
+        ${SRC}
         ${CMAKE_CURRENT_SOURCE_DIR}
-        # ${PROJECT_SOURCE_DIR}/hbba_cfg/${BASENAME}.yaml
     )
-    
+    message("expanded_src: ${_src_path}") 
 #   find_file(HBBA_ROBOT_SRC 
 #       ${ROBOT}.yaml 
 #       ${PROJECT_SOURCE_DIR}/hbba_cfg 
 #       ${irl1_hbba_cfg_PACKAGE_PATH}/hbba_cfg
 #   )
     set(HBBA_CFG_SRC_ALL
-        ${HBBA_ROBOT_SRC}
-        ${HBBA_CFG_SRC}
+        ${_src_path}
     )
 
     set(HBBA_CFG_OPTS "-p")

@@ -1,0 +1,25 @@
+<package>
+  <description brief="abtr_priority">
+
+     abtr_priority - A generic, priority-based arbitration nodelet.
+
+  </description>
+  <author>François Ferland</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/abtr_priority</url>
+ <depend package="roscpp"/>
+ <depend package="rospy"/>
+ <depend package="nodelet"/>
+ <depend package="topic_tools"/>
+ <depend package="std_msgs"/>
+ <depend package="actionlib_msgs"/>
+
+ <export>
+   <cpp cflags="-I${prefix}/include"/>
+   <nodelet plugin="${prefix}/abtr_priority.xml"/>
+ </export>
+
+</package>
+
+

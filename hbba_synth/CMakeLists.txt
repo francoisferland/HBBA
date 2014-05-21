@@ -82,6 +82,7 @@ catkin_package(
 #  LIBRARIES testpy
 #  CATKIN_DEPENDS rospy
 #  DEPENDS system_lib
+   CFG_EXTRAS hbba_synth-extras.cmake
 )
 
 ###########

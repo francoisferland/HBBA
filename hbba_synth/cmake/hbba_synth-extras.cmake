@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Automatic build of hbba_cfg with "add_hbba_cfg" macro.
 # The BASENAME parameter should name a configuration file found in your project
@@ -8,13 +7,8 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 # the current project's "hbba_cfg" folder, or in the one found in 
 # irl1_hbba_cfg, such as "irl1_tr".
 
-rosbuild_find_ros_package(irl1_hbba_cfg)
-# Need to find the location of this macro's package for building and
-# dependencies tools:
-rosbuild_find_ros_package(hbba_synth)
-
-set(HBBA_CFG_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/hbba_cfg_out)
-macro(add_hbba_cfg BASENAME ROBOT)
+macro(add_hbba_cfg BASENAME SRCS)
+    set(HBBA_CFG_OUTPUT_PATH ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/hbba_cfg_out)
     file(MAKE_DIRECTORY ${HBBA_CFG_OUTPUT_PATH})
     set(HBBA_CFG_OUTPUT_BASENAME
         ${HBBA_CFG_OUTPUT_PATH}/${BASENAME}
@@ -23,15 +17,17 @@ macro(add_hbba_cfg BASENAME ROBOT)
         ${HBBA_CFG_OUTPUT_BASENAME}.launch
         ${HBBA_CFG_OUTPUT_BASENAME}.py
     )
-    set(HBBA_CFG_SRC
-        ${PROJECT_SOURCE_DIR}/hbba_cfg/${BASENAME}.yaml
+    find_file(HBBA_CFG_SRC
+        ${SRCS}
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        # ${PROJECT_SOURCE_DIR}/hbba_cfg/${BASENAME}.yaml
     )
     
-    find_file(HBBA_ROBOT_SRC 
-        ${ROBOT}.yaml 
-        ${PROJECT_SOURCE_DIR}/hbba_cfg 
-        ${irl1_hbba_cfg_PACKAGE_PATH}/hbba_cfg
-    )
+#   find_file(HBBA_ROBOT_SRC 
+#       ${ROBOT}.yaml 
+#       ${PROJECT_SOURCE_DIR}/hbba_cfg 
+#       ${irl1_hbba_cfg_PACKAGE_PATH}/hbba_cfg
+#   )
     set(HBBA_CFG_SRC_ALL
         ${HBBA_ROBOT_SRC}
         ${HBBA_CFG_SRC}
@@ -47,8 +43,8 @@ macro(add_hbba_cfg BASENAME ROBOT)
         set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}b")
     endif()
 
-    list(FIND _vargs "NEWREV" _opt_newrev)
-    if (NOT _opt_newrev EQUAL -1)
+    list(FIND _vargs "OLDREV" _opt_oldrev)
+    if (_opt_oldrev EQUAL -1)
         message("Building ${BASENAME} with the new IW revision.")
         set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}n")
     endif()

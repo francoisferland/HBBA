@@ -31,6 +31,10 @@ class FileParser:
         # conf_name contains the first element, and is ignored.
         from definitions import typemap
         for conf_name, conf_content in doc.iteritems():
+            if conf_content is None:
+                if (verbose):
+                    print "Warning: elem " + str(conf_name) + " is None."
+                return
             for elem in conf_content:
                 key = elem.keys()[0]
                 content = elem.values()[0]

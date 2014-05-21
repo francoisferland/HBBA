@@ -141,7 +141,7 @@ namespace abtr_priority
 
             if (!advertised_)
             {
-                pub_ = impl_::advertise<M>(n_, topic_name_, *cmd);
+                pub_ = impl::advertise<M>(n_, topic_name_, *cmd);
                 pub_priority_ = 
                     n_.advertise<std_msgs::Int32>("priority", 10);
                 advertised_ = true;

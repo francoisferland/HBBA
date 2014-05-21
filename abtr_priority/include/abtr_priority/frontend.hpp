@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include <map>
 #include <tr1/unordered_map>
-#include "abtr_priority/RegisterBehavior.h"
+#include <abtr_priority/RegisterBehavior.h>
 #include <std_msgs/Int32.h>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>

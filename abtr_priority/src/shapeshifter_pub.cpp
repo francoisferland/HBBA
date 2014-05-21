@@ -1,8 +1,8 @@
-#include "shapeshifter_pub.hpp"
+#include <abtr_priority/shapeshifter_pub.hpp>
 
 namespace abtr_priority
 {
-	namespace impl_
+	namespace impl
 	{
         template <>
 		ros::Publisher advertise<topic_tools::ShapeShifter>(ros::NodeHandle n,

@@ -104,13 +104,24 @@ include_directories(
 # add_library(audio_tools
 #   src/${PROJECT_NAME}/audio_tools.cpp
 # )
-add_library(abtr_priority 
+add_library(${PROJECT_NAME}
+    src/generic.cpp
+#   src/generic_async.cpp
     src/shapeshifter_pub.cpp
-    src/abtr_priority_nodelet.cpp
-    src/async_abtr_priority_nodelet.cpp
 )
-target_link_libraries(abtr_priority ${catkin_LIBRARIES})
-add_dependencies(abtr_priority abtr_priority_generate_messages_cpp)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages_cpp)
+
+add_library(abtr_priority_nodelets
+    src/abtr_priority_nodelet.cpp
+#    src/async_abtr_priority_nodelet.cpp
+)
+target_link_libraries(abtr_priority_nodelets ${PROJECT_NAME} ${catkin_LIBRARIES})
+
+add_executable(generic_node src/generic_node.cpp)
+target_link_libraries(generic_node ${PROJECT_NAME} ${catkin_LIBRARIES})
+#add_executable(generic_async_node src/generic_async_node.cpp)
+#target_link_libraries(generic_async_node ${PROJECT_NAME} ${catkin_LIBRARIES})
 
 # TODO: Add back action_mux
 

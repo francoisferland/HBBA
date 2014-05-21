@@ -7,7 +7,7 @@
 
 namespace abtr_priority
 {
-	namespace impl_
+	namespace impl
 	{
 		/// \brief Specialized advertizer for ShapeShifter.
 		template <>

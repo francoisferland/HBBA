@@ -5,7 +5,7 @@
 
 namespace abtr_priority
 {
-	namespace impl_
+	namespace impl
 	{
 		/// \brief Template function to create a publisher from a generic topic
 		/// type. 

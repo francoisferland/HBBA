@@ -48,6 +48,7 @@ namespace topic_filters_manager
         {
         private:
             ros::Publisher pub_;
+            bool first_call_;
         public:
             FilterHandler(const std::string& name);
             void setRate(int rate);
@@ -57,6 +58,7 @@ namespace topic_filters_manager
         typedef std::map<std::string, FilterHandlerPtr> HandlersMap;
 
         HandlersMap map_;
+
     };
 
 };

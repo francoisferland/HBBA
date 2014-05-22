@@ -56,7 +56,7 @@ macro(add_hbba_cfg BASENAME SRC)
 
     message("Gathering HBBA dependencies for ${BASENAME}...")
     execute_process(
-        COMMAND rosrun hbba_synth hbba_synth_deps.sh ${HBBA_CFG_SRC}
+        COMMAND rosrun hbba_synth hbba_synth_deps.sh ${HBBA_CFG_SRC_ALL}
         OUTPUT_VARIABLE HBBA_CFG_SRC_DEPS
     )
     #message("${BASENAME} dependencies: ${HBBA_CFG_SRC_DEPS}")

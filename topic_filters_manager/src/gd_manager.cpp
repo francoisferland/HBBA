@@ -27,7 +27,8 @@ void GenericDividerManager::setRate(const std::string& name, int rate)
     handler->setRate(rate);
 }
 
-GenericDividerManager::FilterHandler::FilterHandler(const std::string& name)
+GenericDividerManager::FilterHandler::FilterHandler(const std::string& name):
+    first_call_(true)
 {
     ROS_DEBUG("Advertising 'divider_rate' in /%s...", name.c_str());
     ros::NodeHandle n("/" + name);
@@ -38,12 +39,15 @@ void GenericDividerManager::FilterHandler::setRate(int rate)
 {
     static std_msgs::Int64 msg;
 
-    if (pub_.getNumSubscribers() == 0) {
+    // Don't warn on first call, for some reason the number is always zero.
+    if (!first_call_ && pub_.getNumSubscribers() == 0) {
         ROS_WARN("Divider rate topic '%s' has no subscribers.", 
                  pub_.getTopic().c_str());
     }
 
     msg.data = rate;
     pub_.publish(msg);
+
+    first_call_ = false;
 }
 

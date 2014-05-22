@@ -205,7 +205,7 @@ class Structure:
             abtr_type = self.arbitrationTypes[topic].node
         else:
             abtr_pkg = "abtr_priority"
-            abtr_type = "Generic"
+            abtr_type = "GenericNodelet"
 
         root_topic = self.getRootTopicFullName(topic)
         node_name = "abtr_{0}".format(topic)
@@ -365,6 +365,8 @@ class Structure:
                     pyfile.write(python_header_model)
 
                 pyfile.write(pyscript)
+                pyfile.close()
+                os.chmod(pyfile_path, 0777)
 
             # XML additions: 
             # The whole solver model as a rosparam:

@@ -28,6 +28,5 @@ namespace abtr_priority
 
 }
 
-PLUGINLIB_DECLARE_CLASS(abtr_priority, GenericAsync,
-	abtr_priority::GenericAsyncNodelet, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(abtr_priority::GenericAsyncNodelet, nodelet::Nodelet)
 

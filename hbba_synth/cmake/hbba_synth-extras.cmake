@@ -10,63 +10,62 @@ include(CMakeParseArguments)
 # The OLDREV argument activates code generation in the old revision of
 # hbba_synth (unsupported).
 
-macro(add_hbba_cfg BASENAME SRC)
+macro(add_hbba_cfg _BASENAME _SRC)
     set(_options OLDREV BHVR)
     cmake_parse_arguments(ARG "${_options}" "" "" ${ARGN}) 
-    set(HBBA_CFG_OUTPUT_PATH ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/hbba_cfg_out)
-    file(MAKE_DIRECTORY ${HBBA_CFG_OUTPUT_PATH})
-    set(HBBA_CFG_OUTPUT_BASENAME
-        ${HBBA_CFG_OUTPUT_PATH}/${BASENAME}
+    set(_HBBA_CFG_OUTPUT_PATH ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/hbba_cfg_out)
+    file(MAKE_DIRECTORY ${_HBBA_CFG_OUTPUT_PATH})
+    set(_HBBA_CFG_OUTPUT_BASENAME
+        ${_HBBA_CFG_OUTPUT_PATH}/${_BASENAME}
     )
-    set(HBBA_CFG_OUTPUT
-        ${HBBA_CFG_OUTPUT_BASENAME}.launch
-        ${HBBA_CFG_OUTPUT_BASENAME}.py
+    set(_HBBA_CFG_OUTPUT
+        ${_HBBA_CFG_OUTPUT_BASENAME}.launch
+        ${_HBBA_CFG_OUTPUT_BASENAME}.py
     )
+    unset(_src_path CACHE)
     find_file(_src_path
-        ${SRC}
+        ${_SRC}
         ${CMAKE_CURRENT_SOURCE_DIR}
     )
-    message("expanded_src: ${_src_path}") 
 #   find_file(HBBA_ROBOT_SRC 
 #       ${ROBOT}.yaml 
 #       ${PROJECT_SOURCE_DIR}/hbba_cfg 
 #       ${irl1_hbba_cfg_PACKAGE_PATH}/hbba_cfg
 #   )
-    set(HBBA_CFG_SRC_ALL
+    set(_HBBA_CFG_SRC_ALL
         ${_src_path}
     )
 
-    set(HBBA_CFG_OPTS "-p")
+    set(_HBBA_CFG_OPTS "-p")
     # ARGN requires to be put in a variable before list(...) works:
     set(_vargs ${ARGN})
 
     list(FIND _vargs "BHVR" _opt_bhvr)
     if(NOT _opt_bhvr EQUAL -1)
-        message("Building ${BASENAME} in behavior mode.")
-        set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}b")
+        message("Building ${_BASENAME} in behavior mode.")
+        set(_HBBA_CFG_OPTS "${_HBBA_CFG_OPTS}b")
     endif()
 
     list(FIND _vargs "OLDREV" _opt_oldrev)
     if (_opt_oldrev EQUAL -1)
-        message("Building ${BASENAME} with the new IW revision.")
-        set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}n")
+        message("Building ${_BASENAME} with the new IW revision.")
+        set(_HBBA_CFG_OPTS "${_HBBA_CFG_OPTS}n")
     endif()
 
-    set(HBBA_CFG_OPTS "${HBBA_CFG_OPTS}o")
+    set(_HBBA_CFG_OPTS "${_HBBA_CFG_OPTS}o")
 
-    message("Gathering HBBA dependencies for ${BASENAME}...")
+    message("Gathering HBBA dependencies for ${_BASENAME}...")
     execute_process(
-        COMMAND rosrun hbba_synth hbba_synth_deps.sh ${HBBA_CFG_SRC_ALL}
-        OUTPUT_VARIABLE HBBA_CFG_SRC_DEPS
+        COMMAND rosrun hbba_synth hbba_synth_deps.sh ${_HBBA_CFG_SRC_ALL}
+        OUTPUT_VARIABLE _HBBA_CFG_SRC_DEPS
     )
-    #message("${BASENAME} dependencies: ${HBBA_CFG_SRC_DEPS}")
 
     add_custom_command(
-        OUTPUT ${HBBA_CFG_OUTPUT}
-        COMMAND rosrun hbba_synth hbba_synth ${HBBA_CFG_OPTS} ${HBBA_CFG_OUTPUT_BASENAME} ${HBBA_CFG_SRC_ALL}
-        DEPENDS ${HBBA_CFG_SRC_ALL} ${HBBA_CFG_SRC_DEPS}
+        OUTPUT ${_HBBA_CFG_OUTPUT}
+        COMMAND rosrun hbba_synth hbba_synth ${_HBBA_CFG_OPTS} ${_HBBA_CFG_OUTPUT_BASENAME} ${_HBBA_CFG_SRC_ALL}
+        DEPENDS ${_HBBA_CFG_SRC_ALL} ${_HBBA_CFG_SRC_DEPS}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
-    add_custom_target(${BASENAME} ALL DEPENDS ${HBBA_CFG_OUTPUT})
+    add_custom_target(${_BASENAME} ALL DEPENDS ${_HBBA_CFG_OUTPUT})
 endmacro(add_hbba_cfg)
 

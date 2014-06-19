@@ -7,13 +7,37 @@ project(iw_translator)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   hbba_msgs
-  or_tools
   script_engine
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+
+# This is done to detect if we're building outside of a catkin workspace.
+# If we're in one, the or-tools files will be copied in the devel space.
+# Otherwise, they will end up in sub-folders of the project directory (include/
+# and lib/).
+if    (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set(ORTOOLS_OUTPUT_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/../)
+else  (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set(ORTOOLS_OUTPUT_DIR ${PROJECT_SOURCE_DIR})
+endif (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+
+set(google-or-tools-ROOT
+    ${CMAKE_CURRENT_BINARY_DIR}/google-or-tools-prefix/src/google-or-tools)
+include(ExternalProject)
+externalproject_add(google-or-tools
+    SVN_REPOSITORY    http://or-tools.googlecode.com/svn/trunk/
+    SVN_REVISION      -r3350
+    SVN_TRUST_CERT    1
+    PATCH_COMMAND     patch -p0 -i ${PROJECT_SOURCE_DIR}/or_tools/svn_cert_patch.diff
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND     ${PROJECT_SOURCE_DIR}/or_tools/build.sh
+    BUILD_IN_SOURCE   1
+    INSTALL_COMMAND   ${PROJECT_SOURCE_DIR}/or_tools/install.sh 
+                          ${ORTOOLS_OUTPUT_DIR}
+)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -97,6 +121,7 @@ catkin_package(
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${catkin_INCLUDE_DIRS}
+  ${ORTOOLS_OUTPUT_DIR}/include/or-tools
 )
 
 add_library(solver_impl

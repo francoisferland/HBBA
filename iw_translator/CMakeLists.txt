@@ -39,6 +39,22 @@ externalproject_add(google-or-tools
                           ${ORTOOLS_OUTPUT_DIR}
 )
 
+set(ORTOOLS_LIBS
+    constraint_solver 
+    linear_solver
+    CoinUtils
+    OsiClp
+    Osi
+    Clp
+    Cbc
+    CbcSolver
+    Cgl
+    util
+    base
+    protobuf
+    gflags
+)
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -123,12 +139,14 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${ORTOOLS_OUTPUT_DIR}/include/or-tools
 )
+link_directories(${ORTOOLS_OUTPUT_DIR}/lib/or-tools)
 
 add_library(solver_impl
     src/solver.cpp
 )
 target_link_libraries(solver_impl
     ${catkin_LIBRARIES}
+    ${ORTOOLS_LIBS}
 )
 # Disables deprecated warnings on or_tools headers:
 set_target_properties(solver_impl PROPERTIES

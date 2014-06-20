@@ -1,7 +1,7 @@
 #!/bin/sh
 
 INCPATH=$1/include/or-tools
-LIBPATH=$1/lib
+LIBPATH=$1/lib/or-tools
 
 mkdir -p $LIBPATH
 cp $PWD/lib/*.so $LIBPATH

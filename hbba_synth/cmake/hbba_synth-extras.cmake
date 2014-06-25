@@ -24,9 +24,14 @@ macro(add_hbba_cfg _BASENAME _SRC)
     )
     unset(_src_path CACHE)
     find_file(_src_path
-        ${_SRC}
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        NAMES ${_SRC} ${_SRC}.yaml
+        PATHS ${CMAKE_CURRENT_SOURCE_DIR}
+              ${CMAKE_CURRENT_SOURCE_DIR}/hbba_cfg    # For compatibility with
+                                                      # older setups.
     )
+    if (NOT _src_path)
+        message(SEND_ERROR "Cannot find ${_SRC} for ${_BASENAME}")
+    endif()
 #   find_file(HBBA_ROBOT_SRC 
 #       ${ROBOT}.yaml 
 #       ${PROJECT_SOURCE_DIR}/hbba_cfg 

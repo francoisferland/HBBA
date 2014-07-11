@@ -46,6 +46,8 @@ namespace topic_filters
             np.param("latch_size", ls, 1);
             latch_size_ = abs(ls);
 
+            np.param("divider_rate", rate_, 0);
+
             // Alternative divider rate input as a simple topic:
             sub_rate_ = np.subscribe("divider_rate", 
                                      1, 

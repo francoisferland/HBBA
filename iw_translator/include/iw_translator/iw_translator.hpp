@@ -24,6 +24,8 @@ namespace iw_translator
     ///
     /// Topics:
     ///  - desires_set: The current, active desires set produced by the IW.
+    ///  - intention:   The solved intention for the desire set.
+    ///  - iw_status:   Compact form of the IW Translator status.
     ///
     /// Services:
     ///  - See script_engine for V8 JavaScript services.
@@ -53,6 +55,7 @@ namespace iw_translator
 
         ros::Subscriber                  sub_desires_;
         ros::Publisher                   pub_intention_;
+        ros::Publisher                   pub_status_;
         ros::ServiceClient               srv_eval_script_;
 
         SolverParams                     solver_params_;

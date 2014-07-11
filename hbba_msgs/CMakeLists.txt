@@ -57,6 +57,7 @@ add_message_files(
   RosgraphEvent.msg
   RosgraphEvents.msg
   Strategy.msg
+  IWTranslatorStatus.msg
 )
 
 ## Generate services in the 'srv' folder

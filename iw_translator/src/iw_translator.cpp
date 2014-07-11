@@ -1,5 +1,6 @@
 #include <iw_translator/iw_translator.hpp>
 #include <iw_translator/strategy_parser.hpp>
+#include <hbba_msgs/IWTranslatorStatus.h>
 
 using namespace iw_translator;
 
@@ -68,6 +69,10 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
         "intention",
         10,
         true); // Always latch.
+    pub_status_    = n.advertise<hbba_msgs::IWTranslatorStatus>(
+        "iw_status",
+        10,
+        true); // Always latch.
 
 
     // We set the last activation state to all off, since we can assume that
@@ -88,10 +93,25 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
 
     Solver solver(*solver_model_, g, s, solver_params_);
 
+    // Add current desire set to status message.
+    hbba_msgs::IWTranslatorStatus status;
+    status.stamp = ros::Time::now();
+    status.desire_class.reserve(    msg->desires.size());
+    status.desire_intensity.reserve(msg->desires.size());
+    status.desire_utility.reserve(  msg->desires.size());
+    typedef std::vector<hbba_msgs::Desire>::const_iterator It;
+    for (It i = msg->desires.begin(); i != msg->desires.end(); ++i) {
+        status.desire_class.push_back(    i->type);
+        status.desire_intensity.push_back(i->intensity);
+        status.desire_utility.push_back(  i->utility);
+    }
+
     ActivationVector a;
     if (solver.result(a)) {
         ROS_DEBUG("Solving succeeded.");
         hbba_msgs::Intention out;
+        out.stamp = ros::Time::now();
+
         for (size_t i = 0; i < a.size(); ++i) {
             const hbba_msgs::Strategy& strat = strats_[i];
 
@@ -100,15 +120,29 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
                 strats_[i].id.c_str(), 
                 a[i] ? "true":"false");
 
+            if (a[i]) {
+                status.enabled_strategies.push_back(strat.id);
+            }
+
             const std::string&         strat_id   = strat.id;
             const hbba_msgs::Desire*   desire     = a[i] ? 
-                desireFromType(*msg, strat.utility.id) : NULL;
+                                                    desireFromType(
+                                                        *msg,
+                                                        strat.utility.id)
+                                                  : NULL;
             const std::string&         des_type   = a[i] ?
-                strats_[i].utility.id                  : EMPTY;
+                                                    strats_[i].utility.id
+                                                  : EMPTY;
             const std::string&         des_id     = a[i] && desire ? 
-                desire->id                             : EMPTY;
+                                                    desire->id
+                                                  : EMPTY;
             const std::string&         des_params = a[i] && desire ?
-                desire->params                         : EMPTY;        
+                                                    desire->params
+                                                  : EMPTY;        
+            const int                  des_int    = a[i] && desire ?
+                                                    desire->intensity
+                                                  : -1;
+
 
             out.strategies.push_back(   strat_id);
             out.desires.push_back(      des_id);
@@ -117,11 +151,14 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
             out.enabled.push_back(      a[i]);
         }
 
-        out.stamp = ros::Time::now();
         pub_intention_.publish(out);
 
         activateIntention(out);
     };
+
+    // Note that, unlike for intention, we still publish stats even if the 
+    // solving process was not successful.
+    pub_status_.publish(status);
 }
 
 void IWTranslator::initStrategies()

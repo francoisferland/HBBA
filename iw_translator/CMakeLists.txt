@@ -150,7 +150,13 @@ target_link_libraries(solver_impl
 )
 # Disables deprecated warnings on or_tools headers and enable C++11 support:
 if (CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_COMPILER "g++-4.8")
+    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
+                    OUTPUT_VARIABLE GXX_VERSION
+    )
+    if (NOT GXX_VERSION VERSION_GREATER 4.6)
+        message("Trying to force g++-4.8, default is lower than 4.7...")
+        set(CMAKE_CXX_COMPILER "g++-4.8")
+    endif ()
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
 set_target_properties(solver_impl PROPERTIES

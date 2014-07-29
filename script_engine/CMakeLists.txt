@@ -121,6 +121,7 @@ target_link_libraries(script_engine
     ${catkin_LIBRARIES})
 
 add_dependencies(engine_v8      script_engine_generate_messages_cpp)
+add_dependencies(engine_v8      script_engine_generate_services_cpp)
 add_dependencies(common_plugins script_engine_generate_messages_cpp)
 add_dependencies(script_engine  script_engine_generate_messages_cpp)
 

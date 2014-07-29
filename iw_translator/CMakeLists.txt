@@ -148,7 +148,11 @@ target_link_libraries(solver_impl
     ${catkin_LIBRARIES}
     ${ORTOOLS_LIBS}
 )
-# Disables deprecated warnings on or_tools headers:
+# Disables deprecated warnings on or_tools headers and enable C++11 support:
+if (CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_COMPILER "g++-4.8")
+endif (CMAKE_COMPILER_IS_GNUCXX)
+
 set_target_properties(solver_impl PROPERTIES
     COMPILE_FLAGS "-Wno-deprecated --std=c++11"
 )

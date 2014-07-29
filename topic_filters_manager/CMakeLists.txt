@@ -122,6 +122,7 @@ target_link_libraries(standalone_manager
     ${catkin_LIBRARIES})
 
 add_dependencies(${PROJECT_NAME} topic_filters_manager_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME} topic_filters_manager_generate_services_cpp)
 
 
 #############

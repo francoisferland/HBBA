@@ -109,6 +109,8 @@ add_executable(events_generator src/events_generator_node.cpp)
 target_link_libraries(events_generator ${PROJECT_NAME} ${catkin_LIBRARIES})
 add_executable(exploitation_matcher src/exploitation_matcher_node.cpp)
 target_link_libraries(exploitation_matcher ${PROJECT_NAME} ${catkin_LIBRARIES})
+add_dependencies(exploitation_matcher hbba_msgs_generate_messages_cpp)
+add_dependencies(events_generator     hbba_msgs_generate_messages_cpp)
 
 #############
 ## Install ##

@@ -191,26 +191,25 @@ namespace iw
             pose.stamp_ = ros::Time(0);
 
             try {
-                std::istringstream doc(params);
-                YAML::Parser parser(doc);
-                YAML::Node node;
-                while (parser.GetNextDocument(node)) {
-                    double x, y, t;
+                //std::istringstream doc(params);
+                //YAML::Parser parser(doc);
+                YAML::Node node = YAML::Load(params);;
+                 
+                double x, y, t;
 
-                    node["frame_id"] >> pose.frame_id_;
-                    node["x"]        >> x;
-                    node["y"]        >> y;
-                    node["t"]        >> t;
+                pose.frame_id_ = node["frame_id"].as<std::string>();
+                x              = node["x"].as<double>();
+                y              = node["y"].as<double>();
+                t              = node["t"].as<double>();
 
-                    ROS_DEBUG(
-                        "Parsed a new navigation goal: (%f, %f, %f)",
-                        x,
-                        y,
-                        t);
+                ROS_DEBUG(
+                    "Parsed a new navigation goal: (%f, %f, %f)",
+                    x,
+                    y,
+                    t);
 
-                    pose.setOrigin(tf::Vector3(x, y, 0));
-                    pose.setRotation(tf::createQuaternionFromYaw(t));
-                }
+                pose.setOrigin(tf::Vector3(x, y, 0));
+                pose.setRotation(tf::createQuaternionFromYaw(t));
             } catch (YAML::Exception&) {
                 return false;
             }

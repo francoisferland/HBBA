@@ -113,6 +113,8 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 add_executable(iw_observer_node src/iw_observer_node.cpp)
 target_link_libraries(iw_observer_node ${PROJECT_NAME} ${catkin_LIBRARIES})
 
+add_dependencies(${PROJECT_NAME} hbba_msgs_generate_messages_cpp)
+
 #############
 ## Install ##
 #############

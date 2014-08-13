@@ -4,7 +4,13 @@
         <node name="iw_translator" pkg="iw_translator" type="iw_translator_node"
             output="screen"/>
         <node name="events_generator" pkg="iw" type="events_generator"/>
-        <node name="goto_events_observer" pkg="iw_event_generators" type="goto_events_observer"/>
+        <node name="goto_events_observer" 
+              pkg="iw_event_generators" 
+              type="goto_events_observer">
+            <rosparam>
+                goal_eps: 0.50
+            </rosparam>
+        </node>
         <rosparam>
             solver_model:
                 solver_log:  false

@@ -88,7 +88,7 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
     Vector g, s;
 
     if (!solver_model_->convertDesires(*msg, g, s)) {
-        ROS_WARN("Class with unknown desires will be ignored.");
+        ROS_WARN("Desires with unknown classes will be ignored.");
     }
 
     Solver solver(*solver_model_, g, s, solver_params_);

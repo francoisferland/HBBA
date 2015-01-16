@@ -48,8 +48,7 @@ add_message_files(
   Desire.msg
   DesiresSet.msg
   Event.msg
-  # EmotionIntensities.msg    # Disabled until emotion_msgs is added to the
-                              # tree.
+  EmotionIntensities.msg
   ExploitationMatch.msg
   Intention.msg
   ResourcesSet.msg

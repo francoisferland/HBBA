@@ -104,6 +104,7 @@ add_library(${PROJECT_NAME}
     src/rosgraph_monitor.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME} hbba_msgs_generate_messages_cpp)
 
 add_executable(events_generator src/events_generator_node.cpp)
 target_link_libraries(events_generator ${PROJECT_NAME} ${catkin_LIBRARIES})

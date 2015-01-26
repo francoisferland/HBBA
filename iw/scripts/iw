@@ -20,7 +20,10 @@ class iw_server:
 			self.remove_desires_srv)
         self.srv_up  = rospy.Service('update_desires', UpdateDesires, \
             self.update_desires_srv)
-        self.pub_set = rospy.Publisher('desires_set', DesiresSet, latch=True)
+        self.pub_set = rospy.Publisher('desires_set', 
+                                       DesiresSet,
+                                       latch=True,
+                                       queue_size=1)
 
     def add_desires(self, desires):
         if len(desires) < 1:

@@ -29,7 +29,10 @@ rospy.init_node("hbba_struct", anonymous=True)
 rospy.wait_for_service("hbba/add_desires", 30.0)
 add_desires = rospy.ServiceProxy("hbba/add_desires", AddDesires)
 
-pubEmoIntensity = rospy.Publisher("{1}", Intensity)
+pubEmoIntensity = rospy.Publisher("{1}", 
+                                  Intensity,
+                                  latch=True,
+                                  queue_size=1)
 
 """
 

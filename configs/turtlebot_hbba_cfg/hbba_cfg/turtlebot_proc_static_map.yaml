@@ -1,0 +1,27 @@
+hbba_conf:
+
+# This proc module includes a static map server and an amcl localization node to
+# replicate the features of turtlebot_proc_slam_gmapping.
+
+- procmodule:
+    name: static_map
+    launch: {pkg: 'turtlebot_hbba_cfg', path: 'launch/turtlebot_proc_static_map.launch'}
+    input: 
+        - scan: {type: GenericDivider}
+        - odom
+        - initialpose: {filtered: false}
+
+    output:
+        - map
+        - amcl_pose
+
+- strat:
+    name: StaticMapFull
+    class: SLAM
+    utility: 10
+    costs: {CPU: 0}
+    modules:
+        - static_map:
+            - scan: 1
+            - odom: 1
+

@@ -1,0 +1,44 @@
+# SLAM Planner can be used either GMapping or static maps as they both provide
+# SLAM strategies, see the related proc modules configurations.
+hbba_conf:
+# This proc module's role is only to provide variable input filtering to the
+# move_base behavior.
+# It doesn't actually process anything.
+- procmodule:
+    name: turtlebot_slam_planner_sensors
+    launch: {pkg: 'turtlebot_hbba_cfg', path: 'launch/turtlebot_proc_slam_planner_sensors.launch'}
+    input:
+        - base_scan
+    output:
+        - base_scan_nav
+
+- behavior:
+    name: turtlebot_slam_planner
+    launch: {pkg: 'turtlebot_hbba_cfg', path: 'launch/turtlebot_bhvr_slam_planner.launch'}
+    priority: 10
+    input:
+        - move_base_simple/goal: {src: planner_goal, filtered: false}
+        - map
+        - scan:          base_scan_nav
+    output:
+        - cmd_vel
+
+- strat:
+    name: TBSLAMPlannerSensors
+    class: PlannerSensors
+    utility: 1
+    costs: {CPU: 30}
+    dependencies: {SLAM: 1}
+    modules:
+        - turtlebot_slam_planner_sensors:
+            - base_scan:     2
+            
+- strat:
+    name: TBSLAMPlanner
+    class: GoTo
+    utility: 8
+    dependencies: {PlannerSensors: 1}
+    modules:
+        - turtlebot_slam_planner
+    custom_bringup: "pubNavGoal('/planner_goal', params.frame_id, params.x, params.y, params.t);"
+

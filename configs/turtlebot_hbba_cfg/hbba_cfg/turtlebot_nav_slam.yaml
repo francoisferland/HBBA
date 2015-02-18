@@ -1,0 +1,36 @@
+# Basic Turtlebot navigation demo (with SLAM) in HBBA.
+
+hbba_conf:
+
+- include: {pkg: 'hbba_synth',         file: 'common.yaml'}
+- include: {pkg: 'turtlebot_hbba_cfg', file: 'turtlebot.yaml'}
+
+# Proc modules:
+- include: {pkg: 'turtlebot_hbba_cfg', file: 'turtlebot_proc_slam_gmapping.yaml'}
+
+# Behaviors:
+- include: {pkg: 'turtlebot_hbba_cfg', file: 'turtlebot_bhvr_slam_planner.yaml'}
+
+# Combined priorities:
+#- behavior_priority: {name: 'turtlebot_teleop',            value: 100}
+- behavior_priority: {name: 'turtlebot_slam_planner',     value: 90}
+
+# Available resources:
+- resources:
+    CPU: 100
+    
+# Needed for localization:
+- desire:
+    id: turtlebot_slam_static
+    type: SLAM
+    utility: 1
+    intensity: 1.0
+    security: False
+
+# Teleoperation:
+# - desire:
+#     id: turtlebot_teleop
+#     type: Teleop
+#     utility: 1
+#     intensity: 1.0
+#     security: True

@@ -1,0 +1,4 @@
+hbba_conf:
+
+ - remap: {from: 'base_scan', to: 'scan'}
+ - remap: {from: 'cmd_vel',   to: '/cmd_vel_mux/input/navi'}

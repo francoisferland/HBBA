@@ -1,0 +1,32 @@
+hbba_conf:
+
+- procmodule:
+    name: slam_gmapping
+    launch: {pkg: 'turtlebot_hbba_cfg', path: 'launch/turtlebot_proc_slam_gmapping.launch'}
+    input: 
+        - scan: {type: GenericDivider}
+
+    output:
+        - map
+
+- resources:
+    GMapping: 1
+
+- strat:
+    name: SLAMGMappingFull
+    class: SLAM
+    utility: 10
+    costs: {CPU: 20, GMapping: 1}
+    modules:
+        - slam_gmapping:
+            - scan: 1
+
+- strat:
+    name: SLAMGMappingHalf
+    class: SLAM
+    utility: 5
+    costs: {CPU: 10, GMapping: 1}
+    modules:
+        - slam_gmapping:
+            - scan: 2
+

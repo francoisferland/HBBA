@@ -1,0 +1,4 @@
+<launch>
+    <node name="base_scan_passthrough" pkg="topic_tools" type="relay"
+        args="base_scan base_scan_nav"/>
+</launch>

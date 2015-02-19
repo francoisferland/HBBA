@@ -6,6 +6,24 @@ built at 3IT-IntRoLab (Université de Sherbrooke).
 It has been built with ROS and our robots (IRL-1/TR and /AZ3 variants) in mind,
 but has been designed to be compatible with various platforms.
 
-For any information, you can contact me, François Ferland
-(git@francoisferland.com).
+To build the Intention Translator, which relies on Google or-tools, you need to
+install these packages (on Ubuntu 14.04):
+
+ - bison
+ - flex
+ - python-setuptools
+ - python-dev
+ - autoconf
+ - libtool
+ - zlib1g-dev
+ - texinfo
+ - gawk 
+ - g++
+ - curl
+ - texlive
+ - subversion
+ - make
+ - gettext
+
+Furthermore, libv8-dev is required by the IW Script Engine.
 

@@ -29,7 +29,7 @@ set(google-or-tools-ROOT
 include(ExternalProject)
 externalproject_add(google-or-tools
     SVN_REPOSITORY    http://or-tools.googlecode.com/svn/trunk/
-    SVN_REVISION      -r3350
+    SVN_REVISION      -r3867
     SVN_TRUST_CERT    1
     PATCH_COMMAND     patch -p0 -i ${PROJECT_SOURCE_DIR}/or_tools/svn_cert_patch.diff
     CONFIGURE_COMMAND ""

@@ -1,8 +1,8 @@
 Index: makefiles/Makefile.third_party.unix
 ===================================================================
---- makefiles/Makefile.third_party.unix	(revision 3350)
+--- makefiles/Makefile.third_party.unix	(revision 3867)
 +++ makefiles/Makefile.third_party.unix	(working copy)
-@@ -109,7 +109,7 @@
+@@ -107,7 +107,7 @@
  	cd dependencies/sources/gflags-$(GFLAGS_TAG) && $(SET_PATH) ./autogen.sh
  
  dependencies/sources/gflags-$(GFLAGS_TAG)/autogen.sh:
@@ -11,7 +11,7 @@ Index: makefiles/Makefile.third_party.unix
  
  # Install protocol buffers.
  install_protobuf: dependencies/install/bin/protoc
-@@ -124,13 +124,13 @@
+@@ -122,13 +122,13 @@
  	cd dependencies/sources/protobuf-$(PROTOBUF_TAG) && $(SET_PATH) ./autogen.sh
  
  dependencies/sources/protobuf-$(PROTOBUF_TAG)/autogen.sh:
@@ -27,7 +27,7 @@ Index: makefiles/Makefile.third_party.unix
  
  # Install sparsehash.
  install_sparsehash: dependencies/install/include/google/dense_hash_map
-@@ -145,7 +145,7 @@
+@@ -143,7 +143,7 @@
  	cd dependencies/sources/sparsehash-$(SPARSEHASH_TAG) && $(SET_PATH) ./autogen.sh
  
  dependencies/sources/sparsehash-$(SPARSEHASH_TAG)/autogen.sh:
@@ -36,7 +36,7 @@ Index: makefiles/Makefile.third_party.unix
  	cd dependencies/sources/sparsehash-$(SPARSEHASH_TAG) && patch -p0 -i ../../archives/sparsehash.patch
  
  # Install Coin CBC.
-@@ -158,7 +158,7 @@
+@@ -156,7 +156,7 @@
  	cd dependencies/sources/cbc-$(CBC_TAG) && $(SET_PATH) ./configure --prefix=$(OR_ROOT_FULL)/dependencies/install --disable-bzlib --without-lapack --enable-static --enable-shared --with-pic
  
  dependencies/sources/cbc-$(CBC_TAG)/Makefile.in:
@@ -45,12 +45,12 @@ Index: makefiles/Makefile.third_party.unix
  
  # Install pcre (dependency of SWIG).
  dependencies/install/bin/pcretest: dependencies/sources/pcre-$(PCRE_TAG)/Makefile $(ACLOCAL_TARGET)
-@@ -186,7 +186,7 @@
- 	cd dependencies/sources/swig-$(SWIG_TAG) && $(SET_PATH) ./autogen.sh
+@@ -169,7 +169,7 @@
+ 	cd dependencies/sources/pcre-$(PCRE_TAG) && $(SET_PATH) ./autogen.sh
  
- dependencies/sources/swig-$(SWIG_TAG)/autogen.sh:
--	svn co https://github.com/swig/swig/trunk -r $(SWIG_TAG) dependencies/sources/swig-$(SWIG_TAG)
-+	svn co https://github.com/swig/swig/trunk --non-interactive --trust-server-cert -r $(SWIG_TAG) dependencies/sources/swig-$(SWIG_TAG)
+ dependencies/sources/pcre-$(PCRE_TAG)/autogen.sh:
+-	svn co svn://vcs.exim.org/pcre/code/trunk -r $(PCRE_TAG) dependencies/sources/pcre-$(PCRE_TAG)
++	svn co svn://vcs.exim.org/pcre/code/trunk --non-interactive --trust-server-cert -r $(PCRE_TAG) dependencies/sources/pcre-$(PCRE_TAG)
  
- # Install glpk if needed.
- install_glpk: $(GLPK_TARGET)
+ # Install SWIG.
+ install_swig: dependencies/install/bin/swig

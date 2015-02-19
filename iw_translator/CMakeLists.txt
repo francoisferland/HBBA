@@ -165,6 +165,7 @@ endif (CMAKE_COMPILER_IS_GNUCXX)
 set_target_properties(solver_impl PROPERTIES
     COMPILE_FLAGS "-Wno-deprecated --std=c++11"
 )
+add_dependencies(solver_impl google-or-tools)
 
 add_library(iw_translator
     src/iw_translator.cpp
@@ -183,7 +184,7 @@ target_link_libraries(test_strategy_parser iw_translator ${catkin_LIBRARIES})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(iw_translator  hbba_msgs_generate_messages_cpp)
+add_dependencies(iw_translator hbba_msgs_generate_messages_cpp)
 
 #############
 ## Install ##

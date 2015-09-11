@@ -28,10 +28,12 @@ set(google-or-tools-ROOT
     ${CMAKE_CURRENT_BINARY_DIR}/google-or-tools-prefix/src/google-or-tools)
 include(ExternalProject)
 externalproject_add(google-or-tools
-    SVN_REPOSITORY    http://or-tools.googlecode.com/svn/trunk/
-    SVN_REVISION      -r3867
-    SVN_TRUST_CERT    1
-    PATCH_COMMAND     patch -p0 -i ${PROJECT_SOURCE_DIR}/or_tools/svn_cert_patch.diff
+    #SVN_REPOSITORY    http://or-tools.googlecode.com/svn/trunk/
+    #SVN_REVISION      -r3867
+    #SVN_TRUST_CERT    1
+    #PATCH_COMMAND     patch -p0 -i ${PROJECT_SOURCE_DIR}/or_tools/svn_cert_patch.diff
+    GIT_REPOSITORY    https://github.com/google/or-tools.git
+    GIT_TAG           v2015-09
     CONFIGURE_COMMAND ""
     BUILD_COMMAND     ${PROJECT_SOURCE_DIR}/or_tools/build.sh
     BUILD_IN_SOURCE   1
@@ -56,6 +58,7 @@ set(ORTOOLS_LIBS
     glop
     sat
     split
+    bop
 )
 
 ## Uncomment this if the package has a setup.py. This macro ensures

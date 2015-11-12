@@ -27,3 +27,13 @@ install these packages (on Ubuntu 14.04):
 
 Furthermore, libv8-dev is required by the IW Script Engine.
 
+To build the distribution, do not forget to fetch the hbba_base submodule like
+this (from the root directory of this repository):
+
+$ git submodule init; git submodule update
+
+Then, the whole system should build from a single catkin_make.
+However, especially if your Internet connection is unstable, the download of
+some third-party dependencies pulled by or-tools might fail.
+If it's the case, you can normally safely re-start the build process until
+everything is downloaded correctly.

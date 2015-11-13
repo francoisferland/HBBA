@@ -6,7 +6,7 @@ project(iw_event_generators)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   hbba_msgs
-  iw
+  iw_tools
   roscpp
   std_msgs
   tf
@@ -84,7 +84,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES iw_event_generators
-  CATKIN_DEPENDS hbba_msgs iw roscpp std_msgs tf
+  CATKIN_DEPENDS hbba_msgs iw_tools roscpp std_msgs tf
 #  DEPENDS system_lib
 )
 

@@ -41,12 +41,12 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>hbba_msgs</build_depend>
-  <build_depend>iw</build_depend>
+  <build_depend>iw_tools</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>tf</build_depend>
   <run_depend>hbba_msgs</run_depend>
-  <run_depend>iw</run_depend>
+  <run_depend>iw_tools</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>tf</run_depend>

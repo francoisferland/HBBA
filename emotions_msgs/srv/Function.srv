@@ -1,6 +1,0 @@
-# Service to add an emotion in the relay 
-# (also used to reove using only name)
-
-string name # name of emotion
-emotions_msgs/Type type # information on emotion function (see below)
----

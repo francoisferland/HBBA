@@ -1,8 +1,0 @@
-#!/usr/bin/env python
-
-#import roslib; roslib.load_manifest("hbba_synth")
-import rospy
-import hbba_synth
-
-hbba_synth.main()
-

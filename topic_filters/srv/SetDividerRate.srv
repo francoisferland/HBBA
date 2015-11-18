@@ -1,3 +1,0 @@
-int16 divider # the default value is 1, and a value of 2 will divide the rate of the topic by 2.
----
-

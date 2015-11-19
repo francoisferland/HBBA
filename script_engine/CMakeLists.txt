@@ -52,16 +52,6 @@ find_package(catkin REQUIRED COMPONENTS
 #   Message2.msg
 # )
 
-## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  Boolean.srv
-  CompileScript.srv
-  EvalScript.srv
-  RunScript.srv
-  UpdateRate.srv
-)
-
 ## Generate actions in the 'action' folder
 # add_action_files(
 #   FILES
@@ -70,10 +60,10 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
+#generate_messages(
+#  DEPENDENCIES
+#  std_msgs
+#)
 
 ###################################
 ## catkin specific configuration ##
@@ -120,10 +110,10 @@ target_link_libraries(script_engine
     engine_v8
     ${catkin_LIBRARIES})
 
-add_dependencies(engine_v8      script_engine_generate_messages_cpp)
-add_dependencies(engine_v8      script_engine_generate_services_cpp)
-add_dependencies(common_plugins script_engine_generate_messages_cpp)
-add_dependencies(script_engine  script_engine_generate_messages_cpp)
+add_dependencies(engine_v8      hbba_msgs_generate_messages_cpp)
+add_dependencies(engine_v8      hbba_msgs_generate_services_cpp)
+add_dependencies(common_plugins hbba_msgs_generate_messages_cpp)
+add_dependencies(common_plugins hbba_msgs_generate_services_cpp)
 
 
 #############

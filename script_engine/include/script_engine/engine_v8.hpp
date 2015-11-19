@@ -1,9 +1,9 @@
 #ifndef ENGINE_V8_HPP
 #define ENGINE_V8_HPP
 
-#include <script_engine/EvalScript.h>
-#include <script_engine/CompileScript.h>
-#include <script_engine/RunScript.h>
+#include <hbba_msgs/EvalScript.h>
+#include <hbba_msgs/CompileScript.h>
+#include <hbba_msgs/RunScript.h>
 #include <v8.h>
 #include <ros/ros.h>
 #include <pluginlib/class_loader.h>
@@ -43,9 +43,12 @@ namespace script_engine
 		bool run(const std::string& name, std::string& result);
 
 	private:
-		bool eval_srv(EvalScript::Request&, EvalScript::Response&);
-		bool compile_srv(CompileScript::Request&, CompileScript::Response&);
-		bool run_srv(RunScript::Request&, RunScript::Response&);
+		bool eval_srv(hbba_msgs::EvalScript::Request&, 
+                      hbba_msgs::EvalScript::Response&);
+		bool compile_srv(hbba_msgs::CompileScript::Request&, 
+                         hbba_msgs::CompileScript::Response&);
+		bool run_srv(hbba_msgs::RunScript::Request&, 
+                     hbba_msgs::RunScript::Response&);
 		bool run_script(const v8::Handle<v8::Script>& s, std::string& result);
 
 		v8::HandleScope scope_;

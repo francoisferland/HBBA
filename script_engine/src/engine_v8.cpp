@@ -19,6 +19,8 @@ engine_v8::engine_v8():
 	module_loader_(new module_loader_t("script_engine",
 		"script_engine::engine_module"))
 {
+    using namespace hbba_msgs;
+
 	ros::NodeHandle n, np("~");
 
     np.param("no_eval", no_eval_, false);
@@ -101,7 +103,8 @@ bool engine_v8::eval(const std::string& src, std::string& result)
         return false;
 }
 
-bool engine_v8::eval_srv(EvalScript::Request& req, EvalScript::Response& res)
+bool engine_v8::eval_srv(hbba_msgs::EvalScript::Request& req,
+                         hbba_msgs::EvalScript::Response& res)
 {
     if (no_eval_)
         ROS_INFO("Eval: %s", req.source.c_str());
@@ -120,8 +123,8 @@ bool engine_v8::compile(const std::string& name, const std::string& src)
 	return true;
 }
 
-bool engine_v8::compile_srv(CompileScript::Request& req,
-	CompileScript::Response& res)
+bool engine_v8::compile_srv(hbba_msgs::CompileScript::Request& req,
+	                        hbba_msgs::CompileScript::Response& res)
 {
 	return compile(req.name, req.source);
 }
@@ -135,7 +138,8 @@ bool engine_v8::run(const std::string& name, std::string& result)
 	return true;
 }
 
-bool engine_v8::run_srv(RunScript::Request& req, RunScript::Response& res)
+bool engine_v8::run_srv(hbba_msgs::RunScript::Request& req, 
+                        hbba_msgs::RunScript::Response& res)
 {
 	return run(req.name, res.result);
 }

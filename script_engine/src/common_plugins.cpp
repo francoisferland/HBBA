@@ -1,8 +1,8 @@
 #include <script_engine/service_caller_base.hpp>
 #include <script_engine/publisher_topic_arg_base.hpp>
-#include <script_engine/EvalScript.h>
-#include <script_engine/Boolean.h>
-#include <script_engine/UpdateRate.h>
+#include <hbba_msgs/EvalScript.h>
+#include <hbba_msgs/Boolean.h>
+#include <hbba_msgs/UpdateRate.h>
 #include <pluginlib/class_list_macros.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Empty.h>
@@ -23,12 +23,12 @@ namespace common_plugins
     {
 
         void afun(const v8::Arguments& args, 
-            script_engine::EvalScript::Request& req)
+            hbba_msgs::EvalScript::Request& req)
         {
         }
 
         v8::Handle<v8::Value> rfun(
-            const script_engine::EvalScript::Response& res)
+            const hbba_msgs::EvalScript::Response& res)
         {
             return v8::True();
         }
@@ -36,7 +36,7 @@ namespace common_plugins
         const extern char eval_script_str[] = "eval_script";
         const extern char call_eval_str[] = "call_eval";
         typedef script_engine::service_caller_base<
-            script_engine::EvalScript,
+            hbba_msgs::EvalScript,
             eval_script_str,	
             call_eval_str,	
             afun,
@@ -71,14 +71,14 @@ namespace common_plugins
     {
 
         void afun(const v8::Arguments& args, 
-			script_engine::Boolean::Request& req)
+			hbba_msgs::Boolean::Request& req)
         {
             v8::BooleanObject* b = v8::BooleanObject::Cast( *args[1] );
             req.boolean = b->BooleanValue();
         }
 
         v8::Handle<v8::Value> rfun(
-		const script_engine::Boolean::Response& res)
+		const hbba_msgs::Boolean::Response& res)
         {
             return v8::True();
         }
@@ -86,7 +86,7 @@ namespace common_plugins
         const extern char boolean_script_str[] = "boolean_script";
         const extern char call_boolean_str[] = "call_boolean";
         typedef script_engine::service_caller_base<
-            script_engine::Boolean,
+            hbba_msgs::Boolean,
             boolean_script_str,	
             call_boolean_str,	
             afun,
@@ -99,14 +99,14 @@ namespace common_plugins
     {
 
         void afun(const v8::Arguments& args, 
-            script_engine::UpdateRate::Request& req)
+            hbba_msgs::UpdateRate::Request& req)
         {
             v8::Number* v = v8::Number::Cast(*args[1]);
             req.rate = v->Value();
         }
 
         v8::Handle<v8::Value> rfun(
-            const script_engine::UpdateRate::Response& res)
+            const hbba_msgs::UpdateRate::Response& res)
         {
             return v8::True();
         }
@@ -114,7 +114,7 @@ namespace common_plugins
         const extern char update_rate_script_str[] = "update_rate_script";
         const extern char call_update_rate_str[] = "call_update_rate";
         typedef script_engine::service_caller_base<
-            script_engine::UpdateRate,
+            hbba_msgs::UpdateRate,
             update_rate_script_str,	
             call_update_rate_str,	
             afun,

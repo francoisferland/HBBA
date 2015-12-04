@@ -11,6 +11,14 @@ namespace {
 		ROS_INFO("se_log: %s", val);
 		return v8::True();
 	}
+
+	v8::Handle<v8::Value> se_error(const v8::Arguments& args)
+	{
+		v8::String::Utf8Value v(args[0]);
+		const char* val = *v;
+		ROS_ERROR("se_error: %s", val);
+		return v8::True();
+	}
 }
 
 engine_v8::engine_v8():
@@ -34,9 +42,11 @@ engine_v8::engine_v8():
 
 	global_ = v8::ObjectTemplate::New();
 		
-	// Log function.
+	// Log functions.
 	global_->Set(v8::String::New("se_log"),
 		v8::FunctionTemplate::New(se_log));
+	global_->Set(v8::String::New("se_error"),
+		v8::FunctionTemplate::New(se_error));
 
 	// Load plugins.
 	std::vector<std::string> classes = module_loader_->getDeclaredClasses();

@@ -61,7 +61,7 @@ void Runtime::eventsCB(const hbba_msgs::Event::ConstPtr& msg)
     typedef Commands::const_iterator It;
     for (It i = cmds.begin(); i != cmds.end(); ++i) {
         const Command& cmd = **i;
-        cmd.exec(*this);
+        cmd.exec(*this, *msg);
     }
 
     // Look for changes in both add and delete vectors, call the proper

@@ -2,6 +2,7 @@
 #define RULES_AST_HPP
 
 #include <hbba_msgs/Desire.h>
+#include <hbba_msgs/Event.h>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -102,8 +103,9 @@ namespace iw_observer
         ///
         /// Must be implemented in derived classes.
         ///
-        /// \param rt A mutable reference to the IWObserver runtime.
-        virtual void exec(Runtime& rt) const = 0;
+        /// \param rt  A mutable reference to the IWObserver runtime.
+        /// \param evt The event that triggered this command.
+        virtual void exec(Runtime& rt, const hbba_msgs::Event& evt) const = 0;
     };
 
     /// \brief Command class to create and add a new desire to the Intention
@@ -127,7 +129,7 @@ namespace iw_observer
         /// \param args    Arguments to apply to the new desire (see Arg class).
         AddCommand(const Ident& des_cls, const Args& args);
 
-        void exec(Runtime& rt) const;
+        void exec(Runtime& rt, const hbba_msgs::Event& evt) const;
     };
 
     /// \brief Command class to delete an already existing desire from the
@@ -146,7 +148,7 @@ namespace iw_observer
         /// \param des_id Identifier of the desire to delete.
         DelCommand(const Ident& des_id);
 
-        void exec(Runtime& rt) const;
+        void exec(Runtime& rt, const hbba_msgs::Event& evt) const;
     };
 
     typedef std::vector<Command*> Commands;

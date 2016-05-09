@@ -51,8 +51,11 @@ class iw_server:
         return RemoveDesiresResponse()
 
     def update_desires_srv(self, req):
-        self.add_desires(req.add)
-        self.remove_desires(req.remove)
+        rospy.logdebug("Got call for update: " + str(req))
+        if (len(req.add) > 0):
+            self.add_desires(req.add)
+        if (len(req.remove) > 0):
+            self.remove_desires(req.remove)
         self.publish_set()
         return UpdateDesiresResponse()
 

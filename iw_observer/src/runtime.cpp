@@ -17,6 +17,8 @@ Runtime::Runtime(const Rules& rules): rules_(rules)
 
     sub_events_ = n.subscribe("events", 100, &Runtime::eventsCB, this);
 
+    ROS_INFO("Waiting for 'update_desires' service...");
+    ros::service::waitForService("update_desires");
     scl_update_ = n.serviceClient<hbba_msgs::UpdateDesires>("update_desires", 
                                                             true);
 
@@ -71,9 +73,18 @@ void Runtime::eventsCB(const hbba_msgs::Event::ConstPtr& msg)
     std::vector<hbba_msgs::Desire>& add_set = update_des_.request.add;
     std::vector<std::string>&       rem_set = update_des_.request.remove;
     if (!add_set.empty() || !rem_set.empty()) {
-        scl_update_.call(update_des_);
+        ROS_DEBUG("add_set size: %lu, rem_set size: %lu",
+                  add_set.size(),
+                  rem_set.size());
+        if (!scl_update_.call(update_des_)) {
+            ROS_ERROR("Error on update service call!");
+            return;
+        }
+        ROS_DEBUG("Update call done, will clear the sets for the next round.");
         add_set.clear();
         rem_set.clear();
+    } else {
+        ROS_DEBUG("Empty desire updates set, ignoring.");
     }
 }
 

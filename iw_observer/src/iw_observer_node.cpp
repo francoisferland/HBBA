@@ -29,14 +29,15 @@ int main(int argc, char** argv)
         char* ruleset_str = const_cast<char*>(ruleset.c_str());
         yy_scan_string(ruleset.c_str());
         yyparse();
-    } else if (argc < 2) {
-        ROS_INFO("Parsing rules from stdin ...");
-        yyparse();
-    } else {
+    } else if (argc >= 2) {
         ROS_INFO("Parsing rules from '%s' ...", argv[1]);
         yyin = fopen(argv[1], "ro");
         yyparse();
         fclose(yyin);
+    } else {
+        ROS_FATAL("iw_observer needs either the 'ruleset' parameter or a file "
+                  "name as its first argument to parse its rules. Quitting.");
+        return -1;
     }
     ROS_INFO("The ruleset contains %lu rule(s).", ruleset().size());
     Runtime node(ruleset());

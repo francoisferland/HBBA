@@ -24,6 +24,7 @@ install these packages (on Ubuntu 14.04):
  - subversion
  - make
  - gettext
+ - texi2html (for makeinfo, needed by or-tools)
 
 Furthermore, libv8-dev is required by the IW Script Engine.
 

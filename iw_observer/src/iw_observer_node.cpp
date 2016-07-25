@@ -26,6 +26,10 @@ int main(int argc, char** argv)
         ROS_INFO("Parsing rules from 'ruleset' parameter...");
         std::string ruleset;
         np.getParam("ruleset", ruleset);
+        if (ruleset.empty()) {
+            ROS_INFO("Empty ruleset, ignoring and quitting.");
+            return 0;
+        }
         char* ruleset_str = const_cast<char*>(ruleset.c_str());
         yy_scan_string(ruleset.c_str());
         yyparse();

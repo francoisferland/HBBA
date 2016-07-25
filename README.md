@@ -9,21 +9,22 @@ but has been designed to be compatible with various platforms.
 To build the Intention Translator, which relies on Google or-tools, you need to
 install these packages (on Ubuntu 14.04):
 
+ - autoconf
  - bison
+ - curl
  - flex
+ - g++
+ - gawk
+ - gettext
+ - help2man (for or-tools)
+ - libtool
+ - make
  - python-setuptools
  - python-dev
- - autoconf
- - libtool
- - zlib1g-dev
- - texinfo (for makeinfo, needed by or-tools)
- - gawk 
- - g++
- - curl
- - texlive
  - subversion
- - make
- - gettext
+ - texinfo (for makeinfo, needed by or-tools)
+ - texlive (for or-tools)
+ - zlib1g-dev
 
 Furthermore, libv8-dev is required by the IW Script Engine.
 

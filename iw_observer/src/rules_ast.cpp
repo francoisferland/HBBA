@@ -27,7 +27,7 @@ AddCommand::AddCommand(const Ident& des_cls, const Args& args)
     }
 }
 
-void AddCommand::exec(Runtime& rt) const
+void AddCommand::exec(Runtime& rt, const hbba_msgs::Event& evt) const
 {
     rt.addDesire(desire_);
 }
@@ -36,8 +36,14 @@ DelCommand::DelCommand(const Ident& des_id): id_(des_id)
 {
 }
 
-void DelCommand::exec(Runtime& rt) const
+void DelCommand::exec(Runtime& rt, const hbba_msgs::Event& evt) const
 {
-    rt.removeDesire(id_);
+    // Special case of the command: if the specified desire id is "-",
+    // delete the desire that triggered the event instead.
+    if (id_ == "-") {
+        rt.removeDesire(evt.desire);
+    } else {
+        rt.removeDesire(id_);
+    }
 }
 

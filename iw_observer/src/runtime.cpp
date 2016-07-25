@@ -7,6 +7,8 @@ Runtime::EventTypeMap Runtime::event_type_map_;
 Runtime::Runtime(const Rules& rules): rules_(rules)
 {
     if (event_type_map_.empty()) {
+        event_type_map_["des_on"]  = hbba_msgs::Event::DES_ON;
+        event_type_map_["des_off"] = hbba_msgs::Event::DES_OFF;
         event_type_map_["exp_on"]  = hbba_msgs::Event::EXP_ON;
         event_type_map_["exp_off"] = hbba_msgs::Event::EXP_OFF;
     }
@@ -15,6 +17,8 @@ Runtime::Runtime(const Rules& rules): rules_(rules)
 
     sub_events_ = n.subscribe("events", 100, &Runtime::eventsCB, this);
 
+    ROS_INFO("Waiting for 'update_desires' service...");
+    ros::service::waitForService("update_desires");
     scl_update_ = n.serviceClient<hbba_msgs::UpdateDesires>("update_desires", 
                                                             true);
 
@@ -61,7 +65,7 @@ void Runtime::eventsCB(const hbba_msgs::Event::ConstPtr& msg)
     typedef Commands::const_iterator It;
     for (It i = cmds.begin(); i != cmds.end(); ++i) {
         const Command& cmd = **i;
-        cmd.exec(*this);
+        cmd.exec(*this, *msg);
     }
 
     // Look for changes in both add and delete vectors, call the proper
@@ -69,9 +73,18 @@ void Runtime::eventsCB(const hbba_msgs::Event::ConstPtr& msg)
     std::vector<hbba_msgs::Desire>& add_set = update_des_.request.add;
     std::vector<std::string>&       rem_set = update_des_.request.remove;
     if (!add_set.empty() || !rem_set.empty()) {
-        scl_update_.call(update_des_);
+        ROS_DEBUG("add_set size: %lu, rem_set size: %lu",
+                  add_set.size(),
+                  rem_set.size());
+        if (!scl_update_.call(update_des_)) {
+            ROS_ERROR("Error on update service call!");
+            return;
+        }
+        ROS_DEBUG("Update call done, will clear the sets for the next round.");
         add_set.clear();
         rem_set.clear();
+    } else {
+        ROS_DEBUG("Empty desire updates set, ignoring.");
     }
 }
 

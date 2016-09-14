@@ -31,34 +31,35 @@ externalproject_add(google-or-tools
     #SVN_REPOSITORY    http://or-tools.googlecode.com/svn/trunk/
     #SVN_REVISION      -r3867
     #SVN_TRUST_CERT    1
-    PATCH_COMMAND     patch -p0 -i ${PROJECT_SOURCE_DIR}/or_tools/svn_cert_patch.diff
+    #PATCH_COMMAND     patch -p0 -i ${PROJECT_SOURCE_DIR}/or_tools/svn_cert_patch.diff
     GIT_REPOSITORY    https://github.com/google/or-tools.git
-    GIT_TAG           v2015-09
+    GIT_TAG           master
     CONFIGURE_COMMAND ""
     BUILD_COMMAND     ${PROJECT_SOURCE_DIR}/or_tools/build.sh
     BUILD_IN_SOURCE   1
     INSTALL_COMMAND   ${PROJECT_SOURCE_DIR}/or_tools/install.sh 
-                          ${ORTOOLS_OUTPUT_DIR}
+        ${ORTOOLS_OUTPUT_DIR}
 )
 
 set(ORTOOLS_LIBS
-    constraint_solver 
-    linear_solver
-    CoinUtils
-    OsiClp
-    Osi
-    Clp
-    Cbc
-    CbcSolver
-    Cgl
-    util
-    base
-    protobuf
-    gflags
-    glop
-    sat
-    split
-    bop
+    ortools
+#    constraint_solver 
+#    linear_solver
+#    CoinUtils
+#    OsiClp
+#    Osi
+#    Clp
+#    Cbc
+#    CbcSolver
+#    Cgl
+#    util
+#    base
+#    protobuf
+#    gflags
+#    glop
+#    sat
+#    split
+#    bop
 )
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -175,7 +176,11 @@ add_library(iw_translator
     src/solver_model.cpp
     src/strategy_parser.cpp
 )
-target_link_libraries(iw_translator solver_impl ${catkin_LIBRARIES})
+target_link_libraries(iw_translator
+    solver_impl
+    ${catkin_LIBRARIES}
+    ${ORTOOLS_LIB}
+)
 
 add_executable(iw_translator_node src/iw_translator_node.cpp)
 target_link_libraries(iw_translator_node iw_translator ${catkin_LIBRARIES})

@@ -1,0 +1,9 @@
+<library path="lib/libse_extra_plugins">
+    <class name="script_engine/PubFloat64Plugin"
+           type="se_extra_plugins::PubFloat64Plugin"
+           base_class_type="script_engine::engine_module">
+        <description>
+            Publishes a std_msgs/Float64 on the specified topic.
+        </description>
+    </class>
+</library>

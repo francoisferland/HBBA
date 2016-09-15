@@ -1,6 +1,6 @@
 --- makefiles/Makefile.third_party.unix
 +++ makefiles/Makefile.third_party.unix
-@@ -295,7 +295,7 @@
+@@ -285,7 +285,7 @@
  	cd dependencies/sources/cbc-$(CBC_TAG) && $(SET_PATH) ./configure --prefix=$(OR_ROOT_FULL)/dependencies/install --disable-bzlib --without-lapack --enable-static --enable-shared --with-pic ADD_CXXFLAGS="-DCBC_THREAD_SAFE -DCBC_NO_INTERRUPT"
  
  dependencies/sources/cbc-$(CBC_TAG)/Makefile.in:
@@ -9,12 +9,3 @@
  
  # Install pcre (dependency of SWIG).
  dependencies/install/bin/pcretest: dependencies/sources/pcre-$(PCRE_TAG)/Makefile $(ACLOCAL_TARGET)
-@@ -308,7 +308,7 @@
- 	cd dependencies/sources/pcre-$(PCRE_TAG) && $(SET_PATH) ./autogen.sh
- 
- dependencies/sources/pcre-$(PCRE_TAG)/autogen.sh:
--	svn co svn://vcs.exim.org/pcre/code/trunk -r $(PCRE_TAG) dependencies/sources/pcre-$(PCRE_TAG)
-+	svn co svn://vcs.exim.org/pcre/code/trunk --non-interactive --trust-server-cert -r $(PCRE_TAG) dependencies/sources/pcre-$(PCRE_TAG)
- 
- # Install SWIG.
- install_swig: dependencies/install/bin/swig

@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   pluginlib
   topic_filters
-  script_engine
+  script_engine_plugins
 )
 
 ## System dependencies are found with CMake's conventions
@@ -86,7 +86,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS roscpp std_msgs hbba_msgs script_engine
+  CATKIN_DEPENDS roscpp std_msgs hbba_msgs script_engine_plugins
 #  DEPENDS system_lib
 )
 

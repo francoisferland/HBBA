@@ -6,13 +6,14 @@
 #include <hbba_msgs/RunScript.h>
 #include <v8.h>
 #include <ros/ros.h>
+#include <script_engine_plugins/engine_module.hpp>
 #include <pluginlib/class_loader.h>
 #include <string>
 #include <tr1/unordered_map>
 
 namespace script_engine
 {
-	class engine_module;
+	typedef script_engine_plugins::engine_module engine_module;
 
 	/// \brief A V8-based JS execution engine.
 	///

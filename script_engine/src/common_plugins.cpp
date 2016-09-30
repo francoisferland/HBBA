@@ -1,5 +1,5 @@
-#include <script_engine/service_caller_base.hpp>
-#include <script_engine/publisher_topic_arg_base.hpp>
+#include <script_engine_plugins/service_caller_base.hpp>
+#include <script_engine_plugins/publisher_topic_arg_base.hpp>
 #include <hbba_msgs/EvalScript.h>
 #include <hbba_msgs/Boolean.h>
 #include <hbba_msgs/UpdateRate.h>

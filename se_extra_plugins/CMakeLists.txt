@@ -6,7 +6,7 @@ project(se_extra_plugins)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  script_engine
+  script_engine_plugins
   std_msgs
 )
 

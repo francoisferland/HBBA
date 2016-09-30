@@ -1,5 +1,5 @@
-#include "script_engine/engine_v8.hpp"
-#include "script_engine/engine_module.hpp"
+#include <script_engine/engine_v8.hpp>
+#include <script_engine_plugins/engine_module.hpp>
 
 using namespace script_engine;
 

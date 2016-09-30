@@ -102,8 +102,8 @@ add_library(engine_v8 src/engine_v8.cpp)
 target_link_libraries(engine_v8 v8 ${catkin_LIBRARIES})
 
 # Common plugins
-# add_library(common_plugins 
-#	src/common_plugins.cpp )
+add_library(common_plugins 
+    src/common_plugins.cpp )
 
 ## Declare a cpp executable
 add_executable(script_engine src/script_engine.cpp)
@@ -113,8 +113,8 @@ target_link_libraries(script_engine
 
 add_dependencies(engine_v8      hbba_msgs_generate_messages_cpp)
 add_dependencies(engine_v8      hbba_msgs_generate_services_cpp)
-#add_dependencies(common_plugins hbba_msgs_generate_messages_cpp)
-#add_dependencies(common_plugins hbba_msgs_generate_services_cpp)
+add_dependencies(common_plugins hbba_msgs_generate_messages_cpp)
+add_dependencies(common_plugins hbba_msgs_generate_services_cpp)
 
 
 #############

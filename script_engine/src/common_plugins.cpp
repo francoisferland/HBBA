@@ -35,7 +35,7 @@ namespace common_plugins
 
         const extern char eval_script_str[] = "eval_script";
         const extern char call_eval_str[] = "call_eval";
-        typedef script_engine::service_caller_base<
+        typedef script_engine_plugins::service_caller_base<
             hbba_msgs::EvalScript,
             eval_script_str,	
             call_eval_str,	
@@ -58,7 +58,7 @@ namespace common_plugins
 
         const extern char empty_script_str[] = "empty_script";
         const extern char call_empty_str[] = "call_empty";
-        typedef script_engine::service_caller_base<
+        typedef script_engine_plugins::service_caller_base<
             std_srvs::Empty,
             empty_script_str,	
             call_empty_str,	
@@ -85,7 +85,7 @@ namespace common_plugins
 
         const extern char boolean_script_str[] = "boolean_script";
         const extern char call_boolean_str[] = "call_boolean";
-        typedef script_engine::service_caller_base<
+        typedef script_engine_plugins::service_caller_base<
             hbba_msgs::Boolean,
             boolean_script_str,	
             call_boolean_str,	
@@ -113,7 +113,7 @@ namespace common_plugins
 
         const extern char update_rate_script_str[] = "update_rate_script";
         const extern char call_update_rate_str[] = "call_update_rate";
-        typedef script_engine::service_caller_base<
+        typedef script_engine_plugins::service_caller_base<
             hbba_msgs::UpdateRate,
             update_rate_script_str,	
             call_update_rate_str,	
@@ -122,7 +122,7 @@ namespace common_plugins
     }
 
     /// \brief Run commands on the shell.
-    class SysCall: public script_engine::engine_module
+    class SysCall: public script_engine_plugins::engine_module
     {
     public:
         void init(v8::Handle<v8::ObjectTemplate>& global)
@@ -156,7 +156,7 @@ namespace common_plugins
 
         const extern char pub_name[] = "pubEmpty";
 
-        typedef script_engine::publisher_topic_arg_base<
+        typedef script_engine_plugins::publisher_topic_arg_base<
             std_msgs::Empty,
             pub_name,
             afun> PubEmptyPlugin;
@@ -175,7 +175,7 @@ namespace common_plugins
 
         const extern char pub_name[] = "pubString";
 
-        typedef script_engine::publisher_topic_arg_base<
+        typedef script_engine_plugins::publisher_topic_arg_base<
             std_msgs::String,
             pub_name,	
             afun> PubStringPlugin;
@@ -223,7 +223,7 @@ namespace common_plugins
 
         const extern char pub_name[] = "pubNavGoal";
 
-        typedef script_engine::publisher_topic_arg_base<
+        typedef script_engine_plugins::publisher_topic_arg_base<
             geometry_msgs::PoseStamped,
             pub_name,
             afun> PubNavGoalPlugin;
@@ -232,26 +232,26 @@ namespace common_plugins
 
 PLUGINLIB_DECLARE_CLASS(script_engine, EvalCall, 
 	common_plugins::eval::call_eval_plugin,
-	script_engine::engine_module);
+	script_engine_plugins::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, EmptyCall, 
 	common_plugins::empty::call_empty_plugin,
-	script_engine::engine_module);
+	script_engine_plugins::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, BooleanCall, 
 	common_plugins::boolean::call_boolean_plugin,
-	script_engine::engine_module);
+	script_engine_plugins::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, UpdateRateCall, 
 	common_plugins::update_rate::call_update_rate_plugin,
-	script_engine::engine_module);
+	script_engine_plugins::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, SysCall, 
 	common_plugins::SysCall,
-	script_engine::engine_module);
+	script_engine_plugins::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, PubEmpty,
     common_plugins::pub_empty::PubEmptyPlugin,
-    script_engine::engine_module);
+    script_engine_plugins::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, PubString, 
 	common_plugins::pub_string::PubStringPlugin,
-	script_engine::engine_module);
+	script_engine_plugins::engine_module);
 PLUGINLIB_DECLARE_CLASS(script_engine, PubNavGoal, 
 	common_plugins::pub_nav_goal::PubNavGoalPlugin,
-	script_engine::engine_module);
+	script_engine_plugins::engine_module);
 

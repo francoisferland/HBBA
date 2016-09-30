@@ -1,5 +1,5 @@
 <library path="lib/libse_extra_plugins">
-    <class name="script_engine/PubFloat64Plugin"
+    <class name="se_extra_plugins/PubFloat64Plugin"
            type="se_extra_plugins::PubFloat64Plugin"
            base_class_type="script_engine_plugins::engine_module">
         <description>

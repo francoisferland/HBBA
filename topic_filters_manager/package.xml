@@ -62,7 +62,7 @@
     <!-- <metapackage/> -->
 
     <!-- Other tools can request additional information be placed here -->
-    <script_engine plugin="${prefix}/se_plugins.xml"/>
+    <script_engine_plugins plugin="${prefix}/se_plugins.xml"/>
 
   </export>
 </package>

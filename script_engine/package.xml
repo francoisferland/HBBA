@@ -61,7 +61,7 @@
     <!-- <metapackage/> -->
 
     <!-- Other tools can request additional information be placed here -->
-    <script_engine plugin="${prefix}/common_plugins.xml"/>
+    <script_engine_plugins plugin="${prefix}/common_plugins.xml"/>
 
   </export>
 </package>

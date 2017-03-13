@@ -48,13 +48,13 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>pluginlib</build_depend>
   <build_depend>topic_filters</build_depend>
-  <build_depend>script_engine</build_depend>
+  <build_depend>script_engine_plugins</build_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>hbba_msgs</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>pluginlib</run_depend>
   <run_depend>topic_filters</run_depend>
-  <run_depend>script_engine</run_depend>
+  <run_depend>script_engine_plugins</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
@@ -62,7 +62,7 @@
     <!-- <metapackage/> -->
 
     <!-- Other tools can request additional information be placed here -->
-    <script_engine plugin="${prefix}/se_plugins.xml"/>
+    <script_engine_plugins plugin="${prefix}/se_plugins.xml"/>
 
   </export>
 </package>

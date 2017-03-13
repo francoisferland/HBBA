@@ -1,4 +1,4 @@
-#include "script_engine/engine_module.hpp"
+#include <script_engine_plugins/engine_module.hpp>
 #include "topic_filters/SetState.h"
 #include "topic_filters/SetDividerRate.h"
 #include <pluginlib/class_list_macros.h>
@@ -7,7 +7,7 @@
 
 namespace topic_filters_manager
 {
-	class ScriptEnginePlugins: public script_engine::engine_module
+	class ScriptEnginePlugins: public script_engine_plugins::engine_module
 	{
 	public:
 		virtual void init(v8::Handle<v8::ObjectTemplate>& global)
@@ -81,5 +81,5 @@ namespace topic_filters_manager
 
 PLUGINLIB_DECLARE_CLASS(topic_filters_manager, ScriptEnginePlugins, 
 	topic_filters_manager::ScriptEnginePlugins,
-	script_engine::engine_module);
+	script_engine_plugins::engine_module);
 

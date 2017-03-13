@@ -1,7 +1,7 @@
 <library path="lib/libcommon_plugins">
 	<class name="script_engine/EvalCall" 
 			type="common_plugins::eval::call_eval_plugin"
-			base_class_type="script_engine::engine_module">
+			base_class_type="script_engine_plugins::engine_module">
 		<description>
 		  	Test module for the script engine. 
 			Registers a meta eval service call.
@@ -9,49 +9,49 @@
 	</class>
 	<class name="script_engine/BooleanCall" 
 			type="common_plugins::boolean::call_boolean_plugin"
-			base_class_type="script_engine::engine_module">
+			base_class_type="script_engine_plugins::engine_module">
 		<description>
 		  	Registers a meta update boolean service call.
 		</description>
 	</class>
 	<class name="script_engine/EmptyCall" 
 			type="common_plugins::empty::call_empty_plugin"
-			base_class_type="script_engine::engine_module">
+			base_class_type="script_engine_plugins::engine_module">
 		<description>
 		  	Registers a meta empty service call.
 		</description>
 	</class>
 	<class name="script_engine/UpdateRateCall" 
 		type="common_plugins::update_rate::call_update_rate_plugin"
-			base_class_type="script_engine::engine_module">
+			base_class_type="script_engine_plugins::engine_module">
 		<description>
 		  Registers a meta update rate service call.
 		</description>
 	</class>
 	<class name="script_engine/SysCall" 
 			type="common_plugins::SysCall"
-			base_class_type="script_engine::engine_module">
+			base_class_type="script_engine_plugins::engine_module">
 		<description>
 		  Executes commands on the shell through a system() call. 
 		</description>
 	</class>
 	<class name="script_engine/PubEmpty" 
 			type="common_plugins::pub_empty::PubEmptyPlugin"
-			base_class_type="script_engine::engine_module">
+			base_class_type="script_engine_plugins::engine_module">
 		<description>
 		  Publish an empty message on the specified topic.
 		</description>
 	</class>
 	<class name="script_engine/PubString" 
 			type="common_plugins::pub_string::PubStringPlugin"
-			base_class_type="script_engine::engine_module">
+			base_class_type="script_engine_plugins::engine_module">
 		<description>
 		  Publish a string on the specified topic.
 		</description>
 	</class>
 	<class name="script_engine/PubNavGoal" 
 		type="common_plugins::pub_nav_goal::PubNavGoalPlugin"
-			base_class_type="script_engine::engine_module">
+			base_class_type="script_engine_plugins::engine_module">
 		<description>
 		  Publish a navigation goal on a 2D plane on the specified topic and frame_id.
 		</description>

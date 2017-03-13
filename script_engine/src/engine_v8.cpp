@@ -1,5 +1,5 @@
-#include "script_engine/engine_v8.hpp"
-#include "script_engine/engine_module.hpp"
+#include <script_engine/engine_v8.hpp>
+#include <script_engine_plugins/engine_module.hpp>
 
 using namespace script_engine;
 
@@ -24,8 +24,8 @@ namespace {
 engine_v8::engine_v8():
 //	global_(v8::ObjectTemplate::New()),
 //	context_(v8::Context::New(NULL, global_)),
-	module_loader_(new module_loader_t("script_engine",
-		"script_engine::engine_module"))
+	module_loader_(new module_loader_t("script_engine_plugins",
+		"script_engine_plugins::engine_module"))
 {
     using namespace hbba_msgs;
 

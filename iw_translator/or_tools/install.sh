@@ -21,8 +21,13 @@ mkdir -p ${PREFIX}/lib
 cd /tmp
 wget $URL
 tar -xzvf ${PACKAGE}.tar.gz
-cp -r ${FOLDER}/include/* $PREFIX/include/
-cp -r ${FOLDER}/lib/* $PREFIX/lib/
+install ${FOLDER}/lib/* $PREFIX/lib/
+for d in `find ${FOLDER}/include/ -type d`
+do
+    subd=`basename $d`
+    install -d $PREFIX/include/$subd
+    install -m 644 $d/* $PREFIX/include/$subd/
+done
 rm ${PACKAGE}.tar.gz
 rm -r ${FOLDER}
 

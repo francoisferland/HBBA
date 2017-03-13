@@ -1,21 +1,31 @@
-#!/bin/sh
+#!/bin/bash
 
-GENPATH=$2
-INCPATH=$1/include/or-tools
-LIBPATH=$1/lib/or-tools
+# By default, this script tries to install in /opt/local/or-tools.
+# However, it can be installed pretty much anywhere (using the first command
+# line argument as install prefix).
+# Just be sure it can be found with CMake ('or-tools' is a path suffix hint).
 
-mkdir -p $LIBPATH
-cp $PWD/lib/*.so $LIBPATH
+PACKAGE=or-tools_Ubuntu-14.04-64bit_v5.1.4045
+FOLDER=or-tools_Ubuntu-14.04-64bit_v5.1.4047    # NOTE: The content doesn't fit
+URL=https://github.com/google/or-tools/releases/download/v5.1/${PACKAGE}.tar.gz 
 
-mkdir -p $INCPATH/constraint_solver
-cp $PWD/src/constraint_solver/*.h $INCPATH/constraint_solver
-cp $PWD/src/gen/constraint_solver/*.h $INCPATH/constraint_solver 
-mkdir -p $INCPATH/base
-cp $PWD/src/base/*.h $INCPATH/base
-mkdir -p $INCPATH/util
-cp $PWD/src/util/*.h $INCPATH/util
+PREFIX=${1:-/opt/local/or-tools}
 
-# Third-party:
-cp -r $PWD/dependencies/install/lib/*     $LIBPATH/
-cp -r $PWD/dependencies/install/include/* $INCPATH/
+echo Installing in $PREFIX ...
 
+STARTING_DIR=$PWD
+
+mkdir -p ${PREFIX}/include
+mkdir -p ${PREFIX}/lib
+
+cd /tmp
+wget $URL
+tar -xzvf ${PACKAGE}.tar.gz
+cp -r ${FOLDER}/include/* $PREFIX/include/
+cp -r ${FOLDER}/lib/* $PREFIX/lib/
+rm ${PACKAGE}.tar.gz
+rm -r ${FOLDER}
+
+cd $STARTING_DIR
+
+echo Done.

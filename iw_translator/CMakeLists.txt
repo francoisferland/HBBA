@@ -21,14 +21,20 @@ find_library(ORTOOLS_LIBS
     PATH_SUFFIXES or-tools
 )
 if(NOT ORTOOLS_LIBS)
-    message(FATAL_ERROR "Google or-tools lib not found, please install first.")
+    message(FATAL_ERROR "
+        Google or-tools lib not found, please install first.
+        See install script in ${PROJECT_SOURCE_DIR}/or_tools for details."
+    )
 endif(NOT ORTOOLS_LIBS)
 find_path(ORTOOLS_INCLUDE_DIR 
     constraint_solver/constraint_solver.h
     PATH_SUFFIXES or-tools
 )
 if(NOT ORTOOLS_INCLUDE_DIR)
-    message(FATAL_ERROR "Google or-tools headers not found, please install first.")
+    message(FATAL_ERROR "
+        Google or-tools lib not found, please install first.
+        See install script in ${PROJECT_SOURCE_DIR}/or_tools for details."
+    )
 endif(NOT ORTOOLS_INCLUDE_DIR)
 
 ## Uncomment this if the package has a setup.py. This macro ensures

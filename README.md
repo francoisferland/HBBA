@@ -6,27 +6,18 @@ built at 3IT-IntRoLab (Université de Sherbrooke).
 It has been built with ROS and our robots (IRL-1/TR and /AZ3 variants) in mind,
 but has been designed to be compatible with various platforms.
 
-To build the Intention Translator, which relies on Google or-tools, you need to
-install these packages (on Ubuntu 14.04):
+Google or-tools has to be installed first to build the Intention Translator
+(iw_translator).
+Unfortunately, it is not currently offered as a Debian package, but can be built
+from source or downloaded as a pre-built version for Ubuntu 14.04.
+Also, see the "or_tools" subfolder of the iw_translator package for a dpkg
+generation script that can then be used to install or-tools.
 
- - autoconf
+The whole distribution also requires those system dependencies:
+
  - bison
- - curl
  - flex
- - g++
- - gawk
- - gettext
- - help2man (for or-tools)
- - libtool
- - make
- - python-setuptools
- - python-dev
- - subversion
- - texinfo (for makeinfo, needed by or-tools)
- - texlive (for or-tools)
- - zlib1g-dev
-
-Furthermore, libv8-dev is required by the IW Script Engine.
+ - libv8-dev
 
 To build the distribution, do not forget to fetch the hbba_base submodule like
 this (from the root directory of this repository):
@@ -34,7 +25,3 @@ this (from the root directory of this repository):
 $ git submodule init; git submodule update
 
 Then, the whole system should build from a single catkin_make.
-However, especially if your Internet connection is unstable, the download of
-some third-party dependencies pulled by or-tools might fail.
-If it's the case, you can normally safely re-start the build process until
-everything is downloaded correctly.

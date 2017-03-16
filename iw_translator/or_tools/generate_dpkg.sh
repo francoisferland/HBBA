@@ -8,7 +8,7 @@ PACKAGE=or-tools_Ubuntu-14.04-64bit_v5.1.4045
 FOLDER=or-tools_Ubuntu-14.04-64bit_v5.1.4047    # NOTE: The content doesn't fit
 URL=https://github.com/google/or-tools/releases/download/v5.1/${PACKAGE}.tar.gz 
 
-# wget $URL
+wget $URL
 tar -xzvf $PACKAGE.tar.gz
 mkdir -p dpkg/usr/local/
 cp -r $FOLDER/include dpkg/usr/local/

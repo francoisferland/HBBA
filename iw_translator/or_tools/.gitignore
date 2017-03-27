@@ -1,4 +1,4 @@
-dpkg/usr
+dpkg/opt
 *.tar.gz
 *.deb
 or-tools_Ubuntu*

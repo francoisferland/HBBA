@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 # See or-tools/install.sh script to automate installation.
 find_library(ORTOOLS_LIBS 
     ortools
+    HINTS /opt/or-tools/lib
 )
 if(NOT ORTOOLS_LIBS)
     message(FATAL_ERROR "
@@ -27,6 +28,7 @@ if(NOT ORTOOLS_LIBS)
 endif(NOT ORTOOLS_LIBS)
 find_path(ORTOOLS_INCLUDE_DIR 
     constraint_solver/constraint_solver.h
+    HINTS /opt/or-tools/include
 )
 if(NOT ORTOOLS_INCLUDE_DIR)
     message(FATAL_ERROR "

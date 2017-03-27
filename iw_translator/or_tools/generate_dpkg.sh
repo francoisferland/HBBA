@@ -10,9 +10,9 @@ URL=https://github.com/google/or-tools/releases/download/v5.1/${PACKAGE}.tar.gz
 
 wget $URL
 tar -xzvf $PACKAGE.tar.gz
-mkdir -p dpkg/usr/local/
-cp -r $FOLDER/include dpkg/usr/local/
-cp -r $FOLDER/lib dpkg/usr/local/
-rm dpkg/usr/local/lib/*.jar
+mkdir -p dpkg/opt/or-tools/
+cp -r $FOLDER/include dpkg/opt/or-tools/
+cp -r $FOLDER/lib dpkg/opt/or-tools/
+rm dpkg/opt/or-tools/lib/*.jar
 
 dpkg-deb --build dpkg or-tools_5.1.4047-1.deb

@@ -138,16 +138,16 @@ add_hbba_cfg(turlebot_nav_slam hbba_cfg/turtlebot_nav_slam.yaml)
 
 ## Mark cpp header files for installation
 install(DIRECTORY launch
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-    FILES_MATCHING PATTERN "*.launch"
-#   PATTERN ".svn" EXCLUDE
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch/
+  FILES_MATCHING PATTERN "*.launch"
+  PATTERN ".svn" EXCLUDE
 )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(FILES
-    hbba_cfg/turtlebot.yaml
-#   # myfile2
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+install(DIRECTORY hbba_cfg/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/hbba_cfg/
+  FILES_MATCHING PATTERN "*.yaml"
+  PATTERN ".svn" EXCLUDE
 )
 
 #############

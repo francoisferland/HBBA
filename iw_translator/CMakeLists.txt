@@ -156,6 +156,8 @@ target_link_libraries(iw_translator
     ${catkin_LIBRARIES}
     ${ORTOOLS_LIB}
 )
+# To make sure it finds or-tools once deployed:
+set_target_properties(iw_translator PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_executable(iw_translator_node src/iw_translator_node.cpp)
 target_link_libraries(iw_translator_node iw_translator ${catkin_LIBRARIES})

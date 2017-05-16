@@ -14,16 +14,16 @@ class iw_server:
         self.desires = {}
         self.srv_add = \
             rospy.Service('add_desires', AddDesires, self.add_desires_srv)
+        self.pub_set = rospy.Publisher('desires_set', 
+                                       DesiresSet,
+                                       latch=True,
+                                       queue_size=1)
         self.srv_int = rospy.Service('set_desire_intensity', \
 			SetDesireIntensity, self.set_desire_intensity_srv)
         self.srv_del = rospy.Service('remove_desires', RemoveDesires, \
 			self.remove_desires_srv)
         self.srv_up  = rospy.Service('update_desires', UpdateDesires, \
             self.update_desires_srv)
-        self.pub_set = rospy.Publisher('desires_set', 
-                                       DesiresSet,
-                                       latch=True,
-                                       queue_size=1)
 
     def add_desires(self, desires):
         if len(desires) < 1:

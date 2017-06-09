@@ -9,6 +9,8 @@ Runtime::Runtime(const Rules& rules): rules_(rules)
     if (event_type_map_.empty()) {
         event_type_map_["des_on"]  = hbba_msgs::Event::DES_ON;
         event_type_map_["des_off"] = hbba_msgs::Event::DES_OFF;
+        event_type_map_["int_on"]  = hbba_msgs::Event::INT_ON;
+        event_type_map_["int_off"] = hbba_msgs::Event::INT_OFF;
         event_type_map_["exp_on"]  = hbba_msgs::Event::EXP_ON;
         event_type_map_["exp_off"] = hbba_msgs::Event::EXP_OFF;
     }

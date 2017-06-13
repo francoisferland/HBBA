@@ -13,6 +13,8 @@ Runtime::Runtime(const Rules& rules): rules_(rules)
         event_type_map_["int_off"] = hbba_msgs::Event::INT_OFF;
         event_type_map_["exp_on"]  = hbba_msgs::Event::EXP_ON;
         event_type_map_["exp_off"] = hbba_msgs::Event::EXP_OFF;
+        event_type_map_["acc_on"]  = hbba_msgs::Event::ACC_ON;
+        event_type_map_["acc_off"] = hbba_msgs::Event::ACC_OFF;
     }
 
     ros::NodeHandle n;

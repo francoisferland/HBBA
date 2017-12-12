@@ -112,8 +112,8 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_hbba_cfg(turlebot_nav      hbba_cfg/turtlebot_nav.yaml)
-add_hbba_cfg(turlebot_nav_slam hbba_cfg/turtlebot_nav_slam.yaml)
+add_hbba_cfg(turtlebot_nav      hbba_cfg/turtlebot_nav.yaml)
+add_hbba_cfg(turtlebot_nav_slam hbba_cfg/turtlebot_nav_slam.yaml)
 
 #############
 ## Install ##

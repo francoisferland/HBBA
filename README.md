@@ -197,7 +197,6 @@ Then, if everything built correctly, you can start the whole system:
 
     $ roslaunch turtlebot_test turtlebot_stage.launch
     $ roslaunch turtlebot_test turtlebot_nav.launch
-    $ rosrun hbba_docker run_docker.sh
 
 The first line corresponds to the HAL, starting the simulator and basic nodes.
 The second one is a launch file that does three things:
@@ -207,20 +206,15 @@ The second one is a launch file that does three things:
  - Add initial Desires when the core nodes are ready.
 
 The script adding the initial desires waits for the core node services to be
-available. The timeout is 30 seconds. 
+available. The timeout is 30 seconds. Normally, the core nodes will have more
+than enough time to finish starting, but it can be useful if those nodes are
+started with a different method. (like with the Docker configuration).
 
-The last command starts the Docker container and the HBBA core nodes.
-Normally, the nodes should be available before the timeout occurs in the
-previous script.
-
-The idea of splitting the three steps is that it allows to restart the HBBA
-runtime (step two and three) without restarting the simulator or HAL of the real
+The idea of splitting in two steps is that it allows to restart the HBBA
+runtime (step two) without restarting the simulator or HAL of the real
 robot.
-However, to quickly test if everything works, a launch file called
-turtlebot_nav_full.launch that takes care of all three steps has been provided
-in the turtlebot_test package. It can be launched like this:
-
-    $ roslaunch turtlebot_test turtlebot_nav_full.launch
+However, you can create a launch file that start these two steps to automate
+the process. 
 
 If everything is running correctly, you should see a Stage window with a single
 black square representing the robot.

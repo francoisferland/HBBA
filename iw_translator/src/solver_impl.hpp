@@ -7,7 +7,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #pragma GCC diagnostic ignored "-Wignored-qualifiers"
-#include <constraint_solver/constraint_solver.h>
+#include <ortools/constraint_solver/constraint_solver.h>
 #pragma GCC diagnostic pop
 
 #include <boost/scoped_ptr.hpp>
@@ -20,7 +20,7 @@ namespace iw_translator
     {
         typedef std::vector<int64>                             IntVector;
         typedef operations_research::IntVar                    IntVar;
-        typedef operations_research::vector<IntVar*>           IntVarVector;
+        typedef std::vector<IntVar*>                           IntVarVector;
         typedef std::vector<operations_research::Constraint*>  ConstraintsVector;
         typedef boost::scoped_ptr<operations_research::Solver> ORSolverPtr;
 

@@ -80,6 +80,9 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
     last_a_ = std::vector<unsigned char>(strats_.size(), 0);
     last_p_ = std::vector<std::string>(strats_.size(), std::string("")); 
 
+    std::string custom_script;
+    np.param("custom_script", custom_script, std::string(""));
+    evalScript(custom_script);
     initStrategies();
 }
 
@@ -171,8 +174,13 @@ void IWTranslator::initStrategies()
         ss << i->source << std::endl;
     }
 
+    evalScript(ss.str());
+}
+
+void IWTranslator::evalScript(const std::string& script)
+{
     std::string result;
-    script_engine_.eval(ss.str(), result);
+    script_engine_.eval(script, result);
     if (result == "undefined") {
         ROS_INFO("Evaluation done.");
     } else {
@@ -180,7 +188,6 @@ void IWTranslator::initStrategies()
             "Evaluation done, see console for details. Result: '%s'",
             result.c_str());
     }
-
 }
 
 void IWTranslator::activateIntention(const hbba_msgs::Intention& intent)

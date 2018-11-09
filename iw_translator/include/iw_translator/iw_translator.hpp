@@ -76,7 +76,10 @@ namespace iw_translator
 
         /// \brief Evaluate the source script of each strategies, warn the user
         /// in case of errors.
-        void initStrategies(); 
+        void initStrategies();
+
+        /// \brief Evaluate the specified script, warn the user in case of errors.
+        void evalScript(const std::string& script);
 
         /// \brief Call activation (or deactivation) scripts for each strategy.
         ///

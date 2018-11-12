@@ -103,7 +103,8 @@ target_link_libraries(engine_v8 v8 ${catkin_LIBRARIES})
 
 # Common plugins
 add_library(common_plugins 
-    src/common_plugins.cpp )
+    src/message_common_plugins.cpp
+    src/service_common_plugins.cpp)
 
 ## Declare a cpp executable
 add_executable(script_engine src/script_engine.cpp)

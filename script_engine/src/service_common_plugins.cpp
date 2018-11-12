@@ -1,11 +1,8 @@
 #include <script_engine_plugins/service_caller_base.hpp>
-#include <script_engine_plugins/publisher_topic_arg_base.hpp>
 #include <hbba_msgs/EvalScript.h>
 #include <hbba_msgs/Boolean.h>
 #include <hbba_msgs/UpdateRate.h>
 #include <pluginlib/class_list_macros.h>
-#include <std_msgs/String.h>
-#include <std_msgs/Empty.h>
 #include <std_srvs/Empty.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <tf/tf.h>
@@ -146,88 +143,6 @@ namespace common_plugins
         }
 
     };
-
-    /// \brief A basic function to publish on std_msgs/Empty topics.
-    namespace pub_empty
-    {
-        extern void afun(const v8::Arguments&, std_msgs::Empty&)
-        {
-        }
-
-        const extern char pub_name[] = "pubEmpty";
-
-        typedef script_engine_plugins::publisher_topic_arg_base<
-            std_msgs::Empty,
-            pub_name,
-            afun> PubEmptyPlugin;
-    }
-    
-
-    /// \brief A basic function to publish strings on topics.
-    namespace pub_string
-    {
-        extern void afun(const v8::Arguments& args, 
-            std_msgs::String& msg)
-        {
-            v8::String::Utf8Value v8_text(args[1]);
-            msg.data = std::string(*v8_text);
-        }
-
-        const extern char pub_name[] = "pubString";
-
-        typedef script_engine_plugins::publisher_topic_arg_base<
-            std_msgs::String,
-            pub_name,	
-            afun> PubStringPlugin;
-    }
-
-    /// \brief A geometry_msgs/PoseStamped publication tool takes as input a 
-    /// planar (x, y, theta) pose usually meant as a navigation goal.
-    ///
-    /// Params:
-    ///  0: The output topic's name, taken care of by the base class.
-    ///  1: The frame id (String)
-    ///  2: x position
-    ///  3: y position
-    ///  4: theta angle, (around Z).
-    namespace pub_nav_goal
-    {
-        extern void afun(const v8::Arguments& args,
-            geometry_msgs::PoseStamped& msg)
-        {
-            if (args.Length() < 5)
-            {
-                ROS_ERROR("Not enough arguments in pubNavGoal call.");
-                return;
-            }
-
-            v8::String::Utf8Value frame_id(args[1]);
-            v8::Number* vx = v8::Number::Cast(*args[2]);
-            v8::Number* vy = v8::Number::Cast(*args[3]);
-            v8::Number* vt = v8::Number::Cast(*args[4]);
-
-            ROS_DEBUG("Sending navigation goal: %s, %f, %f, %f.",
-                msg.header.frame_id.c_str(),
-                vx->Value(),
-                vy->Value(),
-                vt->Value());
-
-            msg.header.frame_id = *frame_id;
-            msg.header.stamp = ros::Time::now();
-            msg.pose.position.x = vx->Value();
-            msg.pose.position.y = vy->Value();
-            msg.pose.position.z = 0.0;
-            msg.pose.orientation = tf::createQuaternionMsgFromYaw(vt->Value());
-
-        }
-
-        const extern char pub_name[] = "pubNavGoal";
-
-        typedef script_engine_plugins::publisher_topic_arg_base<
-            geometry_msgs::PoseStamped,
-            pub_name,
-            afun> PubNavGoalPlugin;
-    }
 }
 
 PLUGINLIB_DECLARE_CLASS(script_engine, EvalCall, 
@@ -245,13 +160,3 @@ PLUGINLIB_DECLARE_CLASS(script_engine, UpdateRateCall,
 PLUGINLIB_DECLARE_CLASS(script_engine, SysCall, 
 	common_plugins::SysCall,
 	script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubEmpty,
-    common_plugins::pub_empty::PubEmptyPlugin,
-    script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubString, 
-	common_plugins::pub_string::PubStringPlugin,
-	script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubNavGoal, 
-	common_plugins::pub_nav_goal::PubNavGoalPlugin,
-	script_engine_plugins::engine_module);
-

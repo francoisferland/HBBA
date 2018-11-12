@@ -42,6 +42,55 @@
 		  Publish an empty message on the specified topic.
 		</description>
 	</class>
+	<class name="script_engine/PubBoolean"
+			type="common_plugins::pub_boolean::PubBooleanPlugin"
+			base_class_type="script_engine_plugins::engine_module">
+		<description>
+		  Publish a boolean on the specified topic.
+		</description>
+	</class>
+	<class name="script_engine/PubInt8"
+			type="common_plugins::pub_int::PubInt8Plugin"
+			base_class_type="script_engine_plugins::engine_module">
+		<description>
+		  Publish an 8-bit integer on the specified topic.
+		</description>
+	</class>
+	<class name="script_engine/PubInt16"
+			type="common_plugins::pub_int::PubInt16Plugin"
+			base_class_type="script_engine_plugins::engine_module">
+		<description>
+		  Publish a 16-bit integer on the specified topic.
+		</description>
+	</class>
+	<class name="script_engine/PubInt32"
+			type="common_plugins::pub_int::PubInt32Plugin"
+			base_class_type="script_engine_plugins::engine_module">
+		<description>
+		  Publish a 32-bit integer on the specified topic.
+		</description>
+	</class>
+	<class name="script_engine/PubInt64"
+			type="common_plugins::pub_int::PubInt64Plugin"
+			base_class_type="script_engine_plugins::engine_module">
+		<description>
+		  Publish a 64-bit integer on the specified topic.
+		</description>
+	</class>
+	<class name="script_engine/PubFloat32"
+			type="common_plugins::pub_float::PubFloat32Plugin"
+			base_class_type="script_engine_plugins::engine_module">
+		<description>
+		  Publish a float on the specified topic.
+		</description>
+	</class>
+	<class name="script_engine/PubFloat64"
+			type="common_plugins::pub_float::PubFloat64Plugin"
+			base_class_type="script_engine_plugins::engine_module">
+		<description>
+		  Publish a double on the specified topic.
+		</description>
+	</class>
 	<class name="script_engine/PubString" 
 			type="common_plugins::pub_string::PubStringPlugin"
 			base_class_type="script_engine_plugins::engine_module">
@@ -54,6 +103,13 @@
 			base_class_type="script_engine_plugins::engine_module">
 		<description>
 		  Publish a navigation goal on a 2D plane on the specified topic and frame_id.
+		</description>
+	</class>
+	<class name="script_engine/PubDuration"
+			type="common_plugins::pub_duration::PubDurationPlugin"
+			base_class_type="script_engine_plugins::engine_module">
+		<description>
+		  Publish a duration on the specified topic.
 		</description>
 	</class>
 </library>

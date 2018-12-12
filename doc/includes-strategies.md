@@ -1,4 +1,4 @@
-#Custom Script
+# Custom Script
 
 ## Syntax
 ```yaml

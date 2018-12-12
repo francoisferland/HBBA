@@ -13,7 +13,7 @@
   - custom_script: "function enableBase() {pubBoolean('/base/enable', true);}"
 ```
 
-#Stragegies
+# Stragegies
 
 ## Syntax
 ```yaml

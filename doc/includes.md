@@ -1,4 +1,8 @@
 # Includes
+These clauses append the content of other configuration files to the current one.
+
+Notes:
+- The specified configuration file must be in the package `hbba_cfg` folder.
 
 ## Syntax
 ```yaml

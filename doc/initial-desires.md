@@ -1,4 +1,5 @@
 # Initial Desires
+These clauses define desires added at the system startup.
 
 ## Syntax
 ```yaml

@@ -1,4 +1,10 @@
 # Motivations
+These clauses define motivation modules. The input and output topics are not filtered.
+
+Notes:
+- The input and output topics can be renamed by global remap clauses.
+- The specified launch file must not contain any remap clauses.
+- The topic name must not contain "/".
 
 ## Syntax
 ```yaml

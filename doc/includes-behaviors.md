@@ -1,4 +1,11 @@
 # Behaviors
+These clauses define behavior modules. The input topics are filtered by default. The output topics are prioritized by arbitration nodes.
+
+Notes:
+- The output topics can be renamed by global remap clauses.
+- The specified launch file must not contain any remap clauses.
+- The topic name must not contain "/" if the topic is filtered.
+- The arbitration nodes use the priority to select the proper messages. The messages from the highest priority behavior are chosen.
 
 ## Syntax
 ```yaml

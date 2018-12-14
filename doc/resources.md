@@ -1,4 +1,5 @@
 # Resources
+This clause defines the robot available resources that the HBBA module uses to optimize the activated strategies. The resources can be used to make sure that devices are used by strategies one at a time when the motivation nodes don't handle this constraint.
 
 ## Syntax
 ```yaml

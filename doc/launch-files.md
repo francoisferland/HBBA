@@ -1,4 +1,5 @@
 # Launch Files
+These clauses add launch file include clauses at the beginning of the generated launch file. The include clause file attribute contains the specified path.
 
 ## Syntax
 ```yaml

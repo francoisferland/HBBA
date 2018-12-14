@@ -1,4 +1,5 @@
 # Remap Clauses
+These clauses rename global topics or a global services.
 
 ## Syntax
 ```yaml

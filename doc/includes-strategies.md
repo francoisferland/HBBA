@@ -1,4 +1,5 @@
-# Custom Script
+# Custom Scripts
+These clauses are used to define JavaScript functions that can be called in the `custom_bringup` and `custom_bringdn` fields.
 
 ## Syntax
 ```yaml
@@ -14,6 +15,7 @@
 ```
 
 # Stragegies
+These clauses define strategies achieving desires. The JavaScript code in the `custom_bringup` and `custom_bringdn` fields get access to the desire parameters with the global variable named `params`.
 
 ## Syntax
 ```yaml

@@ -1,4 +1,10 @@
 # Perceptions
+These clauses define perception modules. The input topics are filtered by default.
+
+Notes:
+- The output topics can be renamed by global remap clauses.
+- The specified launch file must not contain any remap clauses.
+- The topic name must not contain "/" if the topic is filtered.
 
 ## Syntax
 ```yaml

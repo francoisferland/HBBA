@@ -1,8 +1,6 @@
 #ifndef SOLVER_MODEL_HPP
 #define SOLVER_MODEL_HPP
 
-#include <hbba_msgs/Strategy.h>
-#include <hbba_msgs/DesiresSet.h>
 #include <boost/multi_array.hpp>
 #include <boost/bimap.hpp>
 
@@ -15,6 +13,11 @@ namespace iw_translator
     typedef std::vector<Scalar>                   Vector;
     /// \brief Matrix type for internal data (NxM).
     typedef boost::multi_array<Scalar, 2>         Matrix;
+    /// \brief Column view of matrices.
+    typedef Matrix::const_array_view<1>::type     MatrixColView;
+    /// \brief Range generator for matrices.
+    typedef boost::multi_array_types::index_range MatrixRange;
+
 
     /// \brief A class that represents the static data part of the IW solver.
     ///

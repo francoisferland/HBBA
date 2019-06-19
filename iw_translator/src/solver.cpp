@@ -1,7 +1,7 @@
 #include "solver_impl.hpp"
 
 #include <iw_translator/solver.hpp>
-#include <ros/ros.h>
+//#include <ros/ros.h>
 
 using namespace iw_translator;
 
@@ -20,7 +20,7 @@ Solver::Solver(
         gstr << g[k] << " ";
     }
     gstr << "]";
-    ROS_DEBUG("%s", gstr.str().c_str());
+    //ROS_DEBUG("%s", gstr.str().c_str());
 
     impl_->or_solver.reset(new or_tools::Solver("iw_solver_impl"));
 
@@ -174,19 +174,19 @@ Solver::Solver(
                                                          100));
     }
 
-    ros::Time search_start = ros::Time::now();
+    //ros::Time search_start = ros::Time::now();
 
     solver.NewSearch(db, monitors);
     solver.Solve(db, coll, opt_var);
 
-    ros::Duration search_time = ros::Time::now() - search_start;
-    ROS_DEBUG("Solving search duration: %f s", search_time.toSec());
+    //ros::Duration search_time = ros::Time::now() - search_start;
+    //ROS_DEBUG("Solving search duration: %f s", search_time.toSec());
 
     int nb_sols = coll->solution_count();
-    ROS_DEBUG("Solutions count: %i", nb_sols);
+    //ROS_DEBUG("Solutions count: %i", nb_sols);
 
     if (nb_sols == 0) {
-        ROS_ERROR("IW Solver could not find a solution.");
+        //ROS_ERROR("IW Solver could not find a solution.");
         a_res_.clear();
     } else {
         a_res_.resize(a.size());
@@ -203,7 +203,7 @@ Solver::Solver(
         ss << f_k << " ";
     }
     ss << "]";
-    ROS_DEBUG("F vector: %s", ss.str().c_str());
+    //ROS_DEBUG("F vector: %s", ss.str().c_str());
 
     solver.EndSearch();
 

@@ -11,11 +11,7 @@ namespace iw_translator
 {
     /// \brief Map used to match string identifiers to indices.
     typedef boost::bimap<std::string, int>        IndicesMap;
-    /// \brief Column view of matrices.
-    typedef Matrix::const_array_view<1>::type     MatrixColView;
-    /// \brief Range generator for matrices.
-    typedef boost::multi_array_types::index_range MatrixRange;
-
+    
     /// \brief A class that represents the static data part of the IW solver
     /// based on ROS message definitions.
     ///

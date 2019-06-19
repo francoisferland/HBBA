@@ -121,15 +121,9 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${ORTOOLS_INCLUDE_DIR}
 )
+
 link_directories(${ORTOOLS_OUTPUT_DIR}/lib/or-tools)
 
-add_library(solver_impl
-    src/solver.cpp
-)
-target_link_libraries(solver_impl
-    ${catkin_LIBRARIES}
-    ${ORTOOLS_LIBS}
-)
 # Disables deprecated warnings on or_tools headers and enable C++11 support:
 if (CMAKE_COMPILER_IS_GNUCXX)
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
@@ -141,25 +135,31 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     endif ()
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
-set_target_properties(solver_impl PROPERTIES
+add_library(solver_core
+    src/solver_model.cpp
+    src/solver.cpp
+)
+
+set_target_properties(solver_core PROPERTIES
     COMPILE_FLAGS "-Wno-deprecated --std=c++11"
 )
-add_dependencies(solver_impl google-or-tools)
+add_dependencies(solver_core google-or-tools)
 
-add_library(solver_model
-    src/solver_model.cpp
+target_link_libraries(solver_core
+    ${ORTOOLS_LIBS}
 )
+
 add_library(iw_translator
     src/iw_translator.cpp
     src/solver_model_ros.cpp
     src/strategy_parser.cpp
 )
+
 target_link_libraries(iw_translator
-    solver_impl
-    solver_model
+    solver_core
     ${catkin_LIBRARIES}
-    ${ORTOOLS_LIB}
 )
+
 # To make sure it finds or-tools once deployed:
 set_target_properties(iw_translator PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -190,7 +190,7 @@ add_dependencies(iw_translator hbba_msgs_generate_messages_cpp)
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS solver_impl iw_translator iw_translator_node
+install(TARGETS solver_core iw_translator iw_translator_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

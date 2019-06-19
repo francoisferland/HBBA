@@ -28,7 +28,7 @@ if(NOT ORTOOLS_LIBS)
 endif(NOT ORTOOLS_LIBS)
 find_path(ORTOOLS_INCLUDE_DIR 
     constraint_solver/constraint_solver.h
-    HINTS /opt/or-tools/include
+    HINTS /opt/or-tools/include /opt/or-tools/include/ortools
 )
 if(NOT ORTOOLS_INCLUDE_DIR)
     message(FATAL_ERROR "

@@ -1,10 +1,10 @@
 Package: or-tools
-Version: 5.1.4047-1
+Version: 7.1.6720
 Section: base
 Priority: optional
 Architecture: amd64
 Maintainer: François Ferland <ff@francoisferland.com>
 Description: Google or-tools library, without Java parts.
- Based on official or-tools_Ubuntu-14.04-64bit_v5.1.4047 tar distribution.
+ Based on official tar distribution.
 
 

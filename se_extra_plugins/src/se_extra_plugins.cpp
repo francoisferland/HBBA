@@ -1,6 +1,6 @@
 #include <script_engine_plugins/publisher_topic_arg_base.hpp>
 #include <std_msgs/Float64.h>
-#include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_list_macros.hpp>
 #include <v8.h>
 
 namespace se_extra_plugins
@@ -30,7 +30,5 @@ namespace se_extra_plugins
 
 }
 
-PLUGINLIB_DECLARE_CLASS(se_extra_plugins,
-                        PubFloat64Plugin,
-                        se_extra_plugins::PubFloat64Plugin,
-                        script_engine_plugins::engine_module);
+PLUGINLIB_EXPORT_CLASS(se_extra_plugins::PubFloat64Plugin,
+                       script_engine_plugins::engine_module);

@@ -138,18 +138,18 @@ namespace common_plugins
     };
 }
 
-PLUGINLIB_DECLARE_CLASS(script_engine, EvalCall, 
+PLUGINLIB_EXPORT_CLASS(
 	common_plugins::eval::call_eval_plugin,
 	script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, EmptyCall, 
+PLUGINLIB_EXPORT_CLASS(
 	common_plugins::empty::call_empty_plugin,
 	script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, BooleanCall, 
+PLUGINLIB_EXPORT_CLASS(
 	common_plugins::boolean::call_boolean_plugin,
 	script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, UpdateRateCall, 
+PLUGINLIB_EXPORT_CLASS(
 	common_plugins::update_rate::call_update_rate_plugin,
 	script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, SysCall, 
+PLUGINLIB_EXPORT_CLASS(
 	common_plugins::SysCall,
 	script_engine_plugins::engine_module);

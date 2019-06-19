@@ -214,36 +214,36 @@ namespace common_plugins
     }
 }
 
-PLUGINLIB_DECLARE_CLASS(script_engine, PubEmpty,
+PLUGINLIB_EXPORT_CLASS(
     common_plugins::pub_empty::PubEmptyPlugin,
     script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubBoolean,
+PLUGINLIB_EXPORT_CLASS(
     common_plugins::pub_boolean::PubBooleanPlugin,
     script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubInt8,
+PLUGINLIB_EXPORT_CLASS(
     common_plugins::pub_int::PubInt8Plugin,
     script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubInt16,
+PLUGINLIB_EXPORT_CLASS(
     common_plugins::pub_int::PubInt16Plugin,
     script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubInt32,
+PLUGINLIB_EXPORT_CLASS(
     common_plugins::pub_int::PubInt32Plugin,
     script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubInt64,
+PLUGINLIB_EXPORT_CLASS(
     common_plugins::pub_int::PubInt64Plugin,
     script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubFloat32,
+PLUGINLIB_EXPORT_CLASS(
     common_plugins::pub_float::PubFloat32Plugin,
     script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubFloat64,
+PLUGINLIB_EXPORT_CLASS(
     common_plugins::pub_float::PubFloat64Plugin,
     script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubString, 
+PLUGINLIB_EXPORT_CLASS(
 	common_plugins::pub_string::PubStringPlugin,
 	script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubNavGoal, 
+PLUGINLIB_EXPORT_CLASS(
 	common_plugins::pub_nav_goal::PubNavGoalPlugin,
 	script_engine_plugins::engine_module);
-PLUGINLIB_DECLARE_CLASS(script_engine, PubDuration, 
+PLUGINLIB_EXPORT_CLASS(
 	common_plugins::pub_duration::PubDurationPlugin,
 	script_engine_plugins::engine_module);

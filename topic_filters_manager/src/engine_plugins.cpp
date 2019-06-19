@@ -79,7 +79,6 @@ namespace topic_filters_manager
 
 }
 
-PLUGINLIB_DECLARE_CLASS(topic_filters_manager, ScriptEnginePlugins, 
-	topic_filters_manager::ScriptEnginePlugins,
-	script_engine_plugins::engine_module);
+PLUGINLIB_EXPORT_CLASS(topic_filters_manager::ScriptEnginePlugins,
+                       script_engine_plugins::engine_module);
 

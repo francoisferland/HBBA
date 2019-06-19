@@ -4,7 +4,7 @@
 #include <hbba_msgs/Strategy.h>
 #include <hbba_msgs/DesiresSet.h>
 #include <hbba_msgs/Intention.h>
-#include <iw_translator/solver_model.hpp>
+#include <iw_translator/solver_model_ros.hpp>
 #include <iw_translator/solver.hpp>
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
@@ -49,19 +49,19 @@ namespace iw_translator
     class IWTranslator
     {
     private:
-        std::vector<hbba_msgs::Strategy> strats_;
-        boost::scoped_ptr<SolverModel>   solver_model_;
-        script_engine::engine_v8         script_engine_;
+        std::vector<hbba_msgs::Strategy>    strats_;
+        boost::scoped_ptr<SolverModelROS>   solver_model_;
+        script_engine::engine_v8            script_engine_;
 
-        ros::Subscriber                  sub_desires_;
-        ros::Publisher                   pub_intention_;
-        ros::Publisher                   pub_status_;
-        ros::ServiceClient               srv_eval_script_;
+        ros::Subscriber                     sub_desires_;
+        ros::Publisher                      pub_intention_;
+        ros::Publisher                      pub_status_;
+        ros::ServiceClient                  srv_eval_script_;
 
-        SolverParams                     solver_params_;
+        SolverParams                        solver_params_;
 
-        std::vector<unsigned char>       last_a_;
-        std::vector<std::string>         last_p_;
+        std::vector<unsigned char>          last_a_;
+        std::vector<std::string>            last_p_;
 
     public:
         /// \brief Constructor.

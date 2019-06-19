@@ -1,5 +1,5 @@
 #include <iw_translator/strategy_parser.hpp>
-#include <iw_translator/solver_model.hpp>
+#include <iw_translator/solver_model_ros.hpp>
 #include <ros/ros.h>
 
 int main(int argc, char** argv)
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
                 "will try building model...",
                 strats.size());
             std::vector<hbba_msgs::ResourceUsage> zero_caps;
-            iw_translator::SolverModel model(strats, zero_caps);
+            iw_translator::SolverModelROS model(strats, zero_caps);
 
             ROS_INFO("Cost matrix C:\n%s",         model.cAsCSV().c_str());
             ROS_INFO("Utility matrix U:\n%s",      model.uAsCSV().c_str());

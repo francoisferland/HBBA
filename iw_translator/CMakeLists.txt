@@ -146,13 +146,17 @@ set_target_properties(solver_impl PROPERTIES
 )
 add_dependencies(solver_impl google-or-tools)
 
+add_library(solver_model
+    src/solver_model.cpp
+)
 add_library(iw_translator
     src/iw_translator.cpp
-    src/solver_model.cpp
+    src/solver_model_ros.cpp
     src/strategy_parser.cpp
 )
 target_link_libraries(iw_translator
     solver_impl
+    solver_model
     ${catkin_LIBRARIES}
     ${ORTOOLS_LIB}
 )

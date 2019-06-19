@@ -57,7 +57,7 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
     np.param("time_limit", solver_params_.time_limit,     0);
     np.param("solver_sa",  solver_params_.sa,         false);
 
-    solver_model_.reset(new SolverModel(strats_, res_caps));
+    solver_model_.reset(new SolverModelROS(strats_, res_caps));
 
     sub_desires_ = n.subscribe(
         "desires_set", 

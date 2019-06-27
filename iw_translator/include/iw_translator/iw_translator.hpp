@@ -5,7 +5,7 @@
 #include <hbba_msgs/DesiresSet.h>
 #include <hbba_msgs/Intention.h>
 #include <iw_translator/solver_model_ros.hpp>
-#include <iw_translator/solver.hpp>
+#include <iwt_core/solver.hpp>
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
 #include <script_engine/engine_v8.hpp>

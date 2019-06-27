@@ -5,7 +5,7 @@
 #include <hbba_msgs/DesiresSet.h>
 #include <boost/multi_array.hpp>
 #include <boost/bimap.hpp>
-#include "solver_model.hpp"
+#include <iwt_core/solver_model.hpp>
 
 namespace iw_translator
 {

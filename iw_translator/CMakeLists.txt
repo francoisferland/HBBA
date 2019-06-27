@@ -14,29 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
 # find_package(Boost REQUIRED COMPONENTS system)
 
 
-# Google or-tools library - we now rely on pre-built packages.
-# See or-tools/install.sh script to automate installation.
-find_library(ORTOOLS_LIBS 
-    ortools
-    HINTS /opt/or-tools/lib
-)
-if(NOT ORTOOLS_LIBS)
-    message(FATAL_ERROR "
-        Google or-tools lib not found, please install first.
-        See install script in ${PROJECT_SOURCE_DIR}/or_tools for details."
-    )
-endif(NOT ORTOOLS_LIBS)
-find_path(ORTOOLS_INCLUDE_DIR 
-    ortools/constraint_solver/constraint_solver.h
-    HINTS /opt/or-tools/include
-)
-if(NOT ORTOOLS_INCLUDE_DIR)
-    message(FATAL_ERROR "
-        Google or-tools headers not found, please install first.
-        See install script in ${PROJECT_SOURCE_DIR}/or_tools for details."
-    )
-endif(NOT ORTOOLS_INCLUDE_DIR)
-
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -113,16 +90,16 @@ catkin_package(
 ## Build ##
 ###########
 
+add_subdirectory(iwt_core)
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${catkin_INCLUDE_DIRS}
-  ${ORTOOLS_INCLUDE_DIR}
+  iwt_core/include
 )
-
-link_directories(${ORTOOLS_OUTPUT_DIR}/lib/or-tools)
 
 # Disables deprecated warnings on or_tools headers and enable C++11 support:
 if (CMAKE_COMPILER_IS_GNUCXX)
@@ -135,20 +112,6 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     endif ()
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
-add_library(solver_core
-    src/solver_model.cpp
-    src/solver.cpp
-)
-
-set_target_properties(solver_core PROPERTIES
-    COMPILE_FLAGS "-Wno-deprecated --std=c++11"
-)
-add_dependencies(solver_core google-or-tools)
-
-target_link_libraries(solver_core
-    ${ORTOOLS_LIBS}
-)
-
 add_library(iw_translator
     src/iw_translator.cpp
     src/solver_model_ros.cpp
@@ -156,7 +119,7 @@ add_library(iw_translator
 )
 
 target_link_libraries(iw_translator
-    solver_core
+    iwt_core
     ${catkin_LIBRARIES}
 )
 
@@ -190,7 +153,7 @@ add_dependencies(iw_translator hbba_msgs_generate_messages_cpp)
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS solver_core iw_translator iw_translator_node
+install(TARGETS iw_translator iw_translator_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

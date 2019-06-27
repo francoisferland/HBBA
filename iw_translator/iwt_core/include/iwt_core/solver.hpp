@@ -1,7 +1,7 @@
 #ifndef SOLVER_HPP
 #define SOLVER_HPP
 
-#include <iw_translator/solver_model.hpp>
+#include <iwt_core/solver_model.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace iw_translator

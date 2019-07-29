@@ -26,6 +26,8 @@ if(NOT ORTOOLS_INCLUDE_DIR)
     )
 endif(NOT ORTOOLS_INCLUDE_DIR)
 
+add_definitions("-Wno-deprecated --std=c++11")
+
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
     ${ORTOOLS_INCLUDE_DIR}
@@ -37,13 +39,17 @@ add_library(iwt_core
     src/solver.cpp
 )
 
-set_target_properties(iwt_core PROPERTIES
-    COMPILE_FLAGS "-Wno-deprecated --std=c++11"
-)
 
 target_link_libraries(iwt_core
     ${ORTOOLS_LIBS}
 )
+
+add_executable(sim_parser
+    src/sim_parser.cpp
+)
+target_link_libraries(sim_parser
+    iwt_core
+) 
 
 install(TARGETS iwt_core
     RUNTIME DESTINATION bin

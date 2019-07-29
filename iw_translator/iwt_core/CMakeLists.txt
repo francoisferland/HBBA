@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(iwt_core)
 
-find_package(Boost)
+find_package(Boost REQUIRED)
 
 # Google or-tools library - we now rely on pre-built packages.
 # See or-tools/install.sh script to automate installation.
@@ -29,6 +29,7 @@ endif(NOT ORTOOLS_INCLUDE_DIR)
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
     ${ORTOOLS_INCLUDE_DIR}
+    ${Boost_INCLUDE_DIRS}
 )
 
 add_library(iwt_core

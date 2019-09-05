@@ -1,4 +1,5 @@
 # Basic Turtlebot navigation demo (with a static map) in HBBA.
+# WARNING: Not up to date with Melodic / TB3 config (2019/09)
 
 hbba_conf:
 

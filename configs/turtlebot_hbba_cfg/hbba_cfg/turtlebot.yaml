@@ -1,4 +1,5 @@
 hbba_conf:
 
  - remap: {from: 'base_scan', to: 'scan'}
- - remap: {from: 'cmd_vel',   to: '/cmd_vel_mux/input/navi'}
+# No mux on TB3, straight cmd_vel input (at least in Gazebo):
+# - remap: {from: 'cmd_vel',   to: '/cmd_vel_mux/input/navi'}

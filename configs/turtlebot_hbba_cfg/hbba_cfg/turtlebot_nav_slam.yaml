@@ -34,3 +34,10 @@ hbba_conf:
 #     utility: 1
 #     intensity: 1.0
 #     security: True
+
+# Goto Generator:
+- motivation:
+    name: goto_generator
+    launch: {pkg: "turtlebot_hbba_cfg", path: "launch/motv_goto_generator.launch"}
+    input:
+     - goal

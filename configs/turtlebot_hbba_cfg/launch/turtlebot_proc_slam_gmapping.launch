@@ -1,3 +1,3 @@
 <launch>
-  <include file="$(find turtlebot_navigation)/launch/includes/gmapping.launch.xml"/>
+  <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"/>
 </launch>

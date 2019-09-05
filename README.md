@@ -83,14 +83,21 @@ or-tools, which is used by the IW Translator.
 Building the whole project locally is recommended, but we also have a
 Docker-based configuration that isolate some of the dependencies.
 
-### Complete build (recommended)
+### Complete build on Ubuntu 18.04 and ROS Melodic (recommended)
 
 Google or-tools has to be installed first to build the Intention Translator
 (iw_translator).
 Unfortunately, it is not currently offered as a Debian package, but can be built
-from source or downloaded as a pre-built version for Ubuntu 14.04.
+from source or downloaded as a pre-built version for Ubuntu 18.04.
 Also, see the "or_tools" subfolder of the iw_translator package for a dpkg
 generation script that can then be used to install or-tools.
+To use it, simply run:
+
+  or_tools$ ./generate_dpkg.sh
+  or_tools$ sudo dpkg -i or-tools_ubuntu-18.04_v7.1.6720.deb
+
+This installs the needed librairies in /opt/or-tools.
+The iw_translator package is configured to point to this location by default.
 
 The whole distribution also requires those system dependencies:
 
@@ -104,6 +111,10 @@ this (from the root directory of this repository):
 $ git submodule init; git submodule update
 
 Then, the whole system should build from a single catkin_make.
+If you encounter errors related to a package such as "hbba_synth" not being
+found, this usually means that the rospkg cache needs to be updated.
+Re-sourcing the setup.bash script and re-running catkin_make usually solves
+this. 
 
 ### Docker-based build 
 
@@ -188,36 +199,41 @@ Turtlebot demo
 
 The package includes a Turtlebot-based demo configuration to test if everything
 has been installed correctly.
-It relies on the Stage-based simulation of a Turtlebot. If you do not already
-have it, you can install it like this:
+It relies on a Gazebo-based simulation of a Turtlebot3 and requires its full
+software suite.
+If you do not already have it, you can install it like this:
 
-    $ sudo apt-get install ros-indigo-turtlebot-simulator
+    $ sudo apt-get install ros-melodic-turtlebot3 ros-melodic-turtlebot3-simulations
+
+NOTE: As of 2019/09/05, the turtlebot3_navigation package as a bug in the binary
+version related to TF frame names.
+You can instead clone the turtlebot3 and turtlebot3_simulations repos from
+GitHub in your workspace.
+They also require the installation of the whole navigation stack and gmapping :
+
+    $ sudo apt-get install ros-melodic-navigation ros-melodic-gmapping
 
 Then, if everything built correctly, you can start the whole system:
 
-    $ roslaunch turtlebot_test turtlebot_stage.launch
-    $ roslaunch turtlebot_test turtlebot_nav.launch
+    $ rosrun turtlebot_hbba_cfg start_slam_demo.sh
 
-The first line corresponds to the HAL, starting the simulator and basic nodes.
-The second one is a launch file that does three things:
+The scripts first set the TURTLEBOT3_MODEL environment variable that is required
+by other Turtlebot3 nodes.
+It then launches the simulator along with basic nodes, which corresponds to the
+HAL of the robot.
+Then, it starts the HBBA config for navigation with SLAM.
+This takes care of three things:
  
  - Load the model in the parameter server;
  - Launch higher-level nodes, which includes a navigation behavior;
  - Add initial Desires when the core nodes are ready.
 
-The script adding the initial desires waits for the core node services to be
-available. The timeout is 30 seconds. Normally, the core nodes will have more
-than enough time to finish starting, but it can be useful if those nodes are
-started with a different method. (like with the Docker configuration).
-
 The idea of splitting in two steps is that it allows to restart the HBBA
 runtime (step two) without restarting the simulator or HAL of the real
 robot.
-However, you can create a launch file that start these two steps to automate
-the process. 
 
-If everything is running correctly, you should see a Stage window with a single
-black square representing the robot.
+If everything is running correctly, you should see a Gazebo window with the
+robot and a simple environment.
 At this point, you can use iw_console to manually add a Desire to the IW:
 
     $ rosrun iw_tools iw_console
@@ -237,5 +253,7 @@ location.
 Furthermore, the configuration includes a motivation module that converts 
 geometry_msgs/PoseStamped messages into GoTo desires, and remove them
 automatically when the robot reaches its goal.
-With it, you can configure the 2D Nav Goal tool of RViz to publish to
-/motv_goto_generator/goal, and a Desire will be automatically generated.
+This is managed by the goto_generator node, which accepts new goals on the
+/goto_generator/goal topic, which can be generated with RViz.
+A sample configuration for RViz is also available in the turtlebot_hbba_cfg/cfg
+directory that is already configured for this.

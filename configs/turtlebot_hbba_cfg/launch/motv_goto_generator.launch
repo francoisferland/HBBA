@@ -1,0 +1,3 @@
+<launch>
+    <node name="goto_generator" pkg="iw_tools" type="goto_generator"/>
+</launch>

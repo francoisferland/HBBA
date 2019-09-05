@@ -215,13 +215,15 @@ They also require the installation of the whole navigation stack and gmapping :
 
 Then, if everything built correctly, you can start the whole system:
 
-    $ rosrun turtlebot_hbba_cfg start_slam_demo.sh
+    $ export TURTLEBOT3_MODEL=waffle
+    $ roslaunch turtlebot_hbba_cfg turtlebot_gazebo.launch
+    $ roslaunch turtlebot_hbba_cfg turtlebot_nav_slam.launch
 
-The scripts first set the TURTLEBOT3_MODEL environment variable that is required
+The first line sets the TURTLEBOT3_MODEL environment variable that is required
 by other Turtlebot3 nodes.
 It then launches the simulator along with basic nodes, which corresponds to the
 HAL of the robot.
-Then, it starts the HBBA config for navigation with SLAM.
+Finally, the last line starts the HBBA config for navigation with SLAM.
 This takes care of three things:
  
  - Load the model in the parameter server;

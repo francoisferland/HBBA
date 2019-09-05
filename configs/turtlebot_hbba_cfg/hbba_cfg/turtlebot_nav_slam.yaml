@@ -40,4 +40,4 @@ hbba_conf:
     name: goto_generator
     launch: {pkg: "turtlebot_hbba_cfg", path: "launch/motv_goto_generator.launch"}
     input:
-     - goal
+     - goto_goal

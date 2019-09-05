@@ -256,6 +256,6 @@ Furthermore, the configuration includes a motivation module that converts
 geometry_msgs/PoseStamped messages into GoTo desires, and remove them
 automatically when the robot reaches its goal.
 This is managed by the goto_generator node, which accepts new goals on the
-/goto_generator/goal topic, which can be generated with RViz.
+/goto_goal topic, which can be generated with RViz.
 A sample configuration for RViz is also available in the turtlebot_hbba_cfg/cfg
 directory that is already configured for this.

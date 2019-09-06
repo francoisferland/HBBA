@@ -94,6 +94,7 @@ generation script that can then be used to install or-tools.
 To use it, simply run:
 
   or_tools$ ./generate_dpkg.sh
+  
   or_tools$ sudo dpkg -i or-tools_ubuntu-18.04_v7.1.6720.deb
 
 This installs the needed librairies in /opt/or-tools.

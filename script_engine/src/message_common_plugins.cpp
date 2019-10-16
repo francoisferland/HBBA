@@ -25,7 +25,7 @@ namespace common_plugins
     /// \brief A basic function to publish on std_msgs/Empty topics.
     namespace pub_empty
     {
-        extern void afun(const v8::Arguments&, std_msgs::Empty&)
+        extern void afun(const v8::FunctionCallbackInfo<v8::Value>& args, std_msgs::Empty&)
         {
         }
 
@@ -40,7 +40,7 @@ namespace common_plugins
     /// \brief A basic function to publish booleans on topics.
     namespace pub_boolean
     {
-        extern void afun(const v8::Arguments& args, 
+        extern void afun(const v8::FunctionCallbackInfo<v8::Value>& args, 
             std_msgs::Bool& msg)
         {
             msg.data = args[1]->BooleanValue();
@@ -58,7 +58,7 @@ namespace common_plugins
     namespace pub_int
     {
         template <class IntType, class RosMessage>
-        extern void afun(const v8::Arguments& args, 
+        extern void afun(const v8::FunctionCallbackInfo<v8::Value>& args, 
             RosMessage& msg)
         {
             msg.data = static_cast<IntType>(args[1]->IntegerValue());
@@ -91,7 +91,7 @@ namespace common_plugins
     namespace pub_float
     {
         template <class FloatType, class RosMessage>
-        extern void afun(const v8::Arguments& args, 
+        extern void afun(const v8::FunctionCallbackInfo<v8::Value>& args, 
             RosMessage& msg)
         {
             msg.data = static_cast<FloatType>(args[1]->NumberValue());
@@ -113,7 +113,7 @@ namespace common_plugins
     /// \brief A basic function to publish strings on topics.
     namespace pub_string
     {
-        extern void afun(const v8::Arguments& args, 
+        extern void afun(const v8::FunctionCallbackInfo<v8::Value>& args, 
             std_msgs::String& msg)
         {
             v8::String::Utf8Value v8_text(args[1]);
@@ -139,7 +139,7 @@ namespace common_plugins
     ///  4: theta angle, (around Z).
     namespace pub_nav_goal
     {
-        extern void afun(const v8::Arguments& args,
+        extern void afun(const v8::FunctionCallbackInfo<v8::Value>& args,
             geometry_msgs::PoseStamped& msg)
         {
             if (args.Length() < 5)
@@ -188,7 +188,7 @@ namespace common_plugins
     ///   nsec: int
     namespace pub_duration
     {
-        extern void afun(const v8::Arguments& args, 
+        extern void afun(const v8::FunctionCallbackInfo<v8::Value>& args, 
             std_msgs::Duration& msg)
         {
             if (args.Length() == 2)

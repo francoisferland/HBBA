@@ -4,20 +4,18 @@
 using namespace script_engine;
 
 namespace {
-	v8::Handle<v8::Value> se_log(const v8::Arguments& args)
+	void se_log(const v8::FunctionCallbackInfo<v8::Value>& args)
 	{
 		v8::String::Utf8Value v(args[0]);
 		const char* val = *v;
 		ROS_INFO("se_log: %s", val);
-		return v8::True();
 	}
 
-	v8::Handle<v8::Value> se_error(const v8::Arguments& args)
+	void se_error(const v8::FunctionCallbackInfo<v8::Value>& args)
 	{
 		v8::String::Utf8Value v(args[0]);
 		const char* val = *v;
 		ROS_ERROR("se_error: %s", val);
-		return v8::True();
 	}
 }
 

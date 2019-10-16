@@ -19,7 +19,7 @@ namespace common_plugins
     namespace eval
     {
 
-        void afun(const v8::Arguments& args, 
+        void afun(const v8::FunctionCallbackInfo<v8::Value>& args, 
             hbba_msgs::EvalScript::Request& req)
         {
             v8::String::Utf8Value v8_source(args[1]);
@@ -44,7 +44,7 @@ namespace common_plugins
     namespace empty
     {
 
-        void afun(const v8::Arguments& args, std_srvs::Empty::Request& req)
+        void afun(const v8::FunctionCallbackInfo<v8::Value>& args, std_srvs::Empty::Request& req)
         {
         }
 
@@ -65,7 +65,7 @@ namespace common_plugins
     namespace boolean
     {
 
-        void afun(const v8::Arguments& args, 
+        void afun(const v8::FunctionCallbackInfo<v8::Value>& args, 
 			hbba_msgs::Boolean::Request& req)
         {
             req.boolean = args[1]->BooleanValue();
@@ -90,7 +90,7 @@ namespace common_plugins
     namespace update_rate
     {
 
-        void afun(const v8::Arguments& args, 
+        void afun(const v8::FunctionCallbackInfo<v8::Value>& args, 
             hbba_msgs::UpdateRate::Request& req)
         {
             v8::Number* v = v8::Number::Cast(*args[1]);
@@ -123,7 +123,7 @@ namespace common_plugins
         }
 
     private:
-        static v8::Handle<v8::Value> call(const v8::Arguments& args)
+        static void call(const v8::FunctionCallbackInfo<v8::Value>& args)
         {
             using namespace v8;
 
@@ -131,8 +131,6 @@ namespace common_plugins
 			const char* cmd = *cmd_v;
 
             int r = system(cmd);
-            return Integer::New(r);
-
         }
 
     };

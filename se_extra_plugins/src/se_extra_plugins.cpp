@@ -5,7 +5,7 @@
 
 namespace se_extra_plugins
 {
-    extern void pubFloat64Fun(const v8::Arguments& args,
+    extern void pubFloat64Fun(const v8::FunctionCallbackInfo<v8::Value>& args,
                               std_msgs::Float64&   msg)
     {
         if (args.Length() < 2) {

@@ -1,0 +1,3 @@
+[submodule "hbba_base"]
+	path = hbba_base
+	url = https://github.com/AGuilbault/hbba_base.git

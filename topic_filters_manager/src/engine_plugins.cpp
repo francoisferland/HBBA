@@ -13,33 +13,32 @@ namespace topic_filters_manager
 		virtual void init(v8::Handle<v8::ObjectTemplate>& global)
 		{		
 			using namespace v8;
-			global->Set(v8::String::New("activateFilter"), 
-				v8::FunctionTemplate::New(
+			global->Set(v8::String::NewFromUtf8(Isolate::GetCurrent(),"activateFilter"), 
+				v8::FunctionTemplate::New(Isolate::GetCurrent(),
                     &ScriptEnginePlugins::js_tfmcall<true>));
-			global->Set(v8::String::New("deactivateFilter"), 
-				v8::FunctionTemplate::New(
+			global->Set(v8::String::NewFromUtf8(Isolate::GetCurrent(),"deactivateFilter"), 
+				v8::FunctionTemplate::New(Isolate::GetCurrent(),
                     &ScriptEnginePlugins::js_tfmcall<false>));
-            global->Set(v8::String::New("setDividerRate"),
-                v8::FunctionTemplate::New(
+            global->Set(v8::String::NewFromUtf8(Isolate::GetCurrent(),"setDividerRate"),
+                v8::FunctionTemplate::New(Isolate::GetCurrent(),
                     &ScriptEnginePlugins::js_ratecall));
-            global->Set(v8::String::New("setGenericDividerRate"),
-                        v8::FunctionTemplate::New(
+            global->Set(v8::String::NewFromUtf8(Isolate::GetCurrent(),"setGenericDividerRate"),
+                        v8::FunctionTemplate::New(Isolate::GetCurrent(),
                             &ScriptEnginePlugins::js_gdratecall));
 		}
 
 	private:
 		template <const bool State>
-		static v8::Handle<v8::Value> js_tfmcall(const v8::Arguments& args)
+		static void js_tfmcall(const v8::FunctionCallbackInfo<v8::Value>& args)
 		{	
 			v8::String::Utf8Value nv(args[0]);
 			const char* name = *nv;
 			topic_filters::SetState req;
 			req.request.state = State;
 			tfm_.call_filter<topic_filters::SetState>(name, req);
-			return v8::Undefined();
 		}
 
-        static v8::Handle<v8::Value> js_ratecall(const v8::Arguments& args)
+        static void js_ratecall(const v8::FunctionCallbackInfo<v8::Value>& args)
         {
             v8::String::Utf8Value nv(args[0]);
             const char* name = *nv;
@@ -50,11 +49,9 @@ namespace topic_filters_manager
             topic_filters::SetDividerRate req;
             req.request.divider = rate;
             tfm_.call_filter(name, req);
-
-            return v8::Undefined();
         }
 
-        static v8::Handle<v8::Value> js_gdratecall(const v8::Arguments& args)
+        static void js_gdratecall(const v8::FunctionCallbackInfo<v8::Value>& args)
         {
             v8::String::Utf8Value nv(args[0]);
             const char* name = *nv;
@@ -63,8 +60,6 @@ namespace topic_filters_manager
             int rate = v->Value();
 
             gdm_.setRate(name, rate);
-
-            return v8::Undefined();
         }
 
 		typedef topic_filters_manager::manager               manager_t;

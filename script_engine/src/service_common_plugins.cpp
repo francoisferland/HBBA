@@ -29,7 +29,7 @@ namespace common_plugins
         v8::Handle<v8::Value> rfun(
             const hbba_msgs::EvalScript::Response& res)
         {
-            return v8::True();
+            return v8::True(v8::Isolate::GetCurrent());
         }
 
         const extern char call_eval_str[] = "call_eval";
@@ -50,7 +50,7 @@ namespace common_plugins
 
         v8::Handle<v8::Value> rfun(const std_srvs::Empty::Response& res)
         {
-            return v8::True();
+            return v8::True(v8::Isolate::GetCurrent());
         }
 
         const extern char call_empty_str[] = "call_empty";
@@ -74,7 +74,7 @@ namespace common_plugins
         v8::Handle<v8::Value> rfun(
 		const hbba_msgs::Boolean::Response& res)
         {
-            return v8::True();
+            return v8::True(v8::Isolate::GetCurrent());
         }
 
         const extern char call_boolean_str[] = "call_boolean";
@@ -100,7 +100,7 @@ namespace common_plugins
         v8::Handle<v8::Value> rfun(
             const hbba_msgs::UpdateRate::Response& res)
         {
-            return v8::True();
+            return v8::True(v8::Isolate::GetCurrent());
         }
 
         const extern char call_update_rate_str[] = "call_update_rate";
@@ -118,8 +118,8 @@ namespace common_plugins
         void init(v8::Handle<v8::ObjectTemplate>& global)
         {
             using namespace v8;
-            global->Set(String::New("sys"),
-                FunctionTemplate::New(SysCall::call));
+            global->Set(String::NewFromUtf8(v8::Isolate::GetCurrent(),"sys"),
+                FunctionTemplate::New(v8::Isolate::GetCurrent(),SysCall::call));
         }
 
     private:
@@ -131,6 +131,7 @@ namespace common_plugins
 			const char* cmd = *cmd_v;
 
             int r = system(cmd);
+	    args.GetReturnValue().Set(Integer::New(Isolate::GetCurrent(),r));
         }
 
     };

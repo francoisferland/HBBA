@@ -6,22 +6,27 @@ using namespace script_engine;
 namespace {
 	void se_log(const v8::FunctionCallbackInfo<v8::Value>& args)
 	{
+		v8::Isolate* isolate = args.GetIsolate();
 		v8::String::Utf8Value v(args[0]);
 		const char* val = *v;
 		ROS_INFO("se_log: %s", val);
+		args.GetReturnValue().Set(v8::True(isolate));
 	}
 
 	void se_error(const v8::FunctionCallbackInfo<v8::Value>& args)
 	{
+		v8::Isolate* isolate = args.GetIsolate();
 		v8::String::Utf8Value v(args[0]);
 		const char* val = *v;
 		ROS_ERROR("se_error: %s", val);
+		args.GetReturnValue().Set(v8::True(isolate));
 	}
 }
 
 engine_v8::engine_v8():
 //	global_(v8::ObjectTemplate::New()),
 //	context_(v8::Context::New(NULL, global_)),
+	scope_(v8::Isolate::GetCurrent()),
 	module_loader_(new module_loader_t("script_engine_plugins",
 		"script_engine_plugins::engine_module"))
 {
@@ -39,12 +44,12 @@ engine_v8::engine_v8():
 		&engine_v8::run_srv, this);
 
 	global_ = v8::ObjectTemplate::New();
-		
+
 	// Log functions.
-	global_->Set(v8::String::New("se_log"),
-		v8::FunctionTemplate::New(se_log));
-	global_->Set(v8::String::New("se_error"),
-		v8::FunctionTemplate::New(se_error));
+	global_->Set(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),"se_log"),
+		v8::FunctionTemplate::New(v8::Isolate::GetCurrent(),se_log));
+	global_->Set(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),"se_error"),
+		v8::FunctionTemplate::New(v8::Isolate::GetCurrent(),se_error));
 
 	// Load plugins.
 	std::vector<std::string> classes = module_loader_->getDeclaredClasses();
@@ -65,8 +70,7 @@ engine_v8::engine_v8():
 		}
 	}
 
-	context_ = v8::Context::New(NULL, global_);
-	
+	context_ = v8::Context::New(v8::Isolate::GetCurrent(),NULL, global_);	
 }
 
 engine_v8::~engine_v8()
@@ -81,7 +85,7 @@ bool engine_v8::eval(const std::string& src, std::string& result)
 	ROS_DEBUG("eval(\"%s\") ...", src.c_str());
 	using namespace v8;
 	Context::Scope context_scope(context_);
-	Handle<String> str = String::New(src.c_str());
+	Handle<String> str = String::NewFromUtf8(v8::Isolate::GetCurrent(),src.c_str());
 
     Handle<Script> script;
     {
@@ -89,10 +93,10 @@ bool engine_v8::eval(const std::string& src, std::string& result)
         script = Script::Compile(str);
         if (tc.HasCaught())
         {
-            result = *String::AsciiValue(tc.Message()->Get());
+            result = *String::Utf8Value(tc.Message()->Get());
             ROS_ERROR("V8 compile error: %s: %s \n when running: \n\t%s",
                 result.c_str(),
-                *String::AsciiValue(tc.Message()->GetSourceLine()),
+                *String::Utf8Value(tc.Message()->GetSourceLine()),
                 src.c_str());
             return false;
         }
@@ -126,7 +130,7 @@ bool engine_v8::compile(const std::string& name, const std::string& src)
 {
 	using namespace v8;
 	Context::Scope context_scope(context_);
-	scripts_map_[name] = Script::Compile(String::New(src.c_str()));
+	scripts_map_[name] = Script::Compile(String::NewFromUtf8(v8::Isolate::GetCurrent(),src.c_str()));
 
 	return true;
 }
@@ -161,7 +165,7 @@ bool engine_v8::run_script(const v8::Handle<v8::Script>& s, std::string& result)
 	if (v.IsEmpty())
 	{
 		Handle<Value> exception = tc.Exception();
-		String::AsciiValue e_str(exception);
+		String::Utf8Value e_str(exception);
 		ROS_ERROR("Exception: %s", *e_str);
 		return false;
 	}

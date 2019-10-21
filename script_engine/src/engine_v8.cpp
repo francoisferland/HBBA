@@ -130,7 +130,8 @@ bool engine_v8::compile(const std::string& name, const std::string& src)
 {
 	using namespace v8;
 	Context::Scope context_scope(context_);
-	scripts_map_[name] = Script::Compile(String::NewFromUtf8(v8::Isolate::GetCurrent(),src.c_str()));
+	Handle<String> source = String::NewFromUtf8(v8::Isolate::GetCurrent(),src.c_str());
+	scripts_map_[name] = Script::Compile(source);
 
 	return true;
 }

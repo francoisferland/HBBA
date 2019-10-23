@@ -10,20 +10,20 @@ namespace topic_filters_manager
 	class ScriptEnginePlugins: public script_engine_plugins::engine_module
 	{
 	public:
-		virtual void init(v8::Handle<v8::ObjectTemplate>& global)
+		virtual void init(v8::Isolate* isolate, v8::Handle<v8::ObjectTemplate>& global)
 		{		
 			using namespace v8;
-			global->Set(v8::String::NewFromUtf8(Isolate::GetCurrent(),"activateFilter"), 
-				v8::FunctionTemplate::New(Isolate::GetCurrent(),
+			global->Set(v8::String::NewFromUtf8(isolate,"activateFilter"), 
+				v8::FunctionTemplate::New(isolate,
                     &ScriptEnginePlugins::js_tfmcall<true>));
-			global->Set(v8::String::NewFromUtf8(Isolate::GetCurrent(),"deactivateFilter"), 
-				v8::FunctionTemplate::New(Isolate::GetCurrent(),
+			global->Set(v8::String::NewFromUtf8(isolate,"deactivateFilter"), 
+				v8::FunctionTemplate::New(isolate,
                     &ScriptEnginePlugins::js_tfmcall<false>));
-            global->Set(v8::String::NewFromUtf8(Isolate::GetCurrent(),"setDividerRate"),
-                v8::FunctionTemplate::New(Isolate::GetCurrent(),
+            global->Set(v8::String::NewFromUtf8(isolate,"setDividerRate"),
+                v8::FunctionTemplate::New(isolate,
                     &ScriptEnginePlugins::js_ratecall));
-            global->Set(v8::String::NewFromUtf8(Isolate::GetCurrent(),"setGenericDividerRate"),
-                        v8::FunctionTemplate::New(Isolate::GetCurrent(),
+            global->Set(v8::String::NewFromUtf8(isolate,"setGenericDividerRate"),
+                        v8::FunctionTemplate::New(isolate,
                             &ScriptEnginePlugins::js_gdratecall));
 		}
 

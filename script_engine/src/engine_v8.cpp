@@ -64,6 +64,7 @@ engine_v8::engine_v8():
 		{
             ROS_INFO("Loading script engine plugin %s...", i->c_str());
 			engine_module* m = module_loader_->createUnmanagedInstance(*i);
+			ROS_WARN("HELLO THERE");
 			m->init(isolate, global_);
 			modules_list_.push_back(m);
 		}
@@ -73,9 +74,9 @@ engine_v8::engine_v8():
 				e.what());
 		}
 	}
-
-	context_ = v8::Context::New(isolate,NULL, global_);	
+	context_ = v8::Context::New(isolate,NULL, global_);
 	ROS_WARN("ALLO");
+	v8::Context::Scope context_scope(context_);
 }
 
 engine_v8::~engine_v8()

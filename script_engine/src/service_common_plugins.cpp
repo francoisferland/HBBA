@@ -27,9 +27,9 @@ namespace common_plugins
         }
 
         v8::Handle<v8::Value> rfun(
-            const hbba_msgs::EvalScript::Response& res)
+            const hbba_msgs::EvalScript::Response& res, v8::Isolate* isolate)
         {
-            return v8::True(v8::Isolate::GetCurrent());
+            return v8::True(isolate);
         }
 
         const extern char call_eval_str[] = "call_eval";
@@ -48,9 +48,9 @@ namespace common_plugins
         {
         }
 
-        v8::Handle<v8::Value> rfun(const std_srvs::Empty::Response& res)
+        v8::Handle<v8::Value> rfun(const std_srvs::Empty::Response& res, v8::Isolate* isolate)
         {
-            return v8::True(v8::Isolate::GetCurrent());
+            return v8::True(isolate);
         }
 
         const extern char call_empty_str[] = "call_empty";
@@ -72,9 +72,9 @@ namespace common_plugins
         }
 
         v8::Handle<v8::Value> rfun(
-		const hbba_msgs::Boolean::Response& res)
+		const hbba_msgs::Boolean::Response& res, v8::Isolate* isolate)
         {
-            return v8::True(v8::Isolate::GetCurrent());
+            return v8::True(isolate);
         }
 
         const extern char call_boolean_str[] = "call_boolean";
@@ -98,9 +98,9 @@ namespace common_plugins
         }
 
         v8::Handle<v8::Value> rfun(
-            const hbba_msgs::UpdateRate::Response& res)
+            const hbba_msgs::UpdateRate::Response& res, v8::Isolate* isolate)
         {
-            return v8::True(v8::Isolate::GetCurrent());
+            return v8::True(isolate);
         }
 
         const extern char call_update_rate_str[] = "call_update_rate";
@@ -115,11 +115,12 @@ namespace common_plugins
     class SysCall: public script_engine_plugins::engine_module
     {
     public:
-        void init(v8::Handle<v8::ObjectTemplate>& global)
+        void init(v8::Isolate* isolate, v8::Handle<v8::ObjectTemplate>& global)
         {
             using namespace v8;
-            global->Set(String::NewFromUtf8(v8::Isolate::GetCurrent(),"sys"),
-                FunctionTemplate::New(v8::Isolate::GetCurrent(),SysCall::call));
+	    v8::HandleScope handle_scope(isolate);
+            global->Set(String::NewFromUtf8(isolate,"sys"),
+                FunctionTemplate::New(isolate,SysCall::call));
         }
 
     private:
@@ -131,7 +132,7 @@ namespace common_plugins
 			const char* cmd = *cmd_v;
 
             int r = system(cmd);
-	    args.GetReturnValue().Set(Integer::New(Isolate::GetCurrent(),r));
+	    args.GetReturnValue().Set(Integer::New(args.GetIsolate(),r));
         }
 
     };

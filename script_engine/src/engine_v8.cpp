@@ -62,7 +62,6 @@ engine_v8::engine_v8():
 		{
             ROS_INFO("Loading script engine plugin %s...", i->c_str());
 			engine_module* m = module_loader_->createUnmanagedInstance(*i);
-			ROS_WARN("HELLO THERE");
 			m->init(isolate_, global_);
 			modules_list_.push_back(m);
 		}
@@ -72,7 +71,10 @@ engine_v8::engine_v8():
 				e.what());
 		}
 	}
+	context_ = v8::Context::New(isolate_, NULL, global_);
+	v8::Persistent<v8::Context> persistent_context_(isolate_, context_);
 }
+
 
 engine_v8::~engine_v8()
 {
@@ -86,6 +88,7 @@ bool engine_v8::eval(const std::string& src, std::string& result)
 {
 	ROS_DEBUG("eval(\"%s\") ...", src.c_str());
 	using namespace v8;
+	v8::Context::Scope context_scope_(context_);
 	Handle<String> str = String::NewFromUtf8(isolate_, src.c_str());
 
     Handle<Script> script;

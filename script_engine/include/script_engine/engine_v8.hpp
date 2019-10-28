@@ -52,11 +52,13 @@ namespace script_engine
                      hbba_msgs::RunScript::Response&);
 		bool run_script(const v8::Handle<v8::Script>& s, std::string& result);
 
-                v8::Isolate* isolate;
-                //v8::Isolate::Scope isolate_scope(v8::Isolate*);
-		//v8::HandleScope scope_(v8::Isolate*);
+        v8::Isolate* isolate_;
+        v8::Isolate::Scope isolate_scope_;
+		v8::HandleScope scope_;
+        v8::HandleScope handle_scope_;
 		v8::Handle<v8::ObjectTemplate> global_;
-		v8::Handle<v8::Context> context_;
+		v8::Local<v8::Context> context_;
+        v8::Context::Scope context_scope_;
 
 		typedef std::vector<engine_module*> modules_list_t;
 		modules_list_t modules_list_;

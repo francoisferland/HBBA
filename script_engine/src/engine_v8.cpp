@@ -24,10 +24,13 @@ namespace {
 }
 
 engine_v8::engine_v8():
-//	global_(v8::ObjectTemplate::New()),
-//	context_(v8::Context::New(NULL, global_)),
-//	scope_(v8::Isolate::GetCurrent()),
-	isolate(v8::Isolate::New()),
+	isolate_(v8::Isolate::New()),
+    isolate_scope_(isolate_),
+    scope_(isolate_),
+    handle_scope_(isolate_),
+    global_(v8::ObjectTemplate::New(isolate_)),
+    context_(v8::Context::New(isolate_, NULL, global_)),
+    context_scope_(context_),
 	module_loader_(new module_loader_t("script_engine_plugins",
 		"script_engine_plugins::engine_module"))
 {
@@ -44,16 +47,11 @@ engine_v8::engine_v8():
 	srv_run_script_ = n.advertiseService("run_script",
 		&engine_v8::run_srv, this);
 
-        //isolate = v8::Isolate::New();
-	v8::Isolate::Scope isolate_scope(isolate);
-	v8::HandleScope handle_scope(isolate);
-        global_ = v8::ObjectTemplate::New(isolate);
-
 	// Log functions.
-	global_->Set(v8::String::NewFromUtf8(isolate,"se_log"),
-		v8::FunctionTemplate::New(isolate,se_log));
-	global_->Set(v8::String::NewFromUtf8(isolate,"se_error"),
-		v8::FunctionTemplate::New(isolate,se_error));
+	global_->Set(v8::String::NewFromUtf8(isolate_, "se_log"),
+		v8::FunctionTemplate::New(isolate_, se_log));
+	global_->Set(v8::String::NewFromUtf8(isolate_, "se_error"),
+		v8::FunctionTemplate::New(isolate_, se_error));
 
 	// Load plugins.
 	std::vector<std::string> classes = module_loader_->getDeclaredClasses();
@@ -65,7 +63,7 @@ engine_v8::engine_v8():
             ROS_INFO("Loading script engine plugin %s...", i->c_str());
 			engine_module* m = module_loader_->createUnmanagedInstance(*i);
 			ROS_WARN("HELLO THERE");
-			m->init(isolate, global_);
+			m->init(isolate_, global_);
 			modules_list_.push_back(m);
 		}
 		catch (pluginlib::LibraryLoadException e)
@@ -74,9 +72,6 @@ engine_v8::engine_v8():
 				e.what());
 		}
 	}
-	context_ = v8::Context::New(isolate,NULL, global_);
-	ROS_WARN("ALLO");
-	v8::Context::Scope context_scope(context_);
 }
 
 engine_v8::~engine_v8()
@@ -91,8 +86,7 @@ bool engine_v8::eval(const std::string& src, std::string& result)
 {
 	ROS_DEBUG("eval(\"%s\") ...", src.c_str());
 	using namespace v8;
-	Context::Scope context_scope(context_);
-	Handle<String> str = String::NewFromUtf8(context_->GetIsolate(),src.c_str());
+	Handle<String> str = String::NewFromUtf8(isolate_, src.c_str());
 
     Handle<Script> script;
     {

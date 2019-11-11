@@ -4,7 +4,7 @@
 
 using namespace iw_translator;
 
-namespace 
+namespace
 {
     // Use an empty string for unknown/unmatched desires and other tests:
     static const std::string EMPTY("");
@@ -36,7 +36,7 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
         ROS_ERROR(
             "No strategies defined for IWTranslator, will not be initialized.");
         return;
-    } 
+    }
     XmlRpc::XmlRpcValue strats_def;
     np.getParam("strategies", strats_def);
     if (!StrategyParser::parseArray(strats_def, strats_)) {
@@ -60,9 +60,9 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
     solver_model_.reset(new SolverModel(strats_, res_caps));
 
     sub_desires_ = n.subscribe(
-        "desires_set", 
-        10, 
-        &IWTranslator::desiresCB, 
+        "desires_set",
+        10,
+        &IWTranslator::desiresCB,
         this);
 
     pub_intention_ = n.advertise<hbba_msgs::Intention>(
@@ -78,7 +78,7 @@ IWTranslator::IWTranslator(ros::NodeHandle& n, ros::NodeHandle& np)
     // We set the last activation state to all off, since we can assume that
     // strategies at initialization are already in a "off" state.
     last_a_ = std::vector<unsigned char>(strats_.size(), 0);
-    last_p_ = std::vector<std::string>(strats_.size(), std::string("")); 
+    last_p_ = std::vector<std::string>(strats_.size(), std::string(""));
 
     std::string custom_script;
     np.param("custom_script", custom_script, std::string(""));
@@ -119,8 +119,8 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
             const hbba_msgs::Strategy& strat = strats_[i];
 
             ROS_DEBUG(
-                "Strategy %s activation: %s", 
-                strats_[i].id.c_str(), 
+                "Strategy %s activation: %s",
+                strats_[i].id.c_str(),
                 a[i] ? "true":"false");
 
             if (a[i]) {
@@ -128,7 +128,7 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
             }
 
             const std::string&         strat_id   = strat.id;
-            const hbba_msgs::Desire*   desire     = a[i] ? 
+            const hbba_msgs::Desire*   desire     = a[i] ?
                                                     desireFromType(
                                                         *msg,
                                                         strat.utility.id)
@@ -136,12 +136,12 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
             const std::string&         des_type   = a[i] ?
                                                     strats_[i].utility.id
                                                   : EMPTY;
-            const std::string&         des_id     = a[i] && desire ? 
+            const std::string&         des_id     = a[i] && desire ?
                                                     desire->id
                                                   : EMPTY;
             const std::string&         des_params = a[i] && desire ?
                                                     desire->params
-                                                  : EMPTY;        
+                                                  : EMPTY;
             const int                  des_int    = a[i] && desire ?
                                                     desire->intensity
                                                   : -1;
@@ -159,7 +159,7 @@ void IWTranslator::desiresCB(const hbba_msgs::DesiresSet::ConstPtr& msg)
         activateIntention(out);
     };
 
-    // Note that, unlike for intention, we still publish stats even if the 
+    // Note that, unlike for intention, we still publish stats even if the
     // solving process was not successful.
     pub_status_.publish(status);
 }
@@ -200,7 +200,7 @@ void IWTranslator::activateIntention(const hbba_msgs::Intention& intent)
     // NOTE: We assume all strategies are deactivated at startup.
     // Furthermore, always run bdn first, so that a bup won't be cancelled by a
     // bdn in a later call.
-    
+
     assert(intent.enabled.size() == strats_.size());
 
     const std::vector<unsigned char>& a = intent.enabled;
@@ -213,7 +213,7 @@ void IWTranslator::activateIntention(const hbba_msgs::Intention& intent)
             if (a[i] && strat.bringup_function != EMPTY) {
                 ss_bup << strats_[i].bringup_function << "(" << p[i] << ");";
             } else if (strats_[i].bringdown_function != EMPTY) {
-                ss_bdn << strats_[i].bringdown_function << "();";
+                ss_bdn << strats_[i].bringdown_function << "(" << last_p_[i] << ");";
             }
         }
     }

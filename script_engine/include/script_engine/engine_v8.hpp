@@ -58,6 +58,7 @@ namespace script_engine
         v8::HandleScope handle_scope_;
 		v8::Handle<v8::ObjectTemplate> global_;
 		v8::Local<v8::Context> context_;
+		v8::Persistent<v8::Context> persistent_context_;
         v8::Context::Scope context_scope_;
 
 		typedef std::vector<engine_module*> modules_list_t;

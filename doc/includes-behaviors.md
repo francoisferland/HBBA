@@ -6,7 +6,7 @@ Notes:
 - The specified launch file must not contain any remap clauses.
 - The topic name must not contain "/" if the topic is filtered.
 - The arbitration nodes use the priority to select the proper messages. The messages from the highest priority behavior are chosen.
-
+- The parameter 'latched' means the last value filtered will be sent back the next time the topic is accessible. True by default.
 ## Syntax
 ```yaml
   - procmodule:
@@ -23,8 +23,8 @@ Notes:
     input:
       - node_and_global_topic_name
       - node_topic_name: {src: global_topic_name}
-      - node_and_global_topic_name: {filtered: true/false}
-      - node_topic_name: {src: global_topic_name, filtered: true/false}
+      - node_and_global_topic_name: {filtered: true/false, latched: true/false }
+      - node_topic_name: {src: global_topic_name, filtered: true/false, latched: true/false }
       ...
     output:
       - node_and_global_topic_name
@@ -47,6 +47,7 @@ Notes:
 - `input`: string and/or dictionary array (optional)
   - `src`: string (optional)
   - `filtered`: boolean (optional)
+  - `latched`: boolean (optional)
 - `output`: string array (optional)
 - `services`: string array (optional)
 
